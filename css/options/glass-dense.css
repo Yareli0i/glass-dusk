@@ -1,0 +1,5 @@
+/* Скло: щільніше — менше фону, більше контрасту під текстом */
+:root {
+  --gd-glass-fill: linear-gradient(135deg, rgba(20, 24, 38, .74), rgba(9, 11, 20, .66)) !important;
+  --gd-blur: 30px !important;
+}

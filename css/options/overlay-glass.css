@@ -1,0 +1,67 @@
+/* ╔═══════════════════════════════════════════════════════════════════════════╗
+   ║  Glass Dusk — overlay panels and toolbar (switch «Панелі оверлея → Скло») ║
+   ║                                                                           ║
+   ║  The panels (Огляд гри, друзі, браузер…) are separate untitled windows     ║
+   ║  with body.OverlayPopupBody, so this file rides on ".*" and scopes itself  ║
+   ║  by class. The toolbar lives in the overlay window itself (html.gd-overlay ║
+   ║  comes from js/dusk.js).                                                  ║
+   ║                                                                           ║
+   ║  The game is composited outside these pages: backdrop-filter has nothing  ║
+   ║  to blur there. The glass is a denser tint instead, dense enough to read  ║
+   ║  over a bright scene.                                                     ║
+   ╚═══════════════════════════════════════════════════════════════════════════╝ */
+
+/* ── panels: smoked glass, round corners (the recording timeline stays see-through) ── */
+body.OverlayPopupBody {
+  --color-progress-bar-foreground: var(--gd-accent, var(--gd-house, #5e90e4)) !important;
+  --color-progress-bar-background: rgba(255, 255, 255, .1) !important;
+}
+body.OverlayPopupBody .OverlayPopup.PopupFullWindow:not(.OverlayTimeline) {
+  background: linear-gradient(160deg, rgba(16, 18, 30, .88), rgba(8, 10, 18, .92)) !important;
+  border: 1px solid rgba(255, 255, 255, .11) !important;
+  border-radius: 22px !important;
+  box-shadow: none !important;
+  overflow: hidden;
+}
+/* inside the frame Steam lays its own opaque slate gradient, and a teal strip over the title */
+body.OverlayPopupBody .GameOverview { background: transparent !important; }
+body.OverlayPopupBody .title-area-highlight { background: transparent !important; }
+body.OverlayPopupBody .WindowControls button,
+body.OverlayPopupBody .WindowControls > div { border-radius: 50% !important; }
+body.OverlayPopupBody .GameOverviewSection.HasBackground {
+  background: rgba(255, 255, 255, .04) !important;
+  border-radius: 16px !important;
+  overflow: hidden;
+}
+/* section headers were slate plates (#3d4450): now quiet labels */
+body.OverlayPopupBody .GameOverviewSectionHeader { background: transparent !important; }
+body.OverlayPopupBody .GameOverviewSectionTitle { color: rgba(255, 255, 255, .5) !important; letter-spacing: .08em; }
+body.OverlayPopupBody .GuideListItem,
+body.OverlayPopupBody .RecentNewsItem {
+  background: rgba(255, 255, 255, .045) !important;
+  border-radius: 10px !important;
+  margin-bottom: 4px;
+}
+body.OverlayPopupBody .GuideListItem:hover,
+body.OverlayPopupBody .RecentNewsItem:hover { background: rgba(255, 255, 255, .09) !important; }
+body.OverlayPopupBody .RecentAchievement img,
+body.OverlayPopupBody .ScreenshotsList img,
+body.OverlayPopupBody .Screenshot img { border-radius: 10px !important; }
+
+/* ── the toolbar: a floating pill, the open panel in the accent ── */
+html.gd-overlay .Toolbar {
+  background: rgba(12, 14, 24, .76) !important;
+  border: 1px solid rgba(255, 255, 255, .12) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 20px 50px -20px rgba(0, 0, 0, .7) !important;
+}
+html.gd-overlay .Toolbar .ToolbarButton { border-radius: 999px !important; transition: background .15s ease, color .15s ease; }
+html.gd-overlay .Toolbar .ToolbarButton:hover { background: rgba(255, 255, 255, .09) !important; }
+/* a darker cut of the accent: the overlay comes out brighter on screen than its CSS,
+   and a light fill lost the white icon */
+html.gd-overlay .Toolbar .Toggled {
+  background: color-mix(in srgb, var(--gd-accent, var(--gd-house, #5e90e4)) 72%, #000) !important;
+  color: #fff !important;
+  border-radius: 999px !important;
+  box-shadow: 0 8px 22px -8px var(--gd-accent, var(--gd-house, #5e90e4)) !important;
+}

@@ -1,0 +1,748 @@
+/* ╔═══════════════════════════════════════════════════════════════════════════╗
+   ║  Glass Dusk — Steam client window                                         ║
+   ║                                                                           ║
+   ║  The art of the game you have open fills the window, blurred back into a   ║
+   ║  ground; the library sits on two panes of smoked glass over it and the     ║
+   ║  accent is picked out of that art.                                         ║
+   ║                                                                           ║
+   ║  Two rules, learned the hard way:                                          ║
+   ║   · PAINT, DON'T RESIZE — Steam measures its own layouts (and its popup     ║
+   ║     windows) before the theme lands, so the font and the metrics stay as    ║
+   ║     Steam made them except where the theme owns the whole element.          ║
+   ║   · ONE PANE OF GLASS — blur belongs to the two library panels only.        ║
+   ║     Nested frosted boxes stack into a milky haze over the content.          ║
+   ╚═══════════════════════════════════════════════════════════════════════════╝ */
+
+@font-face {
+  font-family: 'GlassDuskNum';
+  src: url('https://millennium.host/v1/themes/GlassDusk/assets/JetBrainsMono-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-display: swap;
+}
+
+:root {
+  --gd-num: 'GlassDuskNum', 'JetBrains Mono', Consolas, monospace;
+
+  --gd-house: #5e90e4;              /* used until a game lends its colour */
+  --gd-accent-ink: #fff;
+  --gd-ink: #ffffff;
+  --gd-ink-soft: rgba(255, 255, 255, .72);
+  --gd-ink-faint: rgba(255, 255, 255, .46);
+
+  --gd-glass-fill: linear-gradient(150deg, rgba(12, 13, 19, .62), rgba(8, 9, 14, .54));
+  --gd-glass-edge: 1px solid rgba(255, 255, 255, .1);
+  --gd-glass-shadow: 0 40px 90px -30px rgba(0, 0, 0, .75), inset 0 1px 0 rgba(255, 255, 255, .08);
+  --gd-blur: 30px;
+
+  --gd-card-fill: rgba(8, 9, 14, .66);     /* the play bar — flat, no blur */
+  --gd-soft: rgba(255, 255, 255, .05);     /* the lightest surface used inside the glass */
+  --gd-hover: rgba(255, 255, 255, .08);
+  --gd-field: rgba(255, 255, 255, .08);
+  --gd-line: rgba(255, 255, 255, .08);
+
+  --gd-r-xl: 24px;
+  --gd-r-lg: 16px;
+  --gd-r-md: 12px;
+  --gd-r-sm: 8px;
+
+  --gd-meadow: url('https://millennium.host/v1/themes/GlassDusk/assets/meadow.jpg');
+}
+
+/* Steam's own face stays — it is what every popup window is measured with.
+   The heavy mono is only for numbers the theme draws itself. */
+.gd-num,
+.gd-stats b {
+  font-family: var(--gd-num) !important;
+  font-weight: 800 !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.02em;
+}
+
+/* ═══════════════ the ground ═══════════════ */
+
+#gd-art {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: center / cover no-repeat;
+  filter: blur(60px) saturate(1.5) brightness(.46);
+  transform: scale(1.25) translateZ(0);
+  will-change: opacity;
+  opacity: 0;
+  transition: opacity .28s ease-out;
+}
+#gd-art.on { opacity: 1; }
+
+body.DesktopUI::before,
+body.DesktopUI::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+body.DesktopUI::before {
+  background:
+    radial-gradient(120% 90% at 50% 0%, #18203c, transparent 70%),
+    linear-gradient(180deg, #0d1018, #080a11 60%, #05060b);
+}
+body.DesktopUI::after {
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(0, 0, 0, .32), transparent 72%),
+    linear-gradient(180deg, rgba(0, 0, 0, .3), rgba(0, 0, 0, .06) 40%, rgba(0, 0, 0, .46));
+}
+
+/* everything Steam paints opaque steps aside — including the panels it nests
+   inside the library, so the glass stays a single surface */
+body.DesktopUI,
+#popup_target,
+.FocusNavigationRoot,
+.Wrapper,
+.ForceOpaqueBackground,
+.OuterFrame,
+.TopBar,
+.TitleBar,
+.SuperNavBar,
+.ContentFrame,
+.LocalContentContainer,
+.Library,
+[class*=LibraryDisplaySize],
+.LeftListSizableContainer,
+.LeftListSizableContainer .Container,
+.MainPanel,
+.AppDetailsTransitionGroup,
+.AppDetailsMain,
+.AppDetailsMain > .Container,
+.AppDetailsMain .Body.InnerContainer,
+.AppDetailsOverviewPanel,
+.AppDetailsOverviewPanel > .Container,
+.AppDetailsSection,
+.AppDetailsSection.Panel,
+.AppDetailsSectionContainer.Panel,
+.ActivityFeedContainer .Panel,
+.LibraryHome,
+.LibraryHome .Container.Panel,
+.Showcase,
+.ShowcaseOuter,
+.GameStat,
+.GameStat.Panel,
+.PlayBar,
+.PlayBar.Glassy,
+.PlayBar .InnerContainer.Panel,
+.Body.ScrollContainer.Glassy,
+.Body.ScrollContainer .InnerContainer.Panel,
+.BottomBarContainer,
+.BottomBar,
+.URLBarReplacement {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+#popup_target { position: relative; z-index: 1; }
+.StickyHeaderShadow,
+.Backdrop { display: none !important; }
+
+/* ═══════════════ title bar ═══════════════ */
+
+.RootMenuButton > div { color: var(--gd-ink-soft) !important; transition: color .15s ease; }
+.RootMenuButton:hover > div { color: var(--gd-ink) !important; }
+.TitleBarControls .Button,
+.AccountMenu { border-radius: 999px !important; transition: background .18s ease; }
+.TitleBarControls .Button:hover,
+.AccountMenu:hover { background: var(--gd-hover) !important; }
+.windowControlButton:hover .title-area-icon-inner { background: var(--gd-hover) !important; }
+.closeButton:hover .title-area-icon-inner { background: #c4384a !important; }
+
+/* ═══════════════ store / library / community ═══════════════ */
+
+/* Steam draws these tabs 101x26 in a 34px strip — too tight to read as pills.
+   The strip gets room and the button becomes the pill itself. */
+.SuperNavBar { height: 44px !important; display: flex !important; align-items: center !important; }
+.SuperNavMenu .MenuButton {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 32px !important;
+  padding: 0 16px !important;
+  color: var(--gd-ink-soft) !important;
+  border-radius: 999px !important;
+  transition: background .18s ease, color .18s ease;
+}
+.SuperNavMenu:hover .MenuButton { color: var(--gd-ink) !important; background: var(--gd-hover) !important; }
+.SuperNavMenu.Selected .MenuButton {
+  background: var(--gd-accent, var(--gd-house)) !important;
+  color: var(--gd-accent-ink) !important;
+  border-bottom: none !important;
+}
+.SuperNavBar .Arrow,
+.SuperNav .Arrow { color: var(--gd-ink-soft) !important; }
+
+/* the web address strip: a thin translucent rail, the URL a quiet pill */
+.URLBar {
+  background: rgba(255, 255, 255, .035) !important;
+  border-bottom: 1px solid var(--gd-line) !important;
+}
+.URLBarText {
+  background: var(--gd-field) !important;
+  border: none !important;
+  border-radius: 999px !important;
+}
+.URLBarText .URL,
+.URLBar .URL { color: var(--gd-ink-soft) !important; }
+.URLBar svg { opacity: .62; }
+.URLBar .Button,
+.URLBar [class*=Button] { border-radius: 999px !important; }
+.URLBar .Button:hover,
+.URLBar [class*=Button]:hover { background: var(--gd-hover) !important; }
+.URLBarReplacement .DialogInput {
+  background: var(--gd-field) !important;
+  border: none !important;
+  border-radius: 999px !important;
+  color: var(--gd-ink) !important;
+}
+
+/* ═══════════════ the two panes of glass ═══════════════ */
+
+.LeftListSizableContainer > .Container,
+.MainPanel > .AppDetailsTransitionGroup {
+  background: var(--gd-glass-fill) !important;
+  -webkit-backdrop-filter: blur(var(--gd-blur)) saturate(1.25) !important;
+  backdrop-filter: blur(var(--gd-blur)) saturate(1.25) !important;
+  border: var(--gd-glass-edge);
+  box-shadow: var(--gd-glass-shadow) !important;
+  border-radius: var(--gd-r-xl);
+  overflow: hidden;
+}
+.LeftListSizableContainer > .Container {
+  width: calc(100% - 20px) !important;
+  height: calc(100% - 20px) !important;
+  margin: 4px 10px 16px 10px;
+}
+.MainPanel > .AppDetailsTransitionGroup {
+  width: calc(100% - 20px) !important;
+  height: calc(100% - 20px) !important;
+  margin: 4px 0 16px 14px;
+}
+[class*=LibraryDisplaySize] { flex-direction: row-reverse !important; }   /* game list on the right */
+.LibraryWindowDivider { background: transparent !important; }
+
+/* ═══════════════ game list ═══════════════ */
+
+.GameListHomeAndSearch { display: flex !important; align-items: center; gap: 8px; }
+.GameListHomeAndSearch .HomeBox { flex: 1 1 auto !important; min-width: 0; }
+.GameListHomeAndSearch .HomeBox .Bar { width: 100% !important; }
+.GameListHomeAndSearch .CollectionsButton { flex: 0 0 auto !important; }
+.HomeBox .Bar,
+.CollectionsButton .CollectionBar,
+.SearchInput .DialogInput,
+.SearchInput .DialogInput_Wrapper.Panel,
+.AdvancedSearchButton {
+  background: var(--gd-field) !important;
+  border: none !important;
+  border-radius: var(--gd-r-md) !important;
+  color: var(--gd-ink) !important;
+}
+.HomeBox .Bar.Selected {
+  background: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 30%, transparent) !important;
+}
+.ViewName { color: var(--gd-ink) !important; }
+.ReactVirtualized__Grid__innerScrollContainer > div .Panel { border-radius: var(--gd-r-sm); }
+.ReactVirtualized__Grid__innerScrollContainer > div .Panel:hover { background: var(--gd-hover) !important; }
+.ReactVirtualized__Grid__innerScrollContainer .Selected {
+  background: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 30%, transparent) !important;
+  border-radius: var(--gd-r-sm) !important;
+}
+
+/* ═══════════════ library home: the header the theme draws itself ═══════════════ */
+
+.gd-home { padding: 6px 4px 10px; color: var(--gd-ink); }
+.gd-top { display: flex; align-items: flex-end; justify-content: space-between; gap: 30px; flex-wrap: wrap; }
+.gd-hello { line-height: 1.05; }
+.gd-hello small { display: block; margin-bottom: 4px; font-size: 21px; font-weight: 600; color: var(--gd-ink-soft); }
+.gd-hello strong { display: block; font-size: 50px; font-weight: 800; letter-spacing: -.5px; text-shadow: 0 2px 24px rgba(0, 0, 0, .5); }
+.gd-stats { display: flex; gap: 34px; padding-bottom: 6px; }
+.gd-stats small {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--gd-ink-faint);
+}
+.gd-stats b { display: block; margin-top: 6px; font-size: 30px; line-height: 1; color: var(--gd-ink); }
+
+.gd-continue {
+  position: relative;
+  margin-top: 20px;
+  height: 268px;
+  border-radius: var(--gd-r-xl);
+  overflow: hidden;
+  box-shadow: 0 26px 60px -26px rgba(0, 0, 0, .85);
+  cursor: pointer;
+}
+.gd-cont-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 28%; }
+.gd-continue::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(6, 8, 14, .9), rgba(6, 8, 14, .35) 55%, transparent 82%);
+}
+.gd-cont-body { position: absolute; left: 34px; top: 30px; bottom: 28px; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; }
+.gd-cont-body > small { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: rgba(255, 255, 255, .75); }
+.gd-cont-logo { margin-top: 14px; max-width: 320px; max-height: 96px; object-fit: contain; object-position: left top; filter: drop-shadow(0 6px 18px rgba(0, 0, 0, .6)); }
+.gd-cont-name { display: none; margin-top: 14px; font-size: 36px; font-weight: 800; color: #fff; }
+.gd-cont-name.on { display: block; }
+.gd-cont-meta { margin-top: auto; margin-bottom: 14px; font-size: 14px; font-weight: 600; color: rgba(255, 255, 255, .82); }
+.gd-play {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 26px 0 20px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--gd-accent, var(--gd-house));
+  color: var(--gd-accent-ink);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter .15s ease, transform .12s ease;
+}
+.gd-play:hover { filter: brightness(1.08); }
+.gd-play:active { transform: scale(.98); }
+
+.gd-label { margin: 24px 0 12px; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--gd-ink-faint); }
+.gd-shelf {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 148px;
+  gap: 14px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 10px;
+}
+.gd-cap { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 0; border: 0; background: none; cursor: pointer; text-align: left; }
+.gd-cap img,
+.gd-cap-text {
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: var(--gd-r-md);
+  transition: transform .2s ease;
+}
+.gd-cap:hover img { transform: translateY(-4px); }
+.gd-cap span { font-size: 12.5px; font-weight: 600; color: var(--gd-ink-soft); }
+.gd-cap-text {
+  display: grid;
+  place-items: center;
+  align-self: start;
+  padding: 10px;
+  background: var(--gd-soft);
+  font-size: 13px;
+  font-weight: 650;
+  text-align: center;
+  color: var(--gd-ink-soft);
+}
+
+/* ═══════════════ game page ═══════════════ */
+
+/* the art fills the top of the pane and fades into it — edge to edge, with the
+   pane's own rounded corners doing the clipping */
+.AppDetailsMain .Header { padding: 0 !important; box-sizing: border-box; }
+
+/* ─── sweep: surfaces the audit found still wearing Steam's palette ─── */
+
+/* the client's own alert strip ("client is up to date", "restart needed") */
+.Alert {
+  background: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 24%, rgba(12, 13, 19, .92)) !important;
+  border-radius: var(--gd-r-md) !important;
+  color: var(--gd-ink) !important;
+}
+/* the round "back to top" button in the game list — the fill sits on the svg */
+.ScrollToTop,
+.ScrollToTop svg,
+svg#arrowBase { background: var(--gd-field) !important; border-radius: 999px !important; }
+.ScrollToTop:hover svg { background: rgba(255, 255, 255, .16) !important; }
+/* Steam's own hairline around the details pane, on top of our glass edge */
+.AppDetailsMain { border: 0 !important; }
+/* blue section heading in the workshop / featured strips */
+.FeaturedItemHeader { color: var(--gd-accent, var(--gd-house)) !important; }
+/* the date badge on shelf tiles */
+.LibraryItemBoxSubscript { background: var(--gd-soft) !important; border-radius: 6px !important; }
+/* trading-card tiles and the news cards in the activity feed */
+.CardContainer { background: var(--gd-soft) !important; border-radius: var(--gd-r-sm) !important; }
+/* Підстрічка ловила й `_Title`, `_Summary`, `_TextColumn` — градієнт лягав
+   під кожен текстовий блок окремо, і текст виглядав виділеним. Лише сама картка. */
+.PartnerEventMediumImage,
+.PartnerEvent {
+  background-image: linear-gradient(100deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .02)) !important;
+  border-radius: var(--gd-r-md) !important;
+}
+/* the "would you recommend this game" prompt */
+.ThumbIcon,
+.ThumbIcon path { fill: var(--gd-accent, var(--gd-house)) !important; }
+.Playtime { color: var(--gd-ink-soft) !important; }
+.Playtime b, .Playtime strong { color: var(--gd-ink) !important; }
+.Header .TopCapsule {
+  border: 0 !important;
+  border-radius: 0 !important;
+  overflow: hidden;
+  position: relative;
+  -webkit-mask-image: linear-gradient(180deg, #000 74%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 74%, transparent 100%);
+}
+/* Steam runs a perspective-parallax zoom on the hero and gives the picture a
+   fixed box shorter than library_hero (1920x620), so the art comes out cut in
+   half. Flattened and put back in the flow, the image sets its own height and
+   the capsule follows it — the whole picture, no crop and no empty band. */
+.Header .TopCapsule .HeaderBackgroundImage,
+.Header .TopCapsule .ImgContainer {
+  transform: none !important;
+  perspective: none !important;
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: auto !important;
+  max-height: none !important;   /* Steam caps this box at 320px — that is the crop */
+}
+.Header .TopCapsule .HeaderBackgroundImage img.ImgSrc {
+  position: relative !important;
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  object-fit: fill !important;
+}
+/* the low-res blur copy stays out of the flow so it cannot set the height */
+.Header .TopCapsule .HeaderBackgroundImage > img.ImgBlur { position: absolute !important; inset: 0 !important; height: 100% !important; }
+.Header .TopCapsule .ImgBlurBackdrop,
+.Header .TopGradient,
+.Header .HeaderFeatures { display: none !important; }
+
+/* the bar under the art: one flat card, everything in it on one line */
+.AppDetailsOverviewPanel .Container.InPage { margin-top: 0 !important; padding: 0 20px; }
+.AppDetailsOverviewPanel .Container.InPage .Row {
+  margin: 0 -20px !important;
+  height: 72px !important;
+  padding: 0 18px !important;
+  gap: 26px;
+  border-radius: var(--gd-r-lg);
+  background: var(--gd-card-fill) !important;
+  display: flex;
+  align-items: center;
+}
+/* Steam stacks these stats in a superimposed grid and swaps them as state
+   changes — any layout of ours tears that apart. Colour only. */
+.PlayBarLabel { color: var(--gd-ink-faint) !important; }
+.PlayBarDetailLabel { color: var(--gd-ink) !important; }
+.PlayBarDetailLabel .DialogButton { background: none !important; color: var(--gd-ink) !important; }
+.GameStatIcon, .GameStatIconForced { opacity: .6; }
+/* Трек і заливка — різні елементи, і трек є прямим дитям `.AchievementProgressRow`.
+   Через це `[class*=AchievementProgress] > div` фарбував саме трек, і при 0/46
+   смуга виглядала повністю заповненою. Тільки точні класи. */
+.DetailsProgressContainer,
+.AchievementProgressContainer {
+  background: rgba(255, 255, 255, .14) !important;
+  border-radius: 999px !important;
+  overflow: hidden;
+}
+.DetailsProgressBar,
+.AchievementProgress { background: var(--gd-accent, var(--gd-house)) !important; }
+.AchievementProgressRow { background: transparent !important; }
+.PlayBarDetailLabel.AchievementCountLabel { background: none !important; }
+
+.PlayButtonContainer.Green,
+.PlayButtonContainer.Green .PlayButton {
+  background: var(--gd-accent, var(--gd-house)) !important;
+  border-radius: 999px !important;
+  color: var(--gd-accent-ink) !important;
+}
+.PlayButtonContainer.Green { overflow: hidden; }
+/* Only the resting bar gets the tall pill. Steam compacts this button in the
+   sticky strip and in narrow windows, and a fixed height there spills out of it. */
+.AppDetailsOverviewPanel .Container.InPage .PlayButtonContainer.Green,
+.AppDetailsOverviewPanel .Container.InPage .PlayButtonContainer.Green .PlayButton,
+.AppDetailsOverviewPanel .Container.InPage .PlayButtonContainer.Green .StreamingSelector { height: 48px !important; }
+.PlayButtonContainer.Green:hover { filter: brightness(1.08); }
+.PlayButton .ButtonText { color: var(--gd-accent-ink) !important; font-weight: 700 !important; }
+.PlayButton svg,
+.PlayButton .SVGIcon_Play path { fill: var(--gd-accent-ink) !important; color: var(--gd-accent-ink) !important; }
+.PlayButtonContainer.Green .StreamingSelector {
+  background: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 74%, #000) !important;
+  border-radius: 0 999px 999px 0 !important;
+}
+.PlayButtonContainer.Green .StreamingSelector svg,
+.PlayButtonContainer.Green .StreamingSelector polygon { fill: var(--gd-accent-ink) !important; }
+.AppButtonsContainer .MenuButton { border-radius: 999px !important; }
+.AppButtonsContainer .MenuButton:hover { background: var(--gd-hover) !important; }
+
+/* The bar that sticks to the top while scrolling. It is `.PlayBar.Container`,
+   not `.StickyHeader`, and it must be opaque or the feed shows through it; its
+   top corners follow the pane, otherwise a square edge cuts across the curve.
+   At rest the whole thing sits at opacity 0, so painting it is safe. */
+.AppDetailsMain > .PlayBar.Container {
+  background: linear-gradient(180deg, rgba(12, 13, 19, .97), rgba(12, 13, 19, .9)) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid var(--gd-line);
+  border-radius: var(--gd-r-xl) var(--gd-r-xl) 0 0 !important;
+  overflow: hidden;
+}
+.AppDetailsMain > .PlayBar.Container .Row,
+.AppDetailsMain > .PlayBar.Container .PlayBar.Glassy { background: transparent !important; }
+
+/* page links become chips — Steam draws them as bare text in a block row */
+.LinksSection.Panel { padding: 4px 10px !important; }
+.LinksSection .Links.Panel { display: flex !important; flex-wrap: wrap; gap: 8px; }
+.LinksSection .LinkInner {
+  padding: 6px 16px !important;
+  border-radius: 999px !important;
+  background: var(--gd-soft) !important;
+  color: var(--gd-ink-soft) !important;
+  white-space: nowrap;
+  transition: background .15s ease, color .15s ease;
+}
+.LinksSection .LinkInner:hover { background: var(--gd-hover) !important; color: var(--gd-ink) !important; }
+.LinksSection a,
+.LinksSection .AppDetailsButton,
+.LinksSection .DialogButton {
+  border-radius: 999px !important;
+  background: var(--gd-field) !important;
+  color: var(--gd-ink-soft) !important;
+  transition: background .15s ease, color .15s ease;
+}
+.LinksSection a:hover,
+.LinksSection .DialogButton:hover { background: rgba(255, 255, 255, .16) !important; color: var(--gd-ink) !important; }
+
+/* content sections: no boxes inside the glass, just headers and spacing */
+.SectionHeader {
+  color: var(--gd-ink-faint) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase;
+}
+.AppDetailsMain .AppDetailsSection > .SectionHeader { margin: 0 10px !important; }
+
+/* the activity feed: separators instead of stacked cards */
+.ActivityFeedContainer .AppActivityDay { border-top: 1px solid var(--gd-line); padding-top: 8px; }
+.ActivityFeedContainer .AppActivityDay:first-child { border-top: 0; }
+.PostTextEntryArea,
+.chatSubmitButton,
+.EmoticonButton {
+  background: var(--gd-field) !important;
+  border: none !important;
+  border-radius: var(--gd-r-md) !important;
+  color: var(--gd-ink) !important;
+}
+.PartnerEventFeaturedHeader {
+  background: linear-gradient(to right, var(--gd-accent, var(--gd-house)), transparent 92%) !important;
+}
+.CommunityItem.Blank { background: var(--gd-soft) !important; border-radius: var(--gd-r-md) !important; }
+
+/* ═══════════════ downloads ═══════════════ */
+
+.DownloadsPage,
+.DownloadsPage.Panel,
+.DownloadsPage .TopSection,
+.DownloadsPage .ItemListWrapper,
+.DownloadsPage .ItemListWrapper > div,
+.DownloadsPage .SectionItemWrapper.Panel {
+  background: transparent !important;
+  background-image: none !important;
+}
+.DownloadsPage .HeroAndLogo.Empty {
+  background-image: none !important;
+  background: var(--gd-soft) !important;
+  border-radius: var(--gd-r-md) !important;
+}
+/* Every progress bar in the client is one component, driven by two variables,
+   and its fill is a ::after — there is no child element to paint. So the whole
+   job is the variables. The old `[class*=Progress] > div` rule never reached the
+   fill; what it did reach was `.StatusLine`, the text row of the download strip
+   in the bottom bar, and painted it as a solid accent block behind the words. */
+body.DesktopUI,
+[style*="--percent"] {
+  --color-progress-bar-foreground: var(--gd-accent, var(--gd-house)) !important;
+  --color-progress-bar-background: rgba(255, 255, 255, .14) !important;
+}
+.DownloadsPage .ProgressBar,
+.BottomBar .ProgressBar { border-radius: 999px !important; }
+/* the line above the bar keeps Steam's own blue */
+.DownloadStatus .StatusLine,
+.DownloadStatus .Status { color: var(--gd-ink-soft) !important; }
+.DownloadStatus .Percentage { color: var(--gd-ink) !important; font-variant-numeric: tabular-nums; }
+
+/* ═══════════════ collections ═══════════════ */
+
+.MainPanel .Collection.Focusable,
+.MainPanel .Collection.NewCollection {
+  border-radius: var(--gd-r-lg) !important;
+  overflow: hidden;
+  background: var(--gd-soft) !important;
+  transition: transform .18s ease;
+}
+.MainPanel .Collection.Focusable:hover { transform: translateY(-3px); }
+.MainPanel .CollectionImage { border-radius: var(--gd-r-lg) !important; overflow: hidden; }
+
+/* ═══════════════ bottom bar ═══════════════ */
+
+.BottomBar { border-top: 1px solid var(--gd-line) !important; }
+.AddGameButton, .FriendsButton, .DownloadStatus { color: var(--gd-ink-soft) !important; }
+.AddGameButton:hover, .FriendsButton:hover { color: var(--gd-ink) !important; }
+
+/* ═══════════════ scrollbars ═══════════════ */
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, .16);
+  border: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, .3); background-clip: content-box; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ═══════════════ fixes round 2 ═══════════════ */
+
+/* Steam draws its own 3px blue underline under the selected tab; with our pill
+   it reads as two selections at once */
+.SuperNavMenu.Selected .MenuButton::after { display: none !important; }
+
+/* the workshop / trading-card rows kept Steam's light slab */
+.AppDetailsMain .Body.WorkshopContainer,
+.AppDetailsMain [class*=WorkshopContainer],
+.AppDetailsMain [class*=TradingCard] .Panel {
+  background: var(--gd-soft) !important;
+  border-radius: var(--gd-r-md) !important;
+}
+
+/* achievement bars: light track, accent fill — never a black slab */
+/* (тут був `[class*=AchievementProgress] > div` — він ловив трек замість заливки) */
+
+/* "What's New" shelf is off by default — the home already has your own shelf */
+.AppDetailsMain .Body.InnerContainer > div:has(.UpdatesContainer) { display: none !important; }
+
+/* ═══════════════ fixes round 3 ═══════════════ */
+
+/* The home has no frame — the greeting, the hero and the shelf sit straight on
+   the art, the way the sketch had it. Only the game list keeps its pane. */
+.MainPanel > .AppDetailsTransitionGroup:has(.LibraryHome) {
+  background: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+}
+.LibraryHome .gd-home { padding: 16px 22px 12px; }
+
+/* ─── surfaces Steam paints in its own grey, over our glass ─── */
+
+/* the achievement summary and the badge row are gradient slabs */
+.AppDetailsMain .Highlight,
+.AppDetailsMain .Highlight.HighlightDiv,
+.AppDetailsMain .Highlight.BadgeSection {
+  background-image: linear-gradient(100deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .025)) !important;
+  background-color: transparent !important;
+  border-radius: var(--gd-r-md) !important;
+}
+/* achievement tiles in the details column */
+.AppDetailsMain .AdditionalItem.Panel,
+.AppDetailsMain .RightAchievementSection.Panel {
+  background: var(--gd-soft) !important;
+  border-radius: var(--gd-r-sm) !important;
+}
+/* the review / rating block */
+.AppDetailsMain .ReviewContainer,
+.AppDetailsMain .RatingContainer {
+  background: var(--gd-soft) !important;
+  border-radius: var(--gd-r-md) !important;
+}
+.ReviewThumbButton {
+  background: var(--gd-field) !important;
+  border-radius: 999px !important;
+  color: var(--gd-ink-soft) !important;
+}
+.ReviewThumbButton:hover { background: rgba(255, 255, 255, .16) !important; }
+/* Steam's information strip is a flat blue band */
+.AppDetailsMain .Alert {
+  background: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 22%, transparent) !important;
+  border-radius: var(--gd-r-md) !important;
+  color: var(--gd-ink) !important;
+}
+
+/* the activity feed: each entry is a grey gradient card with a blue glow behind it */
+.ActivityFeedContainer .EventBody {
+  background-image: linear-gradient(100deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .02)) !important;
+  border-radius: var(--gd-r-md) !important;
+}
+.ActivityFeedContainer .BackgroundEffects {
+  background-image: radial-gradient(circle,
+    color-mix(in srgb, var(--gd-accent, var(--gd-house)) 30%, transparent) 20%,
+    transparent 72%) !important;
+}
+
+/* the game-list column */
+.GameListHomeAndSearch { background: transparent !important; }
+.CollectionsButton .Bar.CollectionButton {
+  background: var(--gd-field) !important;
+  border-radius: var(--gd-r-sm) !important;   /* 32x32 — a full circle reads as a stray dot */
+}
+.SearchInput input::placeholder,
+.HomeBox input::placeholder { color: var(--gd-ink-faint) !important; }
+.MenuHeader { background: var(--gd-soft) !important; border-radius: var(--gd-r-sm) !important; }
+[class*=AdvancedSearchPane] {
+  background: rgba(16, 19, 30, .96) !important;
+  border-radius: var(--gd-r-md) !important;
+}
+
+/* опис гри Steam кладе на власну темну плиту, і її край читається як межа блоку */
+.AppDetailsMain .AppGameInfoContainer .Container { background: transparent !important; }
+
+/* панель «чи рекомендували б ви гру» лишалась у сіро-блакитних тонах Steam */
+.ReviewContainer,
+.RatingContainer {
+  background: var(--gd-soft) !important;
+  background-image: none !important;
+  border-radius: var(--gd-r-md) !important;
+  color: var(--gd-ink-soft) !important;
+}
+.ReviewContainer b,
+.ReviewContainer strong { color: var(--gd-ink) !important; }
+.ThumbIcon,
+.ThumbIcon *,
+.ReviewThumbButton svg,
+.ReviewThumbButton svg * { fill: var(--gd-accent, var(--gd-house)) !important; }
+
+/* ═══════════════ the game page, per the sketch ═══════════════ */
+
+.AppDetailsMain .Header .TopCapsule { height: auto !important; }
+
+/* (a facts panel lived here — it only repeated what the play bar already says) */
+
+/* Навколо ряду вкладок лишалася ледь помітна рамка — рівно по межах
+   `.AppDetailsSectionContainer`. Жодна обчислена властивість її не пояснює
+   (усі фони прозорі, рамок і тіней немає), але зникає вона лише разом із
+   секцією. Тому тут просте скидання малювання на обгортках: чипи його не
+   зачіпають і лишаються пігулками. */
+.LinksSection,
+.LinksSection > *,
+.LinksSection .AppDetailsSectionContainer,
+.LinksSection .LinksSectionBody,
+.LinksSection .Links {
+  background: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  outline: 0 !important;
+}
+
+/* `.RatingContainer` вкладений у `.ReviewContainer`, і два шари скла підряд
+   дають світлішу коробку в коробці */
+.ReviewContainer .RatingContainer { background: transparent !important; }

@@ -1,0 +1,3 @@
+/* Фон: без картинки — самі сутінки */
+:root { --gd-bg-mode: plain; }
+#gd-art { display: none !important; }

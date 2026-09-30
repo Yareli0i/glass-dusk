@@ -1,0 +1,187 @@
+{
+  "name": "Glass Dusk",
+  "description": "Сутінкове скло для Steam: димчасті панелі на нічному лузі, а сторінка гри забирає колір із її арту.",
+  "author": "Yareli",
+  "version": "1.0.0",
+  "tags": [
+    "Dark",
+    "Glass",
+    "Dynamic",
+    "Minimal"
+  ],
+  "UseDefaultPatches": true,
+  "Steam-WebKit": "css/webkit.css",
+  "RootColors": "css/root.css",
+  "Conditions": {
+    "Фон": {
+      "description": "Що видно за склом",
+      "default": "Арт гри",
+      "tab": "Вигляд",
+      "values": {
+        "Арт гри": {},
+        "Луг": {
+          "TargetCss": {
+            "affects": [
+              "^Steam$"
+            ],
+            "src": "css/options/bg-meadow.css"
+          }
+        },
+        "Без картинки": {
+          "TargetCss": {
+            "affects": [
+              "^Steam$"
+            ],
+            "src": "css/options/bg-plain.css"
+          }
+        }
+      }
+    },
+    "Акцент": {
+      "description": "Звідки клієнт бере колір кнопок і виділень",
+      "default": "З арту гри",
+      "tab": "Вигляд",
+      "values": {
+        "З арту гри": {},
+        "Завжди синій": {
+          "TargetCss": {
+            "affects": [
+              ".*"
+            ],
+            "src": "css/options/accent-fixed.css"
+          }
+        }
+      }
+    },
+    "Скло": {
+      "description": "Скільки фону просвічує крізь панелі",
+      "default": "Звичайне",
+      "tab": "Вигляд",
+      "values": {
+        "Звичайне": {},
+        "Щільніше": {
+          "TargetCss": {
+            "affects": [
+              "^Steam$"
+            ],
+            "src": "css/options/glass-dense.css"
+          }
+        },
+        "Прозоріше": {
+          "TargetCss": {
+            "affects": [
+              "^Steam$"
+            ],
+            "src": "css/options/glass-sheer.css"
+          }
+        }
+      }
+    },
+    "Заокруглення": {
+      "description": "Радіуси панелей і карток",
+      "default": "Звичайне",
+      "tab": "Вигляд",
+      "values": {
+        "Звичайне": {},
+        "М'якше": {
+          "TargetCss": {
+            "affects": [
+              ".*"
+            ],
+            "src": "css/options/radius-soft.css"
+          }
+        },
+        "Гостріше": {
+          "TargetCss": {
+            "affects": [
+              ".*"
+            ],
+            "src": "css/options/radius-sharp.css"
+          }
+        }
+      }
+    },
+    "Полиця «Що нового»": {
+      "description": "Стандартна стрічка новин Steam на Головній",
+      "default": "Сховати",
+      "tab": "Вигляд",
+      "values": {
+        "Сховати": {},
+        "Показувати": {
+          "TargetCss": {
+            "affects": [
+              "^Steam$"
+            ],
+            "src": "css/options/whatsnew-show.css"
+          }
+        }
+      }
+    },
+    "Оверлей у грі": {
+      "description": "Фон за панелями оверлея Shift+Tab: прозорий, щоб було видно гру, або майже чорний, як у Steam",
+      "default": "Прозорий",
+      "tab": "Вигляд",
+      "values": {
+        "Прозорий": {},
+        "Як у Steam": {
+          "TargetCss": {
+            "affects": [
+              "^SP Overlay"
+            ],
+            "src": "css/options/overlay-steam.css"
+          }
+        }
+      }
+    },
+    "Панелі оверлея": {
+      "description": "Панелі Shift+Tab («Огляд гри», друзі, браузер) і панель інструментів знизу: димчасте скло з акцентом або як у Steam",
+      "default": "Скло",
+      "tab": "Вигляд",
+      "values": {
+        "Скло": {
+          "TargetCss": {
+            "affects": [
+              ".*"
+            ],
+            "src": "css/options/overlay-glass.css"
+          }
+        },
+        "Як у Steam": {}
+      }
+    },
+    "Big Picture": {
+      "description": "Головна Big Picture: арт гри у фокусі на весь екран, колір кнопок із нього й чип із годинами гри",
+      "default": "Обкладинка",
+      "tab": "Вигляд",
+      "values": {
+        "Обкладинка": {
+          "TargetCss": {
+            "affects": [
+              "Big Picture"
+            ],
+            "src": "css/bigpicture.css"
+          }
+        },
+        "Як у Steam": {}
+      }
+    }
+  },
+  "Patches": [
+    {
+      "MatchRegexString": "^Steam$",
+      "TargetCss": "css/steam.css"
+    },
+    {
+      "MatchRegexString": ".*",
+      "TargetCss": "css/shared.css"
+    },
+    {
+      "MatchRegexString": ".*",
+      "TargetJs": "js/dusk.js"
+    },
+    {
+      "MatchRegexString": "^SP Overlay",
+      "TargetCss": "css/overlay.css"
+    }
+  ]
+}

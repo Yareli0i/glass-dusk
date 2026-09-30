@@ -1,0 +1,22 @@
+/* ╔═══════════════════════════════════════════════════════════════════════════╗
+   ║  Glass Dusk — in-game overlay (Shift+Tab), window "SP Overlay: <pid>/…"   ║
+   ║                                                                           ║
+   ║  Steam lays black at 67→93 % plus a 300 px inset shadow behind the overlay ║
+   ║  panels, and the game all but disappears under it. Thinned here so the     ║
+   ║  game stays readable behind the panels. The «Оверлей у грі» switch puts     ║
+   ║  Steam's own backdrop back.                                               ║
+   ╚═══════════════════════════════════════════════════════════════════════════╝ */
+
+:root {
+  --gd-overlay-backdrop: radial-gradient(rgba(6, 8, 14, .2), rgba(6, 8, 14, .55));
+  --gd-overlay-shadow: none;
+}
+
+/* the backdrop by its current hash; js/dusk.js maps it again after a client update */
+._3b_pllMxcr_an1aQ5goWvB {
+  background: var(--gd-overlay-backdrop) !important;
+  box-shadow: var(--gd-overlay-shadow) !important;
+}
+
+/* dusk.js keeps the art layer out of the overlay; this covers the moment before it runs */
+#gd-art { display: none !important; }

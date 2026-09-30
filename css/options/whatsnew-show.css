@@ -1,0 +1,2 @@
+/* Що нового: повернути полицю Steam на Головну */
+.AppDetailsMain .Body.InnerContainer > div:has(.UpdatesContainer) { display: block !important; }

@@ -1,0 +1,337 @@
+/* ╔═══════════════════════════════════════════════════════════════════════════╗
+   ║  Glass Dusk — web pages inside the client (store, community, workshop)     ║
+   ║                                                                           ║
+   ║  Deliberately small. Steam's store pages are a fixed-height, absolutely     ║
+   ║  positioned layout in a font it measures itself: boxing their blocks or     ║
+   ║  swapping the face clips prices, buttons and labels. So the theme only      ║
+   ║  changes the ground, the chrome, the fields and the buttons — the page      ║
+   ║  keeps its own structure.                                                   ║
+   ╚═══════════════════════════════════════════════════════════════════════════╝ */
+
+:root {
+  --gd-house: #5e90e4;
+  --gd-accent: #5e90e4;
+  --gd-accent-ink: #fff;
+  --gd-ink: #eef1f8;
+  --gd-ink-soft: rgba(238, 241, 248, .72);
+  --gd-night: #0b0f18;
+  --gd-field: rgba(255, 255, 255, .08);
+  --gd-r-md: 12px;
+}
+
+/* ═══════════════ the ground ═══════════════ */
+
+html,
+body.v6,
+body.v7,
+body.responsive_page,
+body.headerless_page,
+.responsive_page_frame,
+.responsive_page_content,
+.responsive_page_template_content,
+.page_content_ctn,
+.page_content,
+.home_page_body_ctn,
+#responsive_page_template_content,
+.game_page_background,
+.game_page_background.game {
+  background: transparent !important;
+  background-image: none !important;
+}
+
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -2;
+}
+/* only an app page has art of its own; everywhere else a plain dusk ground */
+body::before { background: var(--gd-night); }
+body.gd-art::before {
+  background: var(--gd-art) center / cover no-repeat, var(--gd-night);
+  filter: blur(60px) saturate(1.5) brightness(.42);
+  transform: scale(1.25);
+}
+body::after {
+  z-index: -1;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(0, 0, 0, .4), transparent 72%),
+    linear-gradient(180deg, rgba(0, 0, 0, .4), rgba(0, 0, 0, .14) 40%, rgba(0, 0, 0, .58));
+}
+
+/* ═══════════════ chrome ═══════════════ */
+
+#global_header,
+.responsive_page_menu_ctn,
+.responsive_local_menu,
+#store_header,
+.v7menu #global_header .content {
+  background: rgba(10, 13, 22, .62) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.2);
+  backdrop-filter: blur(22px) saturate(1.2);
+  border-bottom: 1px solid rgba(255, 255, 255, .07) !important;
+  box-shadow: none !important;
+}
+#store_search input,
+.searchbox,
+#store_nav_search_term {
+  background: var(--gd-field) !important;
+  border: none !important;
+  border-radius: 999px !important;
+  color: var(--gd-ink) !important;
+}
+.popup_block_new .popup_body,
+.popup_menu {
+  background: rgba(16, 19, 30, .96) !important;
+  border: 1px solid rgba(255, 255, 255, .08) !important;
+  border-radius: var(--gd-r-md) !important;
+}
+
+/* ═══════════════ buttons ═══════════════ */
+
+.btn_green_white_innerfade,
+.btn_blue_steamui,
+.btnv6_blue_hoverfade,
+.btn_addtocart,
+.btn_medium.queue_btn_active {
+  background: var(--gd-accent) !important;
+  background-image: none !important;
+  border-radius: 999px !important;
+  color: var(--gd-accent-ink) !important;
+  text-shadow: none !important;
+}
+.btn_green_white_innerfade:hover,
+.btnv6_blue_hoverfade:hover,
+.btn_addtocart:hover { filter: brightness(1.08); }
+.btn_green_white_innerfade span,
+.btnv6_blue_hoverfade span,
+.btn_addtocart span { background: transparent !important; }
+.btnv6_lightblue_blue,
+.btn_grey_grey,
+.btn_darkblue_white_innerfade,
+.queue_btn_inactive {
+  background: var(--gd-field) !important;
+  background-image: none !important;
+  border-radius: 999px !important;
+  color: var(--gd-ink) !important;
+}
+/* the community button in the title row is a quiet chip */
+.apphub_OtherSiteInfo a.btnv6_blue_hoverfade {
+  background: var(--gd-field) !important;
+  color: var(--gd-ink) !important;
+}
+.apphub_OtherSiteInfo a.btnv6_blue_hoverfade:hover { background: rgba(255, 255, 255, .16) !important; }
+.discount_pct { background: var(--gd-accent) !important; color: var(--gd-accent-ink) !important; }
+
+/* ═══════════════ a few surfaces Steam paints too bright over our ground ═══════════════ */
+
+.game_area_purchase_game,
+.game_area_purchase_game_wrapper,
+.game_area_bundle_item,
+.queue_actions_ctn {
+  background: rgba(255, 255, 255, .045) !important;
+  background-image: none !important;
+  border-radius: var(--gd-r-md) !important;
+}
+.app_tag { background: var(--gd-field) !important; border-radius: 999px !important; color: var(--gd-ink-soft) !important; }
+.game_review_summary.positive { color: #8fd06a !important; }
+.game_review_summary.mixed { color: #e0b757 !important; }
+.game_review_summary.negative { color: #e07a6a !important; }
+
+/* ═══════════════ scrollbars ═══════════════ */
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, .16);
+  border: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, .3); background-clip: content-box; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* the price plate behind "До кошика" is a black slab on our ground */
+.game_purchase_action,
+.game_purchase_action_bg,
+.game_purchase_price.price,
+.discount_block.game_purchase_discount,
+.game_area_purchase_game .game_purchase_action_bg {
+  background: transparent !important;
+  background-image: none !important;
+}
+.discount_block { background: transparent !important; }
+.discount_prices { background: transparent !important; }
+
+/* ═══════════════ store home ═══════════════
+   Same discipline: radius, colour and hover only — the carousels keep their
+   own measured sizes. */
+
+.home_page_content,
+.home_ctn,
+.home_cluster_ctn,
+.home_area_spotlight,
+.main_cluster_content,
+.home_tabs_content,
+.tab_content,
+.contenthub_specials,
+.saleitembrowserrow {
+  background: transparent !important;
+  background-image: none !important;
+}
+
+.store_capsule,
+.tab_item,
+.special,
+.spotlight_content,
+.curator_capsule,
+.sale_capsule,
+.home_marketing_message,
+.dailydeal_ctn,
+.recommendation {
+  border-radius: 12px !important;
+  overflow: hidden;
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+.store_capsule:hover,
+.special:hover,
+.sale_capsule:hover,
+.curator_capsule:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 34px -18px rgba(0, 0, 0, .8);
+}
+.tab_item { background: rgba(255, 255, 255, .04) !important; }
+.tab_item:hover { background: rgba(255, 255, 255, .09) !important; }
+
+/* section titles and the tab strip */
+.home_page_content h2,
+.home_ctn h2,
+.home_title,
+.home_page_title,
+.contenthub_specials h2 {
+  color: var(--gd-ink) !important;
+  letter-spacing: .01em;
+}
+.home_tabs_row,
+.tab_row,
+.home_tabs_ctn {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(255, 255, 255, .08) !important;
+}
+.tab_menu_item,
+.home_tabs_row .tab {
+  background: transparent !important;
+  border-radius: 999px !important;
+  color: var(--gd-ink-soft) !important;
+}
+.tab_menu_item.active,
+.home_tabs_row .tab.active {
+  background: var(--gd-accent) !important;
+  color: var(--gd-accent-ink) !important;
+}
+
+/* deals and prices */
+.discount_block,
+.discount_block.discount_block_large,
+.sale_price_discount { background: transparent !important; }
+.discount_pct { background: var(--gd-accent) !important; color: var(--gd-accent-ink) !important; border-radius: 6px !important; }
+.discount_original_price { color: rgba(238, 241, 248, .45) !important; }
+.discount_final_price,
+.search_price { color: var(--gd-ink) !important; }
+
+/* carousel arrows and dots */
+.carousel_thumbs .arrow,
+.arrow.left,
+.arrow.right {
+  background: rgba(255, 255, 255, .08) !important;
+  border-radius: 999px !important;
+}
+.carousel_thumbs div.focus,
+.handle.focus { background: var(--gd-accent) !important; }
+
+/* footer */
+#footer,
+.footer_content,
+#footer_text { background: transparent !important; color: rgba(238, 241, 248, .5) !important; }
+
+/* ═══════════════ the last light chips on the home ═══════════════ */
+
+/* the "▾" wishlist menu that appears on a capsule, and the pale outline buttons */
+.ds_options,
+.ds_options_tab {
+  background: rgba(12, 15, 24, .8) !important;
+  border-radius: 6px !important;
+  color: var(--gd-ink-soft) !important;
+}
+.btnv6_white_transparent,
+.btnv6_white_transparent.btn_small,
+.btnv6_white_transparent.btn_small_tall {
+  background: var(--gd-field) !important;
+  background-image: none !important;
+  border: none !important;
+  border-radius: 999px !important;
+  color: var(--gd-ink) !important;
+}
+.btnv6_white_transparent:hover { background: rgba(255, 255, 255, .16) !important; color: var(--gd-ink) !important; }
+/* the white name plates on content-hub capsules */
+.content_hub_capsule_ctn .label_ctn .label,
+.label_ctn > .label {
+  background: rgba(12, 15, 24, .72) !important;
+  border-radius: 999px !important;
+  color: var(--gd-ink) !important;
+}
+/* ═══════════════ community pages ═══════════════ */
+
+.apphub_CardContentGuideTitle,
+.apphub_CardContentAuthorBlock,
+.apphub_Card {
+  background: var(--gd-field) !important;
+  background-image: none !important;
+  border-color: rgba(255, 255, 255, .07) !important;
+  border-radius: var(--gd-r-md) !important;
+}
+.community_home_search_apps,
+.community_home_search_players,
+.community_home_search_app_input,
+.community_home_search_players_input {
+  background: var(--gd-field) !important;
+  border: none !important;
+  border-radius: 999px !important;
+  color: var(--gd-ink) !important;
+}
+
+/* the blue plate behind store capsule blurbs, the carousel ground and the
+   search suggestions — all Steam's own blues over our dusk */
+.info,
+.carousel_items,
+.OtherEvents_EventCtn,
+[id^=searchSuggestions] {
+  background-image: linear-gradient(150deg, rgba(14, 17, 27, .92), rgba(9, 11, 18, .94)) !important;
+  border-radius: var(--gd-r-md) !important;
+}
+
+/* The strip that carries Огляд / Категорії / search is a blue gradient band.
+   Its Panels nest, so only the outer one is filled — otherwise the middle of the
+   strip stacks two tints and reads as a darker block. The fill has to stay: the
+   menu labels sit over whatever banner art the store is showing. */
+.responsive_page_content .Panel { background-image: none !important; }
+.responsive_page_content .Panel:not(.Panel .Panel) {
+  background-image: linear-gradient(180deg, rgba(8, 10, 17, .82), rgba(8, 10, 17, .62)) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  border-bottom: 1px solid rgba(255, 255, 255, .07);
+}
+
+/* the search field in the store's own top strip */
+form:has(> div > input[type=text]) {
+  background: rgba(255, 255, 255, .11) !important;
+  border: 1px solid rgba(255, 255, 255, .08) !important;
+  border-radius: 999px !important;
+  overflow: hidden;
+}
+form:has(> div > input[type=text]) input[type=text] {
+  background: transparent !important;
+  border: none !important;
+  color: var(--gd-ink) !important;
+}
+form:has(> div > input[type=text]) button { background: var(--gd-accent) !important; border: none !important; }
