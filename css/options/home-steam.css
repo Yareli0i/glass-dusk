@@ -1,0 +1,3 @@
+/* Library home: Steam — no greeting / stats / continue block; js/dusk.js reads --gd-home */
+:root { --gd-home: steam; }
+.gd-home { display: none !important; }

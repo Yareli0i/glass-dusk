@@ -1,5 +1,5 @@
 /* Скло: прозоріше — фон видно сильніше */
 :root {
-  --gd-glass-fill: linear-gradient(135deg, rgba(26, 31, 48, .3), rgba(13, 16, 28, .2)) !important;
+  --gd-glass-fill: linear-gradient(135deg, color-mix(in srgb, var(--gd-glass, #0c0d13) 30%, transparent), color-mix(in srgb, color-mix(in srgb, var(--gd-glass, #0c0d13) 66%, #000) 20%, transparent)) !important;
   --gd-blur: 20px !important;
 }

@@ -15,7 +15,7 @@
 
 @font-face {
   font-family: 'GlassDuskNum';
-  src: url('https://millennium.host/v1/themes/GlassDusk/assets/JetBrainsMono-ExtraBold.ttf') format('truetype');
+  src: url('../assets/JetBrainsMono-ExtraBold.ttf') format('truetype');   /* relative: the theme folder is named after the repo */
   font-weight: 800;
   font-display: swap;
 }
@@ -29,12 +29,15 @@
   --gd-ink-soft: rgba(255, 255, 255, .72);
   --gd-ink-faint: rgba(255, 255, 255, .46);
 
-  --gd-glass-fill: linear-gradient(150deg, rgba(12, 13, 19, .62), rgba(8, 9, 14, .54));
+  /* the tint comes from the Colors tab (--gd-glass in css/root.css); the switch «Glass» sets the alpha */
+  --gd-glass-fill: linear-gradient(150deg,
+    color-mix(in srgb, var(--gd-glass, #0c0d13) 62%, transparent),
+    color-mix(in srgb, color-mix(in srgb, var(--gd-glass, #0c0d13) 66%, #000) 54%, transparent));
   --gd-glass-edge: 1px solid rgba(255, 255, 255, .1);
   --gd-glass-shadow: 0 40px 90px -30px rgba(0, 0, 0, .75), inset 0 1px 0 rgba(255, 255, 255, .08);
   --gd-blur: 30px;
 
-  --gd-card-fill: rgba(8, 9, 14, .66);     /* the play bar — flat, no blur */
+  --gd-card-fill: color-mix(in srgb, var(--gd-card, #08090e) 66%, transparent);   /* the play bar — flat, no blur */
   --gd-soft: rgba(255, 255, 255, .05);     /* the lightest surface used inside the glass */
   --gd-hover: rgba(255, 255, 255, .08);
   --gd-field: rgba(255, 255, 255, .08);
@@ -45,7 +48,6 @@
   --gd-r-md: 12px;
   --gd-r-sm: 8px;
 
-  --gd-meadow: url('https://millennium.host/v1/themes/GlassDusk/assets/meadow.jpg');
 }
 
 /* Steam's own face stays — it is what every popup window is measured with.
@@ -66,7 +68,7 @@
   z-index: 0;
   pointer-events: none;
   background: center / cover no-repeat;
-  filter: blur(60px) saturate(1.5) brightness(.46);
+  filter: var(--gd-art-filter, blur(60px) saturate(1.5) brightness(.46));   /* switch «Background art» */
   transform: scale(1.25) translateZ(0);
   will-change: opacity;
   opacity: 0;
@@ -641,7 +643,8 @@ body.DesktopUI,
   height: 100% !important;
   margin: 0 !important;
 }
-.LibraryHome .gd-home { padding: 16px 22px 12px; }
+/* the header is inserted next to .LibraryHome, not inside it — so this sat at 5 px from the edge */
+.AppDetailsTransitionGroup:has(.LibraryHome) .gd-home { padding: 18px 28px 12px; }
 
 /* ─── surfaces Steam paints in its own grey, over our glass ─── */
 

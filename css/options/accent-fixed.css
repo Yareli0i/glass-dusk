@@ -1,2 +1,3 @@
-/* Акцент: завжди домашній синій, арт гри його не змінює */
-:root { --gd-accent: #5e90e4 !important; --gd-accent-ink: #fff !important; }
+/* Accent colour: Fixed — the game art no longer recolours anything; js/dusk.js reads
+   --gd-accent-lock and leaves --gd-accent to the Colors tab (css/root.css) */
+:root { --gd-accent-lock: 1; }

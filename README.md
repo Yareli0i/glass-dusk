@@ -1,65 +1,69 @@
 # Glass Dusk
 
-Тема Steam для Millennium. Луг із Glass Dash за димчастим склом; коли відкрита сторінка гри,
-її арт проступає у фоні, а колір кнопок і виділень береться з цього арту.
+A [Millennium](https://steambrew.app) theme for the Steam desktop client. Smoked glass panels sit over the art of the game you have open, and the client takes its accent colour from that art. Open another game and the whole client changes colour with it.
 
-## Що де лежить
+![Library home](images/library.jpg)
 
-```
-skin.json           патчі й перемикачі (Millennium читає його при старті Steam)
-css/root.css        кольори, які Millennium показує в своєму пікері
-css/steam.css       головне вікно: фон, скляні панелі, список ігор, сторінка гри, завантаження
-css/shared.css      меню, налаштування, діалоги, сповіщення, друзі й чат
-css/webkit.css      веб-сторінки в клієнті: крамниця, спільнота, майстерня
-css/overlay.css     оверлей у грі (Shift+Tab): тонке тло замість сірої плівки
-css/bigpicture.css  Big Picture, «Обкладинка»: арт гри у фокусі на весь екран
-css/options/*.css   те, що вмикають перемикачі теми
-js/dusk.js          рантайм: арт гри у фон + акцент із нього; у Big Picture — акцент і чип з годинами
-assets/meadow.jpg   фон (той самий кадр, що й у шпалері Glass Dash)
-```
+## What it styles
 
-## Перемикачі (Millennium → Themes → Glass Dusk)
+- **Library.** Two panes of smoked glass over the blurred art of the open game, with the game list on the right. The home page gets its own header: greeting, library stats, *Continue* for the last game, recent games.
+- **Game page.** The hero art runs edge to edge, the play bar is one flat card, and page links become chips.
+- **Store and community.** Pages with a game of their own use its art and colour. Everything else sits on a plain dusk ground.
+- **Menus, settings, notifications, friends and chat.** All wear the same colour as the main window.
+- **Big Picture.** The focused game's art fills the home screen and lends its colour to focus rings and tabs. A chip at the top left shows its hours and when you last played.
+- **In-game overlay (Shift+Tab).** A light veil replaces Steam's near-black sheet, so the game stays visible. *Game Overview* and the toolbar become smoked glass in the running game's colour.
 
-| Перемикач | Значення | Що робить |
+![Game page](images/game.jpg)
+![Big Picture](images/bigpicture.jpg)
+
+## Settings
+
+Millennium → Themes → Glass Dusk → ⋯ → Settings. Changes apply after Steam restarts.
+
+| Setting | Values | What it does |
 |---|---|---|
-| Фон | Луг · Луг, арт гри лишається · Без картинки | що видно за склом |
-| Акцент | З арту гри · Завжди синій | звідки береться колір кнопок |
-| Скло | Звичайне · Щільніше · Прозоріше | скільки фону просвічує |
-| Заокруглення | Звичайне · М'якше · Гостріше | радіуси панелей |
-| Полиця «Що нового» | Сховати · Показувати | стандартна стрічка новин на Головній |
-| Оверлей у грі | Прозорий · Як у Steam | тло за панелями Shift+Tab |
-| Панелі оверлея | Скло · Як у Steam | «Огляд гри», друзі, браузер і панель інструментів — димчасте скло з акцентом |
-| Big Picture | Обкладинка · Як у Steam | арт гри у фокусі на весь екран, колір із нього, чип «години · коли грав» |
+| Theme language | **English** · Українська | Text the theme draws itself: home header, Big Picture chip, dates. Steam's own text follows Steam. |
+| Background | **Game art** · Meadow · Plain dusk | What sits behind the glass. |
+| Background art | **Normal** · Subtle · Vivid | How strongly the game art shows through. |
+| Accent colour | **Game art** · Fixed | *Fixed* keeps the Accent colour from the Colors tab everywhere. |
+| Glass | **Normal** · Denser · Sheerer | How see-through the panels are. |
+| Corners | **Normal** · Softer · Sharper | Radius of panels and cards. |
+| Library home | **Theme** · Steam | The theme's home header, or Steam's shelves only. |
+| What's New shelf | on · **off** | Steam's What's New shelf on the home page. |
+| Game list side | **Right** · Left | Where the game list sits. |
+| Big Picture | **Cover** · Steam | Whole-screen art of the focused game, or Big Picture untouched. |
+| Big Picture hours chip | **on** · off | Logo, hours played and last played at the top left. |
+| Overlay background | **Transparent** · Steam | Behind the Shift+Tab panels. |
+| Overlay panels | **Glass** · Steam | *Game Overview*, the browser and the toolbar. |
 
-## Оверлей і Big Picture
+The **Colors** tab has six colours: accent, text, secondary text, glass tint, play bar, store background.
 
-- Вікно Big Picture в українському Steam зветься «Steam у режимі Big Picture», тому патч
-  ловить `Big Picture`, а не `^Steam Big Picture Mode$`.
-- Панелі оверлея — окремі вікна без назви з класом `OverlayPopupBody`, тож їхні стилі їдуть
-  на патчі `.*` і прив'язані до класу.
-- Гру під оверлеєм рушій накладає поза сторінкою: `backdrop-filter` там нічого не розмиє,
-  тому скло панелей — щільніше тонування, а не блюр.
-- Чип у Big Picture — звичайний DOM: геймпад на нього не стає, він лише показує.
+## Install
 
-## Як це тримається купи
+- **From steambrew.app** (once the theme is listed): copy the theme ID on its page and paste it into Millennium → Themes → Install.
+- **By hand:** download this repository and put the folder into `Steam/millennium/themes/`, then pick it in Millennium → Themes.
 
-Steam дає елементам два класи: хешований (`._3x1Hklzy…`, змінюється з кожним оновленням клієнта)
-і семантичний (`.TopBar`, `.PlayBar`, `.AppDetailsSection`, `.ContextMenuPopupBody`).
-Тема написана **на других**, тому оновлення Steam ламають її значно рідше, ніж теми на хешах.
+Tested on Windows 11 with Steam client 1788652215 and Millennium 3.5.0.
 
-Вікна (меню, налаштування, чат) розрізняються не за заголовком, а за класом `body`
-(`ContextMenuPopupBody`, `ModalDialogBody`, `DesktopToastContainer`) — заголовки перекладені
-й залежать від мови клієнта, класи — ні.
+## Good to know
 
-## Якщо після оновлення Steam щось поїхало
+- The overlay cannot blur the game behind its panels. Steam composites the game outside the page, so the glass there is a denser tint instead.
+- Very large custom artwork slows Big Picture down, with or without this theme. Animated PNG covers from SteamGridDB can run to tens of megabytes. If Big Picture stutters when a cover scrolls into view, a lighter version of that cover helps.
+- The Big Picture chip is information only: a controller can't select it.
 
-1. Порівняй селектори з живим DOM: у Steam має бути ввімкнене `.cef-enable-remote-debugging`
-   **ні** — Millennium з ним конфліктує. Замість цього тимчасово поверни `js/dev-bridge.js`
-   з патчем `{ "MatchRegexString": ".*", "TargetJs": "js/dev-bridge.js" }` і локальний сервер
-   на `127.0.0.1:5199` (він віддає CSS наживо й вміє знімати DOM).
-2. Найчастіше ламається одне: Steam додає новий контейнер, який малює свій непрозорий фон.
-   Лікується додаванням його класу в перший список у `css/steam.css`.
+## Credits
 
-## Відкат
+- Code: [MIT](LICENSE).
+- Number font: JetBrains Mono ExtraBold, [SIL OFL 1.1](assets/OFL-JetBrainsMono.txt).
+- Meadow background: from the author's [Glass Dash](https://github.com/Yareli0i/glass-dash) wallpaper.
+- Game art is shown straight from your Steam library and belongs to its owners.
 
-Тема не чіпає інші: у Millennium достатньо перемкнутись назад на NEVKO-UI.
+Changes: [CHANGELOG.md](CHANGELOG.md). How the theme is put together: [DEVELOPMENT.md](DEVELOPMENT.md).
+
+---
+
+## Українською
+
+Тема для Steam на Millennium: димчасте скло поверх арту відкритої гри, а колір кнопок і виділень береться з цього арту. Стилізує бібліотеку, сторінку гри, крамницю, меню, Big Picture й оверлей у грі.
+
+Текст, який малює сама тема, за замовчуванням англійський. Українську вмикає налаштування **Theme language → Українська**. Решту налаштувань описано в таблиці вище, змінюються вони в Millennium → Themes → Glass Dusk → Settings і діють після перезапуску Steam.

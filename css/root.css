@@ -1,10 +1,32 @@
 :root {
+  /*
+   * @name Accent
+   * @description Buttons and highlights when no game art is on screen, and everywhere if "Accent colour" is set to Fixed.
+   */
   --gd-accent: #5E90E4;
+  /*
+   * @name Text
+   * @description Main text on the glass.
+   */
   --gd-ink: #EEF1F8;
+  /*
+   * @name Secondary text
+   * @description Captions, menu items, dates.
+   */
   --gd-ink-soft: #A7AEC0;
-  --gd-glass: #181C2C;
-  --gd-card: #06080E;
+  /*
+   * @name Glass tint
+   * @description Colour of the smoked glass panels; "Glass" sets how see-through they are.
+   */
+  --gd-glass: #0C0D13;
+  /*
+   * @name Play bar
+   * @description The flat card under the game art with the Play button.
+   */
+  --gd-card: #08090E;
+  /*
+   * @name Store background
+   * @description Behind store and community pages that have no game art of their own.
+   */
   --gd-night: #0C1234;
-  --gd-online: #4CB4FF;
-  --gd-ingame: #8CD61D;
 }

@@ -1,0 +1,2 @@
+/* Background art: Vivid — brighter, less blur, the game shows through more */
+:root { --gd-art-filter: blur(40px) saturate(1.6) brightness(.6); }

@@ -1,2 +1,4 @@
-/* Що нового: повернути полицю Steam на Головну */
-.AppDetailsMain .Body.InnerContainer > div:has(.UpdatesContainer) { display: block !important; }
+/* What's New shelf: show — Steam's shelf back on the home.
+   Option files load BEFORE css/steam.css, so a rule here needs more weight than the one it
+   undoes there (an equal !important loses to the later file): hence the html prefix. */
+html .AppDetailsMain .Body.InnerContainer > div:has(.UpdatesContainer) { display: block !important; }

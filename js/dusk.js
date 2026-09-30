@@ -79,6 +79,10 @@
     if (document.body && !layer.isConnected) document.body.insertBefore(layer, document.body.firstChild);
   };
 
+  // switch «Accent colour → Fixed» (css/options/accent-fixed.css): the art stops
+  // recolouring anything and --gd-accent stays whatever the Colors tab says
+  const accentLocked = () => getComputedStyle(root).getPropertyValue('--gd-accent-lock').trim() === '1';
+
   const paint = (src, accent, ink) => {
     if (src) {
       layer.style.backgroundImage = `url("${src}")`;
@@ -86,7 +90,7 @@
     } else {
       layer.classList.remove('on');
     }
-    if (accent) {
+    if (accent && !accentLocked()) {
       root.style.setProperty('--gd-accent', accent);
       root.style.setProperty('--gd-accent-ink', ink || '#fff');
     } else {
@@ -356,29 +360,32 @@
 
   /* ═════════════ the home header ═════════════ */
 
-  const dayShort = new Intl.DateTimeFormat(navigator.language || 'uk', { day: 'numeric', month: 'short' });
-  const clock = new Intl.DateTimeFormat(navigator.language || 'uk', { hour: '2-digit', minute: '2-digit' });
-  const uk = (navigator.language || 'uk').startsWith('uk');
-
-  const words = uk
-    ? { cont: 'Продовжити', recent: 'Нещодавні ігри', play: 'Грати', games: 'Ігор', hours: 'Награно, год',
+  // switch «Theme language» (css/options/lang-uk.css sets --gd-lang: uk); English by default
+  const isUk = () => getComputedStyle(root).getPropertyValue('--gd-lang').trim() === 'uk';
+  const locale = () => (isUk() ? 'uk' : 'en');
+  const WORDS = {
+    uk: { cont: 'Продовжити', recent: 'Нещодавні ігри', play: 'Грати', games: 'Ігор', hours: 'Награно, год',
         disk: 'На дисках, ГБ', today: 'Сьогодні', yday: 'Учора', inGame: 'у грі',
-        hello: h => (h < 5 ? 'Доброї ночі,' : h < 12 ? 'Доброго ранку,' : h < 18 ? 'Доброго дня,' : h < 23 ? 'Доброго вечора,' : 'Доброї ночі,') }
-    : { cont: 'Continue', recent: 'Recently played', play: 'Play', games: 'Games', hours: 'Hours played',
+        hello: h => (h < 5 ? 'Доброї ночі,' : h < 12 ? 'Доброго ранку,' : h < 18 ? 'Доброго дня,' : h < 23 ? 'Доброго вечора,' : 'Доброї ночі,') },
+    en: { cont: 'Continue', recent: 'Recently played', play: 'Play', games: 'Games', hours: 'Hours played',
         disk: 'On disk, GB', today: 'Today', yday: 'Yesterday', inGame: 'played',
-        hello: h => (h < 5 ? 'Good night,' : h < 12 ? 'Good morning,' : h < 18 ? 'Good afternoon,' : h < 23 ? 'Good evening,' : 'Good night,') };
+        hello: h => (h < 5 ? 'Good night,' : h < 12 ? 'Good morning,' : h < 18 ? 'Good afternoon,' : h < 23 ? 'Good evening,' : 'Good night,') },
+  };
+  const W = () => WORDS[locale()];
+  const dayShort = { format: d => new Intl.DateTimeFormat(locale(), { day: 'numeric', month: 'short' }).format(d) };
+  const clock = { format: d => new Intl.DateTimeFormat(locale(), { hour: '2-digit', minute: '2-digit' }).format(d) };
 
   const relDay = ts => {
     const d = new Date(ts * 1000), now = new Date();
     const days = Math.round((new Date(now.getFullYear(), now.getMonth(), now.getDate()) -
       new Date(d.getFullYear(), d.getMonth(), d.getDate())) / 864e5);
-    if (days === 0) return words.today;
-    if (days === 1) return words.yday;
+    if (days === 0) return W().today;
+    if (days === 1) return W().yday;
     return dayShort.format(d);
   };
   const hoursOf = min => (min < 60
-    ? `${min} ${uk ? 'хв' : 'min'}`
-    : `${(min / 60).toLocaleString(navigator.language || 'uk', { maximumFractionDigits: 1 })} ${uk ? 'год' : 'h'}`);
+    ? `${min} ${isUk() ? 'хв' : 'min'}`
+    : `${(min / 60).toLocaleString(locale(), { maximumFractionDigits: 1 })} ${isUk() ? 'год' : 'h'}`);
 
   /* ═════════════ Big Picture: the focused game paints the screen ═════════════ */
 
@@ -412,16 +419,16 @@
     };
 
     const ago = ts => {
-      if (!ts) return uk ? 'ще не запускав' : 'never played';
+      if (!ts) return isUk() ? 'ще не запускав' : 'never played';
       const m = Math.max(0, Math.round((Date.now() / 1000 - ts) / 60));
-      if (m < 60) return uk ? `${m} хв тому` : `${m} min ago`;
-      if (m < 1440) return uk ? `${Math.round(m / 60)} год тому` : `${Math.round(m / 60)} h ago`;
+      if (m < 60) return isUk() ? `${m} хв тому` : `${m} min ago`;
+      if (m < 1440) return isUk() ? `${Math.round(m / 60)} год тому` : `${Math.round(m / 60)} h ago`;
       const d = Math.round(m / 1440);
-      if (d === 1) return words.yday.toLowerCase();
-      return uk ? `${d} дн. тому` : `${d} days ago`;
+      if (d === 1) return W().yday.toLowerCase();
+      return isUk() ? `${d} дн. тому` : `${d} days ago`;
     };
-    const hours = min => (min < 60 ? `${min} ${uk ? 'хв' : 'min'}`
-      : `${(min / 60).toLocaleString(navigator.language || 'uk', { maximumFractionDigits: min < 6000 ? 1 : 0 })} ${uk ? 'год' : 'h'}`);
+    const hours = min => (min < 60 ? `${min} ${isUk() ? 'хв' : 'min'}`
+      : `${(min / 60).toLocaleString(locale(), { maximumFractionDigits: min < 6000 ? 1 : 0 })} ${isUk() ? 'год' : 'h'}`);
 
     /* the art layer */
     const W = 192, H = 108, PAD = 12;
@@ -536,8 +543,9 @@
       if (mine !== token || !enabled()) return;
       paintArt(img);
       if (layer.classList.contains('show')) root.classList.add('gd-bpm-bg');
-      const picked = accentFrom(img);
+      const picked = accentLocked() ? null : accentFrom(img);
       if (picked) root.style.setProperty('--gd-bpm-accent', picked.accent);
+      else root.style.removeProperty('--gd-bpm-accent');
       const o = shared();
       chipApp = o && id ? appRecord(o, id) : null;
       minute = Math.floor(Date.now() / 60000);
@@ -594,6 +602,12 @@
     const o = shared();
     const host = document.querySelector('.LibraryHome');
     if (!o || !host) return;
+    // switch «Library home → Steam» (css/options/home-steam.css)
+    if (getComputedStyle(root).getPropertyValue('--gd-home').trim() === 'steam') {
+      host.querySelectorAll('.gd-home').forEach(b => b.remove());
+      homeSig = '';
+      return;
+    }
     const anchor = host.closest('.Body.InnerContainer') || host.parentElement || host;
     const existing = anchor.querySelector(':scope > .gd-home');
     if (existing && anchor.firstElementChild !== existing) anchor.insertBefore(existing, anchor.firstElementChild);
@@ -613,7 +627,7 @@
     const bytes = apps.reduce((s, a) => s + Number(a.size_on_disk || 0), 0);
     const name = (document.querySelector('.SuperNav .MenuButton span') || {}).textContent || '';
 
-    const sig = [new Date().getHours(), name, apps.length, Math.round(minutes / 60), Math.round(bytes / 2 ** 30),
+    const sig = [locale(), new Date().getHours(), name, apps.length, Math.round(minutes / 60), Math.round(bytes / 2 ** 30),
       last.rt_last_time_played, last.minutes_playtime_forever,
       ...[last, ...shelf].map(a => `${a.appid}:${a.rt_custom_image_mtime || 0}`)].join('|');
     if (existing && sig === homeSig) return;
@@ -624,30 +638,30 @@
     block.innerHTML = `
       <div class="gd-top">
         <div class="gd-hello">
-          <small>${words.hello(new Date().getHours())}</small>
+          <small>${W().hello(new Date().getHours())}</small>
           <strong>${esc(name)}</strong>
         </div>
         <div class="gd-stats">
-          <div><small>${words.games}</small><b class="gd-num">${apps.length}</b></div>
-          <div><small>${words.hours}</small><b class="gd-num">${Math.round(minutes / 60)}</b></div>
-          <div><small>${words.disk}</small><b class="gd-num">${Math.round(bytes / 2 ** 30)}</b></div>
+          <div><small>${W().games}</small><b class="gd-num">${apps.length}</b></div>
+          <div><small>${W().hours}</small><b class="gd-num">${Math.round(minutes / 60)}</b></div>
+          <div><small>${W().disk}</small><b class="gd-num">${Math.round(bytes / 2 ** 30)}</b></div>
         </div>
       </div>
       <div class="gd-continue" data-app="${last.appid}">
         <img class="gd-cont-art" alt="">
         <div class="gd-cont-body">
-          <small>${words.cont}</small>
+          <small>${W().cont}</small>
           <img class="gd-cont-logo" alt="">
           <span class="gd-cont-name">${esc(last.display_name)}</span>
           <div class="gd-cont-meta">${relDay(last.rt_last_time_played)}, ${clock.format(new Date(last.rt_last_time_played * 1000))}
-            · ${hoursOf(last.minutes_playtime_forever || 0)} ${words.inGame}</div>
+            · ${hoursOf(last.minutes_playtime_forever || 0)} ${W().inGame}</div>
           <button class="gd-play" data-game="${esc(gameIdOf(last))}">
             <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M8 5.2v13.6a.8.8 0 0 0 1.2.7l10.9-6.8a.8.8 0 0 0 0-1.4L9.2 4.5A.8.8 0 0 0 8 5.2z"/></svg>
-            ${words.play}
+            ${W().play}
           </button>
         </div>
       </div>
-      <h4 class="gd-label">${words.recent}</h4>
+      <h4 class="gd-label">${W().recent}</h4>
       <div class="gd-shelf">
         ${shelf.map(a => `
           <button class="gd-cap" data-app="${a.appid}" title="${esc(a.display_name)}">

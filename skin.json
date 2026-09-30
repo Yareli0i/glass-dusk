@@ -1,25 +1,46 @@
 {
   "name": "Glass Dusk",
-  "description": "Сутінкове скло для Steam: димчасті панелі на нічному лузі, а сторінка гри забирає колір із її арту.",
+  "description": "Smoked glass over the art of the game you have open: the client takes its accent colour from that art. Styles the library, store, menus, Big Picture and the in-game overlay.",
   "author": "Yareli",
-  "version": "1.0.0",
+  "version": "1.3.0",
   "tags": [
     "Dark",
     "Glass",
     "Dynamic",
-    "Minimal"
+    "Big Picture"
   ],
-  "UseDefaultPatches": true,
+  "github": {
+    "owner": "Yareli0i",
+    "repo_name": "glass-dusk"
+  },
+  "header_image": "https://raw.githubusercontent.com/Yareli0i/glass-dusk/main/images/header.jpg",
+  "splash_image": "https://raw.githubusercontent.com/Yareli0i/glass-dusk/main/images/splash.jpg",
   "Steam-WebKit": "css/webkit.css",
   "RootColors": "css/root.css",
   "Conditions": {
-    "Фон": {
-      "description": "Що видно за склом",
-      "default": "Арт гри",
-      "tab": "Вигляд",
+    "Theme language": {
+      "description": "Text the theme draws itself: home header, Big Picture chip, dates.",
+      "tab": "Look",
+      "default": "English",
       "values": {
-        "Арт гри": {},
-        "Луг": {
+        "English": {},
+        "Українська": {
+          "TargetCss": {
+            "affects": [
+              ".*"
+            ],
+            "src": "css/options/lang-uk.css"
+          }
+        }
+      }
+    },
+    "Background": {
+      "description": "What sits behind the glass.",
+      "tab": "Look",
+      "default": "Game art",
+      "values": {
+        "Game art": {},
+        "Meadow": {
           "TargetCss": {
             "affects": [
               "^Steam$"
@@ -27,7 +48,7 @@
             "src": "css/options/bg-meadow.css"
           }
         },
-        "Без картинки": {
+        "Plain dusk": {
           "TargetCss": {
             "affects": [
               "^Steam$"
@@ -37,13 +58,37 @@
         }
       }
     },
-    "Акцент": {
-      "description": "Звідки клієнт бере колір кнопок і виділень",
-      "default": "З арту гри",
-      "tab": "Вигляд",
+    "Background art": {
+      "description": "How strongly the game art shows through.",
+      "tab": "Look",
+      "default": "Normal",
       "values": {
-        "З арту гри": {},
-        "Завжди синій": {
+        "Normal": {},
+        "Subtle": {
+          "TargetCss": {
+            "affects": [
+              ".*"
+            ],
+            "src": "css/options/art-subtle.css"
+          }
+        },
+        "Vivid": {
+          "TargetCss": {
+            "affects": [
+              ".*"
+            ],
+            "src": "css/options/art-vivid.css"
+          }
+        }
+      }
+    },
+    "Accent colour": {
+      "description": "Colour of buttons and highlights. Fixed uses Accent from the Colors tab.",
+      "tab": "Look",
+      "default": "Game art",
+      "values": {
+        "Game art": {},
+        "Fixed": {
           "TargetCss": {
             "affects": [
               ".*"
@@ -53,13 +98,13 @@
         }
       }
     },
-    "Скло": {
-      "description": "Скільки фону просвічує крізь панелі",
-      "default": "Звичайне",
-      "tab": "Вигляд",
+    "Glass": {
+      "description": "How see-through the panels are.",
+      "tab": "Look",
+      "default": "Normal",
       "values": {
-        "Звичайне": {},
-        "Щільніше": {
+        "Normal": {},
+        "Denser": {
           "TargetCss": {
             "affects": [
               "^Steam$"
@@ -67,7 +112,7 @@
             "src": "css/options/glass-dense.css"
           }
         },
-        "Прозоріше": {
+        "Sheerer": {
           "TargetCss": {
             "affects": [
               "^Steam$"
@@ -77,13 +122,13 @@
         }
       }
     },
-    "Заокруглення": {
-      "description": "Радіуси панелей і карток",
-      "default": "Звичайне",
-      "tab": "Вигляд",
+    "Corners": {
+      "description": "Radius of panels and cards.",
+      "tab": "Look",
+      "default": "Normal",
       "values": {
-        "Звичайне": {},
-        "М'якше": {
+        "Normal": {},
+        "Softer": {
           "TargetCss": {
             "affects": [
               ".*"
@@ -91,7 +136,7 @@
             "src": "css/options/radius-soft.css"
           }
         },
-        "Гостріше": {
+        "Sharper": {
           "TargetCss": {
             "affects": [
               ".*"
@@ -101,13 +146,29 @@
         }
       }
     },
-    "Полиця «Що нового»": {
-      "description": "Стандартна стрічка новин Steam на Головній",
-      "default": "Сховати",
-      "tab": "Вигляд",
+    "Library home": {
+      "description": "The theme's header (greeting, stats, Continue) or Steam's shelves only.",
+      "tab": "Library",
+      "default": "Theme",
       "values": {
-        "Сховати": {},
-        "Показувати": {
+        "Theme": {},
+        "Steam": {
+          "TargetCss": {
+            "affects": [
+              "^Steam$"
+            ],
+            "src": "css/options/home-steam.css"
+          }
+        }
+      }
+    },
+    "What's New shelf": {
+      "description": "Steam's What's New shelf on the library home.",
+      "tab": "Library",
+      "default": "no",
+      "values": {
+        "no": {},
+        "yes": {
           "TargetCss": {
             "affects": [
               "^Steam$"
@@ -117,13 +178,61 @@
         }
       }
     },
-    "Оверлей у грі": {
-      "description": "Фон за панелями оверлея Shift+Tab: прозорий, щоб було видно гру, або майже чорний, як у Steam",
-      "default": "Прозорий",
-      "tab": "Вигляд",
+    "Game list side": {
+      "description": "Where the game list sits.",
+      "tab": "Library",
+      "default": "Right",
       "values": {
-        "Прозорий": {},
-        "Як у Steam": {
+        "Right": {},
+        "Left": {
+          "TargetCss": {
+            "affects": [
+              "^Steam$"
+            ],
+            "src": "css/options/list-left.css"
+          }
+        }
+      }
+    },
+    "Big Picture": {
+      "description": "Cover: the focused game's art fills the screen and lends its colour.",
+      "tab": "Big Picture & overlay",
+      "default": "Cover",
+      "values": {
+        "Cover": {
+          "TargetCss": {
+            "affects": [
+              "GamepadUIPopupWindowBody"
+            ],
+            "src": "css/bigpicture.css"
+          }
+        },
+        "Steam": {}
+      }
+    },
+    "Big Picture hours chip": {
+      "description": "Top-left chip: logo, hours played, last played.",
+      "tab": "Big Picture & overlay",
+      "default": "yes",
+      "values": {
+        "yes": {},
+        "no": {
+          "TargetCss": {
+            "affects": [
+              "GamepadUIPopupWindowBody"
+            ],
+            "src": "css/options/bpm-chip-hide.css"
+          }
+        }
+      }
+    },
+    "Overlay background": {
+      "description": "Behind the Shift+Tab panels: a light veil or Steam's dark sheet.",
+      "tab": "Big Picture & overlay",
+      "default": "Transparent",
+      "values": {
+        "Transparent": {},
+        "Steam": {
           "TargetCss": {
             "affects": [
               "^SP Overlay"
@@ -133,12 +242,12 @@
         }
       }
     },
-    "Панелі оверлея": {
-      "description": "Панелі Shift+Tab («Огляд гри», друзі, браузер) і панель інструментів знизу: димчасте скло з акцентом або як у Steam",
-      "default": "Скло",
-      "tab": "Вигляд",
+    "Overlay panels": {
+      "description": "Game Overview, browser and toolbar: smoked glass or Steam's own.",
+      "tab": "Big Picture & overlay",
+      "default": "Glass",
       "values": {
-        "Скло": {
+        "Glass": {
           "TargetCss": {
             "affects": [
               ".*"
@@ -146,23 +255,7 @@
             "src": "css/options/overlay-glass.css"
           }
         },
-        "Як у Steam": {}
-      }
-    },
-    "Big Picture": {
-      "description": "Головна Big Picture: арт гри у фокусі на весь екран, колір кнопок із нього й чип із годинами гри",
-      "default": "Обкладинка",
-      "tab": "Вигляд",
-      "values": {
-        "Обкладинка": {
-          "TargetCss": {
-            "affects": [
-              "Big Picture"
-            ],
-            "src": "css/bigpicture.css"
-          }
-        },
-        "Як у Steam": {}
+        "Steam": {}
       }
     }
   },

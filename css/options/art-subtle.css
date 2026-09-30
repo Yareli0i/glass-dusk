@@ -1,0 +1,2 @@
+/* Background art: Subtle — darker and softer, the glass reads calmer */
+:root { --gd-art-filter: blur(72px) saturate(1.3) brightness(.34); }
