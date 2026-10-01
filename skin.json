@@ -2,7 +2,7 @@
   "name": "Glass Dusk",
   "description": "Smoked glass over the art of the game you have open: the client takes its accent colour from that art. Styles the library, store, menus, Big Picture and the in-game overlay.",
   "author": "Yareli",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "tags": [
     "Dark",
     "Glass",
@@ -12,6 +12,9 @@
   "github": {
     "owner": "Yareli0i",
     "repo_name": "glass-dusk"
+  },
+  "funding": {
+    "kofi": "yareli0i"
   },
   "header_image": "https://raw.githubusercontent.com/Yareli0i/glass-dusk/main/images/header.jpg",
   "splash_image": "https://raw.githubusercontent.com/Yareli0i/glass-dusk/main/images/splash.jpg",

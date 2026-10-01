@@ -99,10 +99,17 @@
     }
   };
 
-  /* ── store and community pages: their own origin, their own art ── */
+  /* ── web pages: the store gets its app's art; community and profiles are left alone ── */
 
-  const webHost = /steampowered|steamcommunity/.test(location.hostname);
+  // Profiles carry their owners' own backgrounds and themes, and the community's old
+  // markup read worse half-restyled than untouched — so nothing here runs on them.
+  if (/(^|\.)steamcommunity\.com$/.test(location.hostname)) return;
+  const webHost = /(^|\.)steampowered\.com$/.test(location.hostname);
   if (webHost) {
+    // css/webkit.css reaches every web page (Steam-WebKit); its rules wait for this class.
+    // A URL patch was tried and missed pages that redirect (/wishlist/ → /wishlist/id/…,
+    // /replay/ → /replay/<id>/…). Checkout, help and login pages stay Steam's own.
+    if (location.hostname === 'store.steampowered.com') root.classList.add('gd-store');
     const appid = (location.pathname.match(/\/app\/(\d+)/) || [])[1];
     if (appid) {
       const url = `https://shared.steamstatic.com/store_item_assets/steam/apps/${appid}/library_hero.jpg`;
@@ -113,7 +120,7 @@
       img.crossOrigin = 'anonymous';
       img.onload = () => {
         const picked = accentFrom(img);
-        if (picked) {
+        if (picked && !accentLocked()) {
           root.style.setProperty('--gd-accent', picked.accent);
           root.style.setProperty('--gd-accent-ink', picked.ink);
         }
@@ -311,9 +318,9 @@
     next();
   };
 
-  // Ідентифікатор для RunGame. Поля m_gameid в записах гри немає (undefined) —
-  // через це кнопка «Грати» передавала порожній рядок і мовчки нічого не робила.
-  // Для гри Steam це просто appid.
+  // The id RunGame wants. Library entries have no m_gameid (undefined), so the Play
+  // button passed an empty string and silently did nothing. For a Steam game it is
+  // simply the appid.
   const gameIdOf = app => String(app.gameid || app.m_gameid || app.appid || '');
 
   const esc = s => String(s == null ? '' : s)
@@ -389,7 +396,7 @@
 
   /* ═════════════ Big Picture: the focused game paints the screen ═════════════ */
 
-  // Switch «Big Picture → Обкладинка» (css/bigpicture.css). Steam keeps the focused game's
+  // Switch "Big Picture → Cover" (css/bigpicture.css). Steam keeps the focused game's
   // art behind its home screen; during a move there are two images — the incoming one
   // first, the outgoing one marked OffScreen. Reading the last one showed the game just
   // left, so the chip and the colour were always one step behind.

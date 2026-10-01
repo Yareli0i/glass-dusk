@@ -1,4 +1,4 @@
-/* Скло: щільніше — менше фону, більше контрасту під текстом */
+/* Glass: denser — less background, more contrast under text */
 :root {
   --gd-glass-fill: linear-gradient(135deg, color-mix(in srgb, var(--gd-glass, #0c0d13) 74%, transparent), color-mix(in srgb, color-mix(in srgb, var(--gd-glass, #0c0d13) 66%, #000) 66%, transparent)) !important;
   --gd-blur: 30px !important;

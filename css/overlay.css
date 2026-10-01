@@ -3,8 +3,8 @@
    ║                                                                           ║
    ║  Steam lays black at 67→93 % plus a 300 px inset shadow behind the overlay ║
    ║  panels, and the game all but disappears under it. Thinned here so the     ║
-   ║  game stays readable behind the panels. The «Оверлей у грі» switch puts     ║
-   ║  Steam's own backdrop back.                                               ║
+   ║  game stays readable behind the panels. "Overlay background → Steam"      ║
+   ║  puts Steam's own backdrop back.                                          ║
    ╚═══════════════════════════════════════════════════════════════════════════╝ */
 
 :root {

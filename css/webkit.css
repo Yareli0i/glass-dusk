@@ -1,5 +1,10 @@
 /* ╔═══════════════════════════════════════════════════════════════════════════╗
-   ║  Glass Dusk — web pages inside the client (store, community, workshop)     ║
+   ║  Glass Dusk — the store inside the client (store.steampowered.com only)    ║
+   ║                                                                           ║
+   ║  Community and profile pages stay as Steam draws them: profiles carry      ║
+   ║  their owners' own backgrounds and themes, and a half-restyled community   ║
+   ║  read worse than an untouched one. Millennium loads this file into every   ║
+   ║  web page; its rules wait for html.gd-store, set by js/dusk.js.            ║
    ║                                                                           ║
    ║  Deliberately small. Steam's store pages are a fixed-height, absolutely     ║
    ║  positioned layout in a font it measures itself: boxing their blocks or     ║
@@ -19,9 +24,12 @@
   --gd-r-md: 12px;
 }
 
+/* store.steampowered.com only (js/dusk.js adds the class); :where() adds no specificity */
+:where(html.gd-store) {
+
 /* ═══════════════ the ground ═══════════════ */
 
-html,
+&,
 body.v6,
 body.v7,
 body.responsive_page,
@@ -62,6 +70,13 @@ body::after {
 }
 
 /* ═══════════════ chrome ═══════════════ */
+
+/* On the React store pages (wishlist) the client gets its own variant of the global
+   header — a <header id="global_header"> with a logo and a mobile-menu button — and
+   Steam ships no stylesheet for it: the button came out 260×236 with a raw image in it,
+   with or without this theme. Inside the client the top bar already carries the
+   navigation, and the classic store pages collapse this header to nothing. */
+header#global_header { display: none !important; }
 
 #global_header,
 .responsive_page_menu_ctn,
@@ -142,17 +157,22 @@ body::after {
 
 /* ═══════════════ scrollbars ═══════════════ */
 
+/* & for the page's own scrollbar: nested, a bare ::-webkit-scrollbar reaches descendants only */
+&::-webkit-scrollbar,
 ::-webkit-scrollbar { width: 10px; height: 10px; }
+&::-webkit-scrollbar-thumb,
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, .16);
   border: 3px solid transparent;
   background-clip: content-box;
   border-radius: 999px;
 }
+&::-webkit-scrollbar-thumb:hover,
 ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, .3); background-clip: content-box; }
+&::-webkit-scrollbar-track,
 ::-webkit-scrollbar-track { background: transparent; }
 
-/* the price plate behind "До кошика" is a black slab on our ground */
+/* the price plate behind "Add to Cart" is a black slab on our ground */
 .game_purchase_action,
 .game_purchase_action_bg,
 .game_purchase_price.price,
@@ -281,26 +301,6 @@ body::after {
   border-radius: 999px !important;
   color: var(--gd-ink) !important;
 }
-/* ═══════════════ community pages ═══════════════ */
-
-.apphub_CardContentGuideTitle,
-.apphub_CardContentAuthorBlock,
-.apphub_Card {
-  background: var(--gd-field) !important;
-  background-image: none !important;
-  border-color: rgba(255, 255, 255, .07) !important;
-  border-radius: var(--gd-r-md) !important;
-}
-.community_home_search_apps,
-.community_home_search_players,
-.community_home_search_app_input,
-.community_home_search_players_input {
-  background: var(--gd-field) !important;
-  border: none !important;
-  border-radius: 999px !important;
-  color: var(--gd-ink) !important;
-}
-
 /* the blue plate behind store capsule blurbs, the carousel ground and the
    search suggestions — all Steam's own blues over our dusk */
 .info,
@@ -311,7 +311,7 @@ body::after {
   border-radius: var(--gd-r-md) !important;
 }
 
-/* The strip that carries Огляд / Категорії / search is a blue gradient band.
+/* The strip that carries Browse / Categories / search is a blue gradient band.
    Its Panels nest, so only the outer one is filled — otherwise the middle of the
    strip stacks two tints and reads as a darker block. The fill has to stay: the
    menu labels sit over whatever banner art the store is showing. */
@@ -335,3 +335,5 @@ form:has(> div > input[type=text]) input[type=text] {
   color: var(--gd-ink) !important;
 }
 form:has(> div > input[type=text]) button { background: var(--gd-accent) !important; border: none !important; }
+
+}   /* :where(html.gd-store) */

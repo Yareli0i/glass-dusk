@@ -1,10 +1,10 @@
 /* ╔═══════════════════════════════════════════════════════════════════════════╗
-   ║  Glass Dusk — overlay panels and toolbar (switch «Панелі оверлея → Скло») ║
+   ║  Glass Dusk — overlay panels and toolbar ("Overlay panels → Glass")       ║
    ║                                                                           ║
-   ║  The panels (Огляд гри, друзі, браузер…) are separate untitled windows     ║
-   ║  with body.OverlayPopupBody, so this file rides on ".*" and scopes itself  ║
-   ║  by class. The toolbar lives in the overlay window itself (html.gd-overlay ║
-   ║  comes from js/dusk.js).                                                  ║
+   ║  The panels (Game Overview, friends, browser…) are separate untitled      ║
+   ║  windows with body.OverlayPopupBody, so this file rides on ".*" and       ║
+   ║  scopes itself by class. The toolbar lives in the overlay window itself   ║
+   ║  (html.gd-overlay comes from js/dusk.js).                                 ║
    ║                                                                           ║
    ║  The game is composited outside these pages: backdrop-filter has nothing  ║
    ║  to blur there. The glass is a denser tint instead, dense enough to read  ║

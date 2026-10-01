@@ -20,6 +20,13 @@
   --gd-line: rgba(255, 255, 255, .08);
 }
 
+/* Everything below is for the client's own windows. Millennium loads this file into
+   web pages too (store, community, profiles), where these generic class names — .friend,
+   .gameName, .avatarHolder, the scrollbars — caught Steam's community markup and left
+   those pages half-restyled. Web pages carry html.MillenniumWindow_SteamBrowser; :where()
+   adds no specificity, so the cascade inside the client stays exactly as it was. */
+:where(:root:not(.MillenniumWindow_SteamBrowser)) {
+
 /* the art layer js/dusk.js puts in every window */
 #gd-art {
   position: fixed;
@@ -76,6 +83,48 @@ body.ContextMenuPopupBody .MenuItem.Item.Focus {
 }
 body.ContextMenuPopupBody .MenuItem.Separator,
 body.ContextMenuPopupBody hr.MenuItem { background: var(--gd-line) !important; border: none !important; }
+
+/* A menu that fits inside its parent window is drawn right there — no popup window, no
+   ContextMenuPopupBody: the right-click menu on a game in the library. Same glass. */
+body.DesktopUI .contextMenu {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+body.DesktopUI .contextMenuContents {
+  background: var(--gd-pane) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(1.3);
+  backdrop-filter: blur(26px) saturate(1.3);
+  border: 1px solid rgba(255, 255, 255, .1) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 30px 60px -22px rgba(0, 0, 0, .75) !important;
+  color: var(--gd-ink) !important;
+}
+body.DesktopUI .contextMenuItem {
+  border-radius: 8px !important;
+  color: var(--gd-ink) !important;
+  transition: background .12s ease;
+}
+body.DesktopUI .contextMenuItem:hover {
+  background: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 28%, transparent) !important;
+  color: #fff !important;
+}
+/* Steam's green "Play" row at the top of a game's menu */
+body.DesktopUI .contextMenuItem.Play,
+body.DesktopUI .contextMenuItem.Play:hover {
+  background: var(--gd-accent, var(--gd-house)) !important;
+  color: var(--gd-accent-ink, #fff) !important;
+  font-weight: 600;
+}
+body.DesktopUI .contextMenuItem.Play:hover { filter: brightness(1.08); }
+body.DesktopUI .contextMenuItem.Play svg,
+body.DesktopUI .contextMenuItem.Play svg * { fill: currentColor !important; }
+/* Steam draws a separator as a top border on the row below it; on a rounded row it bends */
+body.DesktopUI .ContextMenuSeparator + .contextMenuItem {
+  border-top-color: var(--gd-line) !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
 
 /* notifications live in the same kind of window */
 /* the notification rows keep Steam's own metrics and spacing; a background of
@@ -142,6 +191,8 @@ body.ModalDialogBody .Field { background: var(--gd-soft) !important; border-radi
   color: var(--gd-ink) !important;
 }
 .DialogButton._DialogLayout:hover { background: rgba(255, 255, 255, .14) !important; }
+/* the tall tiles on Settings → Account are buttons too; a pill that high is a blob */
+.DialogButton.FatButton { border-radius: var(--gd-r-md, 12px) !important; }
 .DialogButton.Primary {
   background: var(--gd-accent, var(--gd-house)) !important;
   color: var(--gd-accent-ink, #fff) !important;
@@ -193,7 +244,8 @@ body.fullheight #popup_target.popup_chat_frame,
   text-transform: uppercase;
   letter-spacing: .1em;
 }
-.statusHeaderGlow ellipse { fill: rgba(94, 144, 228, .16) !important; }
+/* Steam's own glow behind the name stays: it fades out by itself and follows the status */
+.statusHeaderGlow { opacity: .7; }
 .currentUserContainer { border-bottom: 1px solid var(--gd-line); }
 .playerName { color: var(--gd-ink) !important; }
 .richPresenceLabel,
@@ -238,12 +290,19 @@ body.fullheight #popup_target.popup_chat_frame,
 
 /* ═══════════════ scrollbars ═══════════════ */
 
+/* nested, a bare ::-webkit-scrollbar would only reach descendants — & keeps the window's own */
+&::-webkit-scrollbar,
 ::-webkit-scrollbar { width: 10px; height: 10px; }
+&::-webkit-scrollbar-thumb,
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, .16);
   border: 3px solid transparent;
   background-clip: content-box;
   border-radius: 999px;
 }
+&::-webkit-scrollbar-thumb:hover,
 ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, .3); background-clip: content-box; }
+&::-webkit-scrollbar-track,
 ::-webkit-scrollbar-track { background: transparent; }
+
+}   /* :where(:root:not(.MillenniumWindow_SteamBrowser)) */

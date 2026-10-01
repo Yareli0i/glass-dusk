@@ -377,8 +377,8 @@ svg#arrowBase { background: var(--gd-field) !important; border-radius: 999px !im
 .LibraryItemBoxSubscript { background: var(--gd-soft) !important; border-radius: 6px !important; }
 /* trading-card tiles and the news cards in the activity feed */
 .CardContainer { background: var(--gd-soft) !important; border-radius: var(--gd-r-sm) !important; }
-/* Підстрічка ловила й `_Title`, `_Summary`, `_TextColumn` — градієнт лягав
-   під кожен текстовий блок окремо, і текст виглядав виділеним. Лише сама картка. */
+/* A substring match also caught `_Title`, `_Summary` and `_TextColumn`: the gradient
+   landed under every text block and the text looked highlighted. The card only. */
 .PartnerEventMediumImage,
 .PartnerEvent {
   background-image: linear-gradient(100deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .02)) !important;
@@ -442,9 +442,9 @@ svg#arrowBase { background: var(--gd-field) !important; border-radius: 999px !im
 .PlayBarDetailLabel { color: var(--gd-ink) !important; }
 .PlayBarDetailLabel .DialogButton { background: none !important; color: var(--gd-ink) !important; }
 .GameStatIcon, .GameStatIconForced { opacity: .6; }
-/* Трек і заливка — різні елементи, і трек є прямим дитям `.AchievementProgressRow`.
-   Через це `[class*=AchievementProgress] > div` фарбував саме трек, і при 0/46
-   смуга виглядала повністю заповненою. Тільки точні класи. */
+/* Track and fill are separate elements, and the track is a direct child of
+   `.AchievementProgressRow`. So `[class*=AchievementProgress] > div` painted the track,
+   and at 0/46 the bar looked full. Exact classes only. */
 .DetailsProgressContainer,
 .AchievementProgressContainer {
   background: rgba(255, 255, 255, .14) !important;
@@ -623,7 +623,7 @@ body.DesktopUI,
 }
 
 /* achievement bars: light track, accent fill — never a black slab */
-/* (тут був `[class*=AchievementProgress] > div` — він ловив трек замість заливки) */
+/* (`[class*=AchievementProgress] > div` lived here — it caught the track, not the fill) */
 
 /* "What's New" shelf is off by default — the home already has your own shelf */
 .AppDetailsMain .Body.InnerContainer > div:has(.UpdatesContainer) { display: none !important; }
@@ -706,10 +706,10 @@ body.DesktopUI,
   border-radius: var(--gd-r-md) !important;
 }
 
-/* опис гри Steam кладе на власну темну плиту, і її край читається як межа блоку */
+/* Steam sets the game description on a dark slab of its own, and its edge reads as a border */
 .AppDetailsMain .AppGameInfoContainer .Container { background: transparent !important; }
 
-/* панель «чи рекомендували б ви гру» лишалась у сіро-блакитних тонах Steam */
+/* the "would you recommend this game" panel stayed in Steam's grey-blue */
 .ReviewContainer,
 .RatingContainer {
   background: var(--gd-soft) !important;
@@ -730,11 +730,10 @@ body.DesktopUI,
 
 /* (a facts panel lived here — it only repeated what the play bar already says) */
 
-/* Навколо ряду вкладок лишалася ледь помітна рамка — рівно по межах
-   `.AppDetailsSectionContainer`. Жодна обчислена властивість її не пояснює
-   (усі фони прозорі, рамок і тіней немає), але зникає вона лише разом із
-   секцією. Тому тут просте скидання малювання на обгортках: чипи його не
-   зачіпають і лишаються пігулками. */
+/* A faint frame stayed around the row of link chips, exactly along
+   `.AppDetailsSectionContainer`. No computed property explains it (every background
+   is transparent, no borders, no shadows), yet it only goes away with the section.
+   Hence a plain paint reset on the wrappers; the chips are not touched and stay pills. */
 .LinksSection,
 .LinksSection > *,
 .LinksSection .AppDetailsSectionContainer,
@@ -746,6 +745,16 @@ body.DesktopUI,
   outline: 0 !important;
 }
 
-/* `.RatingContainer` вкладений у `.ReviewContainer`, і два шари скла підряд
-   дають світлішу коробку в коробці */
+/* `.RatingContainer` sits inside `.ReviewContainer`, and two layers of glass in a row
+   give a lighter box within a box */
 .ReviewContainer .RatingContainer { background: transparent !important; }
+
+/* ═══════════════ the card a capsule shows on hover ═══════════════ */
+
+/* Steam's grey slab with square corners; its blurred cover stays as the ground */
+.AppPortraitHover {
+  background: #0d1018 !important;
+  border-radius: var(--gd-r-md) !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .1), 0 24px 50px -18px rgba(0, 0, 0, .85) !important;
+}
+.AppPortraitHover .AppTitleContainer { background: transparent !important; }

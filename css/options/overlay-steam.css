@@ -1,4 +1,4 @@
-/* «Оверлей у грі» → «Як у Steam»: Steam's own near-black backdrop */
+/* Overlay background → Steam: Steam's own near-black backdrop */
 html:root {
   --gd-overlay-backdrop: radial-gradient(rgba(0, 0, 0, .667), rgba(0, 0, 0, .933));
   --gd-overlay-shadow: inset 0 0 300px 10px #000;

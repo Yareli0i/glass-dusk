@@ -6,8 +6,8 @@
 skin.json            patches, settings (Conditions) and store metadata
 css/root.css         the Colors tab: one :root block, @name/@description per colour
 css/steam.css        main window: ground, the two panes of glass, game list, game page, downloads
-css/shared.css       every window: menus, settings, dialogs, notifications, friends and chat
-css/webkit.css       web pages inside the client: store, community, workshop
+css/shared.css       every client window: menus, settings, dialogs, notifications, friends and chat
+css/webkit.css       the store inside the client (store.steampowered.com only)
 css/overlay.css      in-game overlay window ("SP Overlay: …")
 css/bigpicture.css   Big Picture "Cover" (switch Big Picture)
 css/options/*.css    what the settings switch on
@@ -24,6 +24,18 @@ assets/              number font (+ its OFL licence) and the meadow background
 - **One pane of glass.** `backdrop-filter` is used on the two library panels only. Nested frosted boxes stack into a milky haze.
 - **Option files load before `css/steam.css`.** A rule in an option file that undoes a rule in `steam.css` needs more specificity (an `html` prefix): an equal `!important` loses to the later file.
 - **Relative asset paths.** The theme folder is named after the repository, so nothing may reference the folder by name.
+
+## Web pages
+
+- Millennium loads the `Steam-WebKit` stylesheet and every `.*` patch into each web page the client shows: store, community, profiles. Those pages carry `html.MillenniumWindow_SteamBrowser`.
+- `css/shared.css` is for the client's own windows, and its class names (`.friend`, `.gameName`, `.avatarHolder`, the scrollbars) also exist in community markup. The whole file is nested in `:where(:root:not(.MillenniumWindow_SteamBrowser))`. `:where()` adds no specificity, so the cascade inside the client is unchanged.
+- `css/webkit.css` is nested in `:where(html.gd-store)`. `js/dusk.js` sets that class on store.steampowered.com. Matching by URL in `skin.json` is not reliable: `/wishlist/` and `/replay/` redirect, and the patch is decided before the redirect.
+- Community and profile pages get nothing from the theme. Check with a screenshot diff against the same page with the theme's stylesheets disabled: it should be zero.
+
+## Menus
+
+- Most menus are their own windows with `body.ContextMenuPopupBody`. A menu that fits inside its parent window is drawn in that window instead: the right-click menu on a game in the library. `css/shared.css` covers both, the second through `body.DesktopUI .contextMenu`.
+- Steam draws a menu separator as a top border on the row below it.
 
 ## Big Picture
 

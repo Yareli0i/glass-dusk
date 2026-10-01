@@ -1,8 +1,8 @@
 /* ╔═══════════════════════════════════════════════════════════════════════════╗
-   ║  Glass Dusk — Big Picture, «Обкладинка»                                   ║
+   ║  Glass Dusk — Big Picture, "Cover"                                        ║
    ║                                                                           ║
-   ║  The window is titled «Steam у режимі Big Picture» in Ukrainian, so the    ║
-   ║  patch matches "Big Picture", not "^Steam Big Picture Mode$". Every        ║
+   ║  The window title is translated, so the patch matches the body class      ║
+   ║  GamepadUIPopupWindowBody instead of "^Steam Big Picture Mode$". Every    ║
    ║  element carries a readable class next to its hash (BasicFooter, Clock…),  ║
    ║  and those are what these rules use.                                      ║
    ║                                                                           ║

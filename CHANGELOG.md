@@ -2,6 +2,23 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 1.4.0 — 2026-10-01
+
+**Community and profiles**
+- Community and profile pages are no longer restyled. They were caught half-way: rules meant for the client's own windows (friends, avatars, scrollbars) also matched community markup. Profiles carry their owners' own backgrounds and themes, so these pages now stay exactly as Steam draws them.
+- Store styling applies to store.steampowered.com only.
+
+**Fixes**
+- Wishlist: a huge unstyled header with a menu button sat on top of the page. It is Steam's own in-client header, shown with or without the theme, and it is now hidden.
+- Library: the right-click menu on a game stayed in Steam's grey with a green Play row. It now matches the other menus.
+- Library: the card that appears when hovering a game gets rounded corners and the theme's dark ground.
+- Settings → Account: the three large tiles were stretched into ovals.
+- Friends list: the glow behind your name was a hard-edged ellipse. Steam's own soft glow is back.
+
+**Other**
+- Donate button for steambrew.app (Ko-fi).
+- Source comments are in English throughout.
+
 ## 1.3.0 — 2026-09-30
 
 Ready for release.

@@ -1,4 +1,4 @@
-/* Фон: луг замість арту гри */
+/* Background: the meadow instead of game art */
 :root { --gd-bg-mode: meadow; }
 body.DesktopUI::before {
   background: url('../../assets/meadow.jpg') center / cover no-repeat !important;
