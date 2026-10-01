@@ -543,6 +543,16 @@ svg#arrowBase { background: var(--gd-field) !important; border-radius: 999px !im
 .PartnerEventFeaturedHeader {
   background: linear-gradient(to right, var(--gd-accent, var(--gd-house)), transparent 92%) !important;
 }
+/* The featured update card on a game page: Steam's blue comes twice — as the ground
+   under the blurred image and as a border-image, which also keeps the corners square. */
+.PartnerEventFeatured {
+  background-image: linear-gradient(to right,
+    color-mix(in srgb, var(--gd-accent, var(--gd-house)) 55%, #0c0e15), #10131c 70%) !important;
+  border-image: none !important;
+  border-color: rgba(255, 255, 255, .1) !important;
+  border-radius: var(--gd-r-md) !important;
+  overflow: hidden;
+}
 .CommunityItem.Blank { background: var(--gd-soft) !important; border-radius: var(--gd-r-md) !important; }
 
 /* ═══════════════ downloads ═══════════════ */

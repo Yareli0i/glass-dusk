@@ -12,12 +12,13 @@ Versions follow [semantic versioning](https://semver.org). The repository starts
 - Wishlist: a huge unstyled header with a menu button sat on top of the page. It is Steam's own in-client header, shown with or without the theme, and it is now hidden.
 - Library: the right-click menu on a game stayed in Steam's grey with a green Play row. It now matches the other menus.
 - Library: the card that appears when hovering a game gets rounded corners and the theme's dark ground.
+- Game page: the *Featured* update card kept Steam's blue frame and square corners.
 - Settings → Account: the three large tiles were stretched into ovals.
 - Friends list: the glow behind your name was a hard-edged ellipse. Steam's own soft glow is back.
 
 **Other**
 - Donate button for steambrew.app (Ko-fi).
-- Source comments are in English throughout.
+- Source comments are in English throughout, and the screenshots show the English client.
 
 ## 1.3.0 — 2026-09-30
 
