@@ -768,3 +768,16 @@ body.DesktopUI,
   box-shadow: 0 0 0 1px rgba(255, 255, 255, .1), 0 24px 50px -18px rgba(0, 0, 0, .85) !important;
 }
 .AppPortraitHover .AppTitleContainer { background: transparent !important; }
+
+/* the "N of M earned" bar at the top of a game's achievements page */
+.AchievementsPageContainer .ProgressBar { background: var(--gd-field) !important; }
+.AchievementsPageContainer .ProgressBar .Percent { background: var(--gd-accent, var(--gd-house)) !important; }
+/* the page itself: Steam's slate-blue sheet, the grey sheen behind it and the blue "scroll to top" tab */
+.AchievementsPageContainer .GamepadPage { background-image: none !important; }
+.AchievementsPageContainer .Page { background: #0d1018 !important; }
+.AchievementsPageContainer .Page .Background .Blur { background-image: linear-gradient(transparent, #0d1018) !important; }
+.ScrollToTopButton > div {
+  background: var(--gd-accent, var(--gd-house)) !important;
+  background-image: none !important;
+  color: var(--gd-accent-ink, #fff) !important;
+}

@@ -302,8 +302,9 @@ header#global_header { display: none !important; }
   color: var(--gd-ink) !important;
 }
 /* the blue plate behind store capsule blurbs, the carousel ground and the
-   search suggestions — all Steam's own blues over our dusk */
-.info,
+   search suggestions — all Steam's own blues over our dusk.
+   Not .reason.info: those are the rows of "Is this game relevant to you?", plain text on the block. */
+.info:not(.reason),
 .carousel_items,
 .OtherEvents_EventCtn,
 [id^=searchSuggestions] {
@@ -316,7 +317,7 @@ header#global_header { display: none !important; }
    strip stacks two tints and reads as a darker block. The fill has to stay: the
    menu labels sit over whatever banner art the store is showing. */
 .responsive_page_content .Panel { background-image: none !important; }
-.responsive_page_content .Panel:not(.Panel .Panel) {
+.responsive_page_content .Panel:not(.Panel .Panel):not(.review_ctn .Panel) {
   background-image: linear-gradient(180deg, rgba(8, 10, 17, .82), rgba(8, 10, 17, .62)) !important;
   -webkit-backdrop-filter: blur(18px) saturate(1.15);
   border-bottom: 1px solid rgba(255, 255, 255, .07);
@@ -335,5 +336,157 @@ form:has(> div > input[type=text]) input[type=text] {
   color: var(--gd-ink) !important;
 }
 form:has(> div > input[type=text]) button { background: var(--gd-accent) !important; border: none !important; }
+
+/* ═══════════════ a game's page: "already in your library" and the review form ═══════════════ */
+
+.game_background_lighten { background-image: none !important; }          /* Steam's blue glow under the queue bar */
+.queue_menu_arrow { background: var(--gd-field) !important; }
+.btnv6_border_2px { border-color: transparent !important; }
+.game_area_already_owned .ds_owned_flag {
+  background-color: var(--gd-accent) !important;
+  border-radius: 4px;
+  color: var(--gd-accent-ink) !important;
+}
+.game_area_already_owned .already_in_library { color: var(--gd-ink) !important; }
+.game_area_play_stats {
+  background: rgba(255, 255, 255, .045) !important;
+  background-image: none !important;
+  border-radius: var(--gd-r-md) !important;
+}
+.game_area_play_stats .hours_played { color: var(--gd-ink-soft) !important; }
+.game_area_play_stats .details_block a,
+#review_create #review_describe a { color: var(--gd-accent) !important; }
+#review_create h2 {
+  border-color: rgba(255, 255, 255, .08) !important;
+  color: var(--gd-ink) !important;
+}
+#review_create textarea.input_box {
+  background: var(--gd-field) !important;
+  border: 1px solid transparent !important;
+  border-radius: var(--gd-r-md) !important;
+  box-shadow: none !important;
+  color: var(--gd-ink) !important;
+}
+#review_create textarea.input_box:focus { border-color: var(--gd-accent) !important; outline: none; }
+#review_create .review_controls {
+  background: rgba(255, 255, 255, .04) !important;
+  border-radius: var(--gd-r-md) !important;
+}
+#review_create .controltext,
+#review_create .controlblock label,
+#review_create .review_control_didyouenjoy { color: var(--gd-ink-soft) !important; }
+#review_create .controlblock a { color: var(--gd-ink) !important; }
+#review_create .dselect_container {
+  background: var(--gd-field) !important;
+  border-radius: 999px !important;
+}
+#review_create .dselect_container .trigger { color: var(--gd-ink) !important; }
+#review_create input[type=checkbox] { accent-color: var(--gd-accent); }
+/* Yes / No are a choice, not two calls to action: quiet until one is picked */
+#VoteUpDownBtnCtn a.btn_medium {
+  background: var(--gd-field) !important;
+  color: var(--gd-ink) !important;
+}
+#VoteUpDownBtnCtn a.btn_medium:hover { background: rgba(255, 255, 255, .16) !important; filter: none; }
+#VoteUpDownBtnCtn a.btn_medium.btn_active,
+#VoteUpDownBtnCtn a.btn_medium.btn_active:hover {
+  background: var(--gd-accent) !important;
+  color: var(--gd-accent-ink) !important;
+}
+#VoteUpDownBtnCtn i.ico18 { filter: grayscale(1) brightness(2.4); }     /* the thumbs are blue sprites */
+/* posting is the action */
+#recommendation_submit {
+  background: var(--gd-accent) !important;
+  background-image: none !important;
+}
+#recommendation_submit span { background: transparent !important; color: var(--gd-accent-ink) !important; }
+#recommendation_submit:hover { filter: brightness(1.08); }
+
+/* ═══════════════ a game's page: customer reviews ═══════════════
+   Steam's newer React block. Its own classes are hashes that change with store updates, so
+   only what has a stable name is touched: the wrapper, .Panel, .DialogButton, hr.
+   The rating colours, the thumb boxes and the "PC specs" plate stay Steam's. */
+
+.review_ctn { border-top-color: transparent !important; }
+.review_ctn .Panel { border-bottom-color: transparent !important; }
+.review_ctn div:not(.Panel) > .Panel.Focusable { border-radius: var(--gd-r-md) !important; }      /* a review card */
+.review_ctn .DialogButton {
+  background-color: var(--gd-field) !important;
+  border-radius: 999px !important;
+  color: var(--gd-ink) !important;
+}
+.review_ctn .DialogButton:hover { background-color: rgba(255, 255, 255, .16) !important; }
+.review_ctn .DialogButton > div { color: var(--gd-ink-soft) !important; }
+.review_ctn button.Focusable:not(.DialogButton) { border-radius: 999px !important; }                /* the active-filter chip */
+.review_ctn hr { border-color: rgba(255, 255, 255, .08) !important; }
+/* the navy fade over a long review, just above "Read more" */
+.review_ctn .Panel.Focusable > div > div:empty:last-child:not(:only-child) { background-image: none !important; }
+
+/* ═══════════════ a game's page: the right column ═══════════════
+   Steam stacks square near-black blocks here. They become the same soft rounded cards as the
+   purchase boxes on the left. A heading is a block of its own that sits flush on the next one,
+   so the pair shares one set of corners. Paint only: sizes and spacing stay Steam's. */
+
+.rightcol.game_meta_data > .block {
+  background: rgba(255, 255, 255, .045) !important;
+  border-radius: var(--gd-r-md) !important;
+}
+.rightcol.game_meta_data > .block.heading {
+  background: rgba(255, 255, 255, .08) !important;
+  border-radius: var(--gd-r-md) var(--gd-r-md) 0 0 !important;
+}
+.rightcol.game_meta_data > .block.heading + .block { border-radius: 0 0 var(--gd-r-md) var(--gd-r-md) !important; }
+/* the achievements block is a newer React island with hashed classes only: picked by its mount point */
+.rightcol.game_meta_data > [data-featuretarget] .noOpinionatedGlobalStyles > div {
+  background: rgba(255, 255, 255, .045) !important;
+  border-radius: var(--gd-r-md) !important;
+}
+/* Embed and Report are small tools, not calls to action */
+#shareEmbedRow a.btnv6_blue_hoverfade {
+  background: var(--gd-field) !important;
+  color: var(--gd-ink) !important;
+}
+#shareEmbedRow a.btnv6_blue_hoverfade:hover { background: rgba(255, 255, 255, .16) !important; filter: none; }
+
+/* ═══════════════ plugins that add to a store page ═══════════════ */
+
+/* HLTB for Steam: its block in the right column of a game's page */
+#hltb-store-data {
+  background: rgba(255, 255, 255, .045) !important;
+  border-radius: var(--gd-r-md) !important;
+}
+#hltb-store-data .hltb-store-title { color: var(--gd-ink-soft) !important; }
+#hltb-store-data .hltb-store-row,
+#hltb-store-data .hltb-store-loading { color: var(--gd-ink-soft) !important; }
+#hltb-store-data .hltb-store-row span { color: var(--gd-ink) !important; }
+#hltb-store-data .hltb-store-link { color: var(--gd-accent) !important; }
+#hltb-store-data .hltb-store-link:hover { color: var(--gd-ink) !important; }
+
+/* Browser extensions installed through Extendium. Their blocks in the right column are ordinary
+   .block cards and are covered above; these are the pieces with a look of their own. */
+
+/* Augmented Steam: its list of links (IsThereAnyDeal, SteamDB, PCGamingWiki…) is a card too,
+   and eight accent buttons in a column shout — they are links, so they get the quiet chip */
+.rightcol.game_meta_data > div:has(.es_app_btn) {
+  background: rgba(255, 255, 255, .045) !important;
+  border-radius: var(--gd-r-md) !important;
+}
+.rightcol.game_meta_data a.es_app_btn {
+  background: var(--gd-field) !important;
+  color: var(--gd-ink) !important;
+}
+.rightcol.game_meta_data a.es_app_btn:hover { background: rgba(255, 255, 255, .16) !important; filter: none; }
+/* SteamDB's lowest-price line and Augmented Steam's price history above a purchase box */
+a.steamdb_prices,
+.itad-pricing {
+  background-color: rgba(255, 255, 255, .045) !important;
+  border-radius: var(--gd-r-md) !important;
+}
+/* SteamDB's "# appid" chip on a purchase box */
+a.btn_black.steamdb_link {
+  background: var(--gd-field) !important;
+  border-radius: 999px !important;
+  color: var(--gd-ink-soft) !important;
+}
 
 }   /* :where(html.gd-store) */

@@ -10,11 +10,13 @@ A [Millennium](https://steambrew.app) theme for the Steam desktop client. Smoked
 - **Game page.** The hero art runs edge to edge, the play bar is one flat card, and page links become chips.
 - **Store.** A game's page uses its art and colour. Everything else sits on a plain dusk ground.
 - **Menus, settings, notifications, friends and chat.** All wear the same colour as the main window.
+- **Plugins.** Millennium plugins with an interface of their own take the theme's colours: HLTB for Steam, Achievement Groups, Player Count, Extendium. Size on Disk, Non-Steam Playtimes and Easy SteamGrid match as they are. Browser extensions added through Extendium (SteamDB, Augmented Steam) put their blocks on store pages in the same cards as Steam's own.
 - **Community and profiles** stay as Steam draws them. Profiles carry their owners' own backgrounds and themes, and a half-restyled community reads worse than an untouched one.
 - **Big Picture.** The focused game's art fills the home screen and lends its colour to focus rings and tabs. A chip at the top left shows its hours and when you last played.
 - **In-game overlay (Shift+Tab).** A light veil replaces Steam's near-black sheet, so the game stays visible. *Game Overview* and the toolbar become smoked glass in the running game's colour.
 
 ![Game page](images/game.jpg)
+![Plugins on a game page: HLTB for Steam, Player Count, Size on Disk](images/plugins.jpg)
 ![Big Picture](images/bigpicture.jpg)
 
 ## Settings
@@ -36,12 +38,13 @@ Millennium → Themes → Glass Dusk → ⋯ → Settings. Changes apply after S
 | Big Picture hours chip | **on** · off | Logo, hours played and last played at the top left. |
 | Overlay background | **Transparent** · Steam | Behind the Shift+Tab panels. |
 | Overlay panels | **Glass** · Steam | *Game Overview*, the browser and the toolbar. |
+| Plugins | **Theme** · Plugin's own | Plugins with their own interface: in the theme's colours, or as they ship. |
 
 The **Colors** tab has six colours: accent, text, secondary text, glass tint, play bar, store background.
 
 ## Install
 
-- **From steambrew.app** (once the theme is listed): copy the theme ID on its page and paste it into Millennium → Themes → Install.
+- **From steambrew.app:** open [Glass Dusk in the theme catalogue](https://steambrew.app/theme/0hs3xMU5Eb85uvIALzkq), press *Copy Theme ID* and paste it into Millennium → Themes → Install.
 - **By hand:** download this repository and put the folder into `Steam/millennium/themes/`, then pick it in Millennium → Themes.
 
 Tested on Windows 11 with Steam client 1788652215 and Millennium 3.5.0.
@@ -60,7 +63,7 @@ The theme is free and stays free. If you like it, you can leave a tip on [Ko-fi]
 
 - Code: [MIT](LICENSE).
 - Number font: JetBrains Mono ExtraBold, [SIL OFL 1.1](assets/OFL-JetBrainsMono.txt).
-- Meadow background: from the author's [Glass Dash](https://github.com/Yareli0i/glass-dash) wallpaper.
+- Meadow background: by the author.
 - Game art is shown straight from your Steam library and belongs to its owners.
 
 Changes: [CHANGELOG.md](CHANGELOG.md). How the theme is put together: [DEVELOPMENT.md](DEVELOPMENT.md).

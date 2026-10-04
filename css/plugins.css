@@ -1,0 +1,245 @@
+/* ╔═══════════════════════════════════════════════════════════════════════════╗
+   ║  Glass Dusk — Millennium plugins that draw an interface of their own       ║
+   ║  (switch "Plugins → Theme")                                               ║
+   ║                                                                           ║
+   ║  Plugins ship their colours inside their own code: a <style> they add at   ║
+   ║  run time, in Steam's stock blue and grey. Those sheets come after the     ║
+   ║  theme's, so every rule here is !important and names the plugin's own      ║
+   ║  classes. Plugins that only reuse Steam's components (Non-Steam Playtimes,  ║
+   ║  Easy SteamGrid) need little or nothing: they already wear the theme       ║
+   ║  through css/steam.css and css/shared.css.                                 ║
+   ║                                                                           ║
+   ║  Colour and radius only. Sizes and positions stay the plugin's.            ║
+   ╚═══════════════════════════════════════════════════════════════════════════╝ */
+
+/* client windows only — a few of these class names are generic enough to exist on web pages */
+:where(:root:not(.MillenniumWindow_SteamBrowser)) {
+
+--gd-plug-accent: var(--gd-accent, var(--gd-bpm-accent, var(--gd-house, #5e90e4)));
+--gd-plug-panel: linear-gradient(150deg, rgba(14, 16, 26, .86), rgba(8, 9, 15, .9));
+
+/* Big Picture has an accent variable of its own (css/bigpicture.css) */
+body.GamepadUIPopupWindowBody { --gd-plug-accent: var(--gd-bpm-accent, var(--gd-accent, #5e90e4)); }
+
+/* ═══════════════ HLTB for Steam — the strip over a game's hero art ═══════════════ */
+
+/* The strip is a child of the hero capsule, and css/steam.css fades that whole capsule out at
+   the bottom with a mask — the strip, sitting in the bottom corner, faded with it. While the
+   strip is there, the fade moves to the picture alone. */
+.Header .TopCapsule:has(> #hltb-for-millennium) {
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+.Header .TopCapsule:has(> #hltb-for-millennium) > .HeaderBackgroundImage {
+  -webkit-mask-image: linear-gradient(180deg, #000 74%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 74%, transparent 100%);
+}
+#hltb-for-millennium .hltb-info {
+  background: var(--gd-plug-panel) !important;
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: var(--gd-r-md, 12px);
+  box-shadow: 0 18px 40px -22px rgba(0, 0, 0, .8);
+}
+#hltb-for-millennium .hltb-info p { color: var(--gd-ink, #eef1f8) !important; }
+#hltb-for-millennium .hltb-gametime { font-variant-numeric: tabular-nums; }
+#hltb-for-millennium .hltb-info p.hltb-label {
+  color: var(--gd-ink-soft, #a7aec0) !important;
+  letter-spacing: .08em;
+  opacity: 1 !important;
+}
+#hltb-for-millennium .hltb-details-btn { color: var(--gd-plug-accent) !important; }
+#hltb-for-millennium .hltb-details-btn:hover { color: var(--gd-ink, #eef1f8) !important; }
+
+/* ═══════════════ tiles that plugins add to the play bar ═══════════════ */
+
+/* Player Count and Size on Disk build their tile from Steam's hashed class names alone, without
+   the readable ones (.PlayBarLabel, .GameStatIcon), so the play-bar rules in css/steam.css pass
+   them by: the caption came out brighter than its neighbours and the value dimmer.
+   A tile is: icon, then a column of caption and value. */
+#playercount-badge > div:first-child,
+[data-size-on-disk] > div:first-child { opacity: .6; }
+#playercount-badge > div:last-child > :first-child,
+[data-size-on-disk] > div:last-child > :first-child { color: var(--gd-ink-faint, rgba(238, 241, 248, .44)) !important; }
+[data-size-on-disk] > div:last-child > :last-child { color: var(--gd-ink, #eef1f8) !important; }
+/* Player Count paints the whole tile by how many are playing (red, gold, grey, bronze, blue);
+   in the bar that reads as a warning. It is a quiet tile like the others: grey icon, white number. */
+#playercount-badge { color: #969696 !important; }
+#playercount-badge [data-playercount-value] { color: var(--gd-ink, #eef1f8) !important; }
+
+/* ═══════════════ Achievement Groups — its page inside a game's achievements ═══════════════ */
+
+body .steam-hunters-achievements-page { color: var(--gd-ink, #eef1f8) !important; }
+body .steam-hunters-achievements-page .achievements-header {
+  background: var(--gd-soft, rgba(255, 255, 255, .05)) !important;
+  border-radius: var(--gd-r-md, 12px) !important;
+}
+body .steam-hunters-achievements-page .achievements-header .header-top-row .search-container input,
+body .steam-hunters-achievements-page .preferences-popup .preferences-list .cache-duration-input {
+  background: var(--gd-field, rgba(255, 255, 255, .08)) !important;
+  border: 1px solid transparent !important;
+  border-radius: 10px !important;
+  color: var(--gd-ink, #eef1f8) !important;
+}
+body .steam-hunters-achievements-page .achievements-header .header-top-row .search-container input:focus,
+body .steam-hunters-achievements-page .preferences-popup .preferences-list .cache-duration-input:focus {
+  border-color: var(--gd-plug-accent) !important;
+}
+body .steam-hunters-achievements-page .achievements-header .header-bottom-row .filter-group { color: var(--gd-ink-soft, #a7aec0) !important; }
+body .steam-hunters-achievements-page .achievements-header .header-bottom-row .toggle-group .toggle-item { border-radius: 8px !important; }
+body .steam-hunters-achievements-page .achievements-header .header-bottom-row .toggle-group .toggle-item:hover { background: var(--gd-hover, rgba(255, 255, 255, .08)) !important; }
+body .steam-hunters-achievements-page .achievements-header .header-bottom-row .toggle-group .toggle-item span { color: var(--gd-ink, #eef1f8) !important; }
+body .steam-hunters-achievements-page .achievements-header select,
+body .steam-hunters-achievements-page .achievements-header .DialogDropDown,
+body .steam-hunters-achievements-page .achievements-header .__DropDownControlButton__,
+body .steam-hunters-achievements-page .achievements-header [class*=DropDownControlButton] {
+  background-color: var(--gd-field, rgba(255, 255, 255, .08)) !important;
+  border: 1px solid transparent !important;
+  border-radius: 10px !important;
+  color: var(--gd-ink, #eef1f8) !important;
+}
+body .steam-hunters-achievements-page .achievements-header select:hover,
+body .steam-hunters-achievements-page .achievements-header .__DropDownControlButton__:hover,
+body .steam-hunters-achievements-page .achievements-header select.gpfocuswithin,
+body .steam-hunters-achievements-page .achievements-header .__DropDownControlButton__.gpfocuswithin {
+  background-color: rgba(255, 255, 255, .14) !important;
+  border-color: transparent !important;
+}
+body .steam-hunters-achievements-page .achievements-header .DialogDropDown_CurrentDisplay { color: var(--gd-ink, #eef1f8) !important; }
+body .steam-hunters-achievements-page .achievements-header select option { background-color: #12151f !important; color: var(--gd-ink, #eef1f8) !important; }
+
+body .steam-hunters-achievements-page .achievement-group {
+  background-color: var(--gd-soft, rgba(255, 255, 255, .05)) !important;
+  border-radius: var(--gd-r-md, 12px) !important;
+}
+body .steam-hunters-achievements-page .group-image { border-radius: 8px !important; }
+body .steam-hunters-achievements-page .group-title .group-title-text,
+body .steam-hunters-achievements-page .group-stats { color: var(--gd-ink, #eef1f8) !important; }
+body .steam-hunters-achievements-page .date,
+body .steam-hunters-achievements-page .points,
+body .steam-hunters-achievements-page .expand-button,
+body .steam-hunters-achievements-page .achievement-item .achievement-extra-info .guide-link,
+body .steam-hunters-achievements-page .achievement-item .achievement-extra-info .obtainability.Obtainable { color: var(--gd-plug-accent) !important; }
+
+body .steam-hunters-achievements-page .achievement-item .center { border-radius: 10px !important; }
+body .steam-hunters-achievements-page .achievement-item .center:hover,
+body .steam-hunters-achievements-page .gpfocuswithin > .achievement-item > .center {
+  background-color: color-mix(in srgb, var(--gd-plug-accent) 14%, transparent) !important;
+}
+/* the bar behind each achievement: a quiet track, and the accent once it is unlocked */
+body .steam-hunters-achievements-page .achievement-item .achievement-progress {
+  background-color: rgba(255, 255, 255, .05) !important;
+  border-radius: 10px !important;
+}
+body .steam-hunters-achievements-page .achievement-item .achievement-progress.unlocked {
+  background-color: color-mix(in srgb, var(--gd-plug-accent) 15%, transparent) !important;
+}
+body .steam-hunters-achievements-page .achievement-item .achievement-image { border-radius: 8px !important; }
+body .steam-hunters-achievements-page .achievement-item .achievement-content .achievement-inner-content h3 { color: var(--gd-ink, #eef1f8) !important; }
+body .steam-hunters-achievements-page .achievement-item .achievement-content .achievement-inner-content p,
+body .steam-hunters-achievements-page .achievement-item .achievement-extra-info .completed-count { color: var(--gd-ink-soft, #a7aec0) !important; }
+body .steam-hunters-achievements-page .achievement-item .achievement-extra-info .achievement-tag,
+body .steam-hunters-achievements-page .achievement-item .achievement-extra-info .obtainability {
+  background: var(--gd-field, rgba(255, 255, 255, .08)) !important;
+  border-radius: 999px !important;
+}
+body .steam-hunters-achievements-page .achievement-item .achievement-extra-info .achievement-tag { color: var(--gd-ink, #eef1f8) !important; }
+
+/* its buttons: Collapse All, Clear Cache, Save Defaults, the cog */
+body .steam-hunters-achievements-page button {
+  background-color: var(--gd-field, rgba(255, 255, 255, .08)) !important;
+  border-radius: 999px !important;
+  color: var(--gd-ink, #eef1f8) !important;
+}
+body .steam-hunters-achievements-page button:hover,
+body .steam-hunters-achievements-page button.gpfocuswithin { background-color: rgba(255, 255, 255, .16) !important; }
+body .steam-hunters-achievements-page .expand-button,
+body .steam-hunters-achievements-page .expand-button:hover { background: none !important; color: var(--gd-plug-accent) !important; }
+
+/* its preferences window */
+body .steam-hunters-achievements-page .preferences-overlay { background: rgba(5, 6, 11, .72) !important; }
+body .steam-hunters-achievements-page .preferences-popup {
+  background: linear-gradient(160deg, rgb(26, 29, 44), rgb(14, 16, 27)) !important;
+  border: 1px solid rgba(255, 255, 255, .1) !important;
+  border-radius: var(--gd-r-lg, 16px) !important;
+  box-shadow: 0 30px 70px -20px rgba(0, 0, 0, .85) !important;
+}
+body .steam-hunters-achievements-page .preferences-popup .preferences-header {
+  background: transparent !important;
+  border-bottom: 1px solid var(--gd-line, rgba(255, 255, 255, .08)) !important;
+}
+body .steam-hunters-achievements-page .preferences-popup .preferences-list .preference-item {
+  background: var(--gd-soft, rgba(255, 255, 255, .05)) !important;
+  border-radius: var(--gd-r-md, 12px) !important;
+}
+body .steam-hunters-achievements-page .preferences-popup .preferences-list .preference-item:hover { background: var(--gd-hover, rgba(255, 255, 255, .08)) !important; }
+body .steam-hunters-achievements-page .preferences-popup .preferences-list .preference-item .preference-info .preference-label { color: var(--gd-ink, #eef1f8) !important; }
+body .steam-hunters-achievements-page .preferences-popup .preferences-list .preference-item .preference-info .preference-description,
+body .steam-hunters-achievements-page .preferences-popup .preferences-preview .preview-text { color: var(--gd-ink-soft, #a7aec0) !important; }
+body .steam-hunters-achievements-page .preferences-popup .preferences-preview {
+  background: transparent !important;
+  border-top: 1px solid var(--gd-line, rgba(255, 255, 255, .08)) !important;
+}
+body .steam-hunters-achievements-page .preferences-popup .preferences-preview .preview-window {
+  background: var(--gd-soft, rgba(255, 255, 255, .05)) !important;
+  border-radius: var(--gd-r-md, 12px) !important;
+}
+
+body .steam-hunters-tooltip .__TextToolTip__ { background-color: #12151f !important; border-radius: 8px; }
+.steam-hunters-tooltip-arrow { border-top-color: #12151f !important; }
+
+/* ═══════════════ Extendium — browser extensions inside Steam ═══════════════ */
+
+/* its menu on the address bar: the "Manage extensions" row is one of Steam's grey Field slabs */
+.extendium-toolbar-manager-context-menu .Field {
+  background: transparent !important;
+  border-radius: 8px !important;
+}
+.extendium-toolbar-manager-context-menu .Field:hover { background: var(--gd-hover, rgba(255, 255, 255, .08)) !important; }
+.extensions-bar-container .extensions-bar:hover { border-color: rgba(255, 255, 255, .16) !important; }
+.extensions-bar-container .extension-button:hover { background: var(--gd-hover, rgba(255, 255, 255, .08)) !important; }
+/* the Extensions window: one card per extension */
+.extension-card {
+  background-color: var(--gd-soft, rgba(255, 255, 255, .05)) !important;
+  border-radius: var(--gd-r-md, 12px) !important;
+}
+.extension-card .secondary-text { color: var(--gd-ink-soft, #A7AEC0) !important; }
+/* The compatibility pill (Perfect, Great, Okay, Broken) gets its colour inline from the plugin.
+   That colour stays underneath as a tint: a dark veil goes over it and the bevel goes away. */
+.extension-main .content .name-and-version .compatibility-pill {
+  background-image: linear-gradient(rgba(16, 19, 30, .55), rgba(16, 19, 30, .55)) !important;
+  border-color: transparent !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+/* an extension's Details view: a bare column with a black glow becomes one card */
+.extension-detail-info {
+  background: var(--gd-soft, rgba(255, 255, 255, .05)) !important;
+  border-radius: var(--gd-r-md, 12px) !important;
+  box-shadow: none !important;
+  overflow: hidden;
+}
+.extension-detail-info .section .heading { color: var(--gd-ink-soft, #A7AEC0) !important; }
+.extension-detail-info .section .content { color: var(--gd-ink, #EEF1F8) !important; }
+.extension-detail-info .section.hr { border-top-color: var(--gd-line, rgba(255, 255, 255, .08)) !important; }
+.extension-detail-info a { color: var(--gd-plug-accent) !important; }
+.extension-detail-info .clickable-row:hover { background: var(--gd-hover, rgba(255, 255, 255, .08)) !important; }
+.extension-card .md-button:hover,
+.extension-detail-info .md-button:hover { background: var(--gd-hover, rgba(255, 255, 255, .08)) !important; }
+.storage-manager .styled-input,
+.ext-links-manager .styled-input,
+.ext-links-manager .ext-links-toggle,
+.ext-links-manager .ext-links-remove,
+.ext-links-manager .ext-links-add {
+  background: var(--gd-field, rgba(255, 255, 255, .08)) !important;
+  border-color: transparent !important;
+  border-radius: 10px !important;
+}
+.storage-manager .styled-input:focus,
+.ext-links-manager .styled-input:focus {
+  border-color: var(--gd-plug-accent) !important;
+  box-shadow: none !important;
+}
+.ext-links-manager .ext-links-toggle input[type=checkbox]::after { background: var(--gd-plug-accent) !important; }
+
+}   /* :where(:root:not(.MillenniumWindow_SteamBrowser)) */

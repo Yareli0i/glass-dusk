@@ -10,6 +10,7 @@ css/shared.css       every client window: menus, settings, dialogs, notification
 css/webkit.css       the store inside the client (store.steampowered.com only)
 css/overlay.css      in-game overlay window ("SP Overlay: …")
 css/bigpicture.css   Big Picture "Cover" (switch Big Picture)
+css/plugins.css      Millennium plugins with their own interface (switch Plugins)
 css/options/*.css    what the settings switch on
 js/dusk.js           runtime: art and accent, the library home header, Big Picture layer and chip,
                      overlay accent from the running game
@@ -36,6 +37,15 @@ assets/              number font (+ its OFL licence) and the meadow background
 
 - Most menus are their own windows with `body.ContextMenuPopupBody`. A menu that fits inside its parent window is drawn in that window instead: the right-click menu on a game in the library. `css/shared.css` covers both, the second through `body.DesktopUI .contextMenu`.
 - Steam draws a menu separator as a top border on the row below it.
+
+## Plugins
+
+- A plugin's interface lives in the client's own windows, next to Steam's. Plugins made of Steam's components (a `GameStat` tile in the play bar, a `DialogBody` in a properties window) need no rules.
+- Plugins with markup of their own add a `<style>` at run time, after the theme's files. `css/plugins.css` therefore uses `!important` and the plugin's own class names, and changes colour and radius only.
+- To see what a plugin paints, read `.millennium/Dist/index.js` in its folder: the stylesheet is a string there.
+- A plugin's store-page block (HLTB) is styled in `css/webkit.css`, inside the `gd-store` wrapper.
+- Browser extensions installed through Extendium (SteamDB, Augmented Steam) add to store pages too. Most of their blocks are Steam's own `.block` and take the right-column card rule in `css/webkit.css`; only the pieces with a look of their own (`.es_app_btn`, `.steamdb_prices`, `.itad-pricing`, `.steamdb_link`) have rules, next to HLTB's.
+- A colour a plugin sets inline can stay as a tint: put a `background-image` veil over it (Extendium's compatibility pill).
 
 ## Big Picture
 

@@ -165,6 +165,22 @@ body.ModalDialogBody:not(.OverlayPopupBody) .PopupFullWindow {
   background: linear-gradient(160deg, rgba(20, 23, 36, .97), rgba(9, 11, 20, .98)) !important;
   color: var(--gd-ink) !important;
 }
+/* A dialog opened inside one of these windows (Settings → Storage → Move Content) is built
+   from the same ModalPosition / DialogContent blocks, so the rule above left it with no
+   ground at all and the page showed through its text. It gets a panel of its own. */
+body.DesktopUI .FullModalOverlay .ModalPosition .ModalPosition_Content {
+  background: linear-gradient(160deg, rgb(26, 29, 44), rgb(14, 16, 27)) !important;
+  border-radius: var(--gd-r-lg, 16px);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .1), 0 30px 70px -20px rgba(0, 0, 0, .85) !important;
+  overflow: hidden;
+}
+body.DesktopUI .FullModalOverlay .ModalPosition .DialogContent {
+  background: transparent !important;
+  background-image: none !important;
+}
+body.DesktopUI .FullModalOverlay .ModalPosition_TopBar {
+  background: linear-gradient(to right, var(--gd-accent, var(--gd-house)), transparent 85%) !important;
+}
 body.ModalDialogBody .PagedSettingsDialog_PageListColumn { border-right: 1px solid var(--gd-line) !important; }
 body.ModalDialogBody .PagedSettingsDialog_Title { color: var(--gd-ink) !important; }
 /* the page list on the left — Steam calls the row PagedSettingsDialog_PageListItem,
@@ -207,6 +223,56 @@ body.ModalDialogBody .Field { background: var(--gd-soft) !important; border-radi
   color: var(--gd-ink) !important;
 }
 .DialogToggle_On { background: var(--gd-accent, var(--gd-house)) !important; }
+
+/* controls Steam paints in its own blue: switches, sliders, segmented choices, radio pips */
+body.DesktopUI .ToggleRail::before,
+body.DesktopUI .SliderTrack::before,
+body.DesktopUI .Pip.ActivePip { background: var(--gd-accent, var(--gd-house)) !important; }
+body.DesktopUI .Shared_Radio_Group {
+  background: var(--gd-field) !important;
+  border-radius: 10px !important;
+  overflow: hidden;
+}
+body.DesktopUI .Shared_Radio_Group .RadioButton { background: transparent !important; border-radius: 8px !important; }
+body.DesktopUI .Shared_Radio_Group .RadioButton::before { background: transparent !important; }
+body.DesktopUI .Shared_Radio_Group .RadioButton:hover { background: var(--gd-hover) !important; }
+body.DesktopUI .Shared_Radio_Group .RadioButton.Active,
+body.DesktopUI .Shared_Radio_Group .RadioButton.Active:hover {
+  background: var(--gd-accent, var(--gd-house)) !important;
+  background-image: none !important;
+  color: var(--gd-accent-ink, #fff) !important;
+}
+/* grey square slabs inside the settings pages: family members, the update-timing note,
+   the recording modes */
+body.ModalDialogBody .FamilyMemberRow,
+body.ModalDialogBody .FakeContainer,
+body.ModalDialogBody .RecordingModeOption {
+  background: var(--gd-soft) !important;
+  border-radius: var(--gd-r-md, 12px) !important;
+}
+/* tables in a game's Properties window: beta branches, DLC */
+body.ModalDialogBody .BetaHeaderRow,
+body.ModalDialogBody .DlcHeader { background: var(--gd-field) !important; }
+body.ModalDialogBody .BetaRow { background: var(--gd-soft) !important; }
+body.ModalDialogBody .BetaRow.Selected {
+  background: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 22%, transparent) !important;
+  border-color: var(--gd-accent, var(--gd-house)) !important;
+}
+/* the tick in a checked box is Steam's blue */
+body.DesktopUI .DialogCheckbox.Active svg,
+body.DesktopUI .DialogCheckbox.Active svg * { fill: var(--gd-accent, var(--gd-house)) !important; }
+
+/* Steam's newer button component and the tiles in Recordings & Screenshots */
+body.DesktopUI .ButtonBox.Secondary { background: var(--gd-field) !important; border-radius: 8px !important; }
+body.DesktopUI .ButtonBox.Secondary:hover { background: rgba(255, 255, 255, .14) !important; }
+body.DesktopUI .ButtonBox.Secondary.Active,
+body.DesktopUI .ButtonBox.Secondary.Active:hover {
+  background: var(--gd-accent, var(--gd-house)) !important;
+  color: var(--gd-accent-ink, #fff) !important;
+}
+body.ModalDialogBody .TopListTitle { color: var(--gd-ink) !important; }
+body.ModalDialogBody .BackgroundRecordingListItem,
+body.ModalDialogBody .BackgroundRecordingListScaler { background: var(--gd-soft) !important; }
 
 /* ═══════════════ notification toasts ═══════════════ */
 
@@ -281,7 +347,55 @@ body.fullheight #popup_target.popup_chat_frame,
   border-radius: 10px !important;
   color: var(--gd-ink) !important;
 }
-.chatSubmitButton { background: var(--gd-house) !important; border-radius: 999px !important; }
+
+/* The chat window. With chats not docked it is a window of its own, and its ground is
+   .chatDialogs — .chat_main_flex only exists in the friends list. */
+.chatDialogs {
+  background: linear-gradient(160deg, rgb(20, 23, 36), rgb(10, 12, 22)) !important;
+}
+body .ChatTabs.titleBarContainer {
+  background: rgb(13, 15, 25) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+body .ChatTabs .ChatTab { background: transparent !important; border-radius: 10px 10px 0 0 !important; }
+body .ChatTabs .ChatTab.Active { background: rgba(255, 255, 255, .07) !important; }
+/* inside it the conversation and the entry row are bands, not cards */
+.chatDialogs .chatWindow { background: transparent !important; border-radius: 0 !important; }
+.chatDialogs .chatEntry {
+  background: transparent !important;
+  border-top: 1px solid var(--gd-line) !important;
+  border-radius: 0 !important;
+}
+.chatEntryControls,
+.chatEntryActionsGroup,
+.ChatMessageEntryVoice {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+.FriendChatTypingNotification {
+  background-image: linear-gradient(to top, rgba(12, 14, 24, .92), transparent) !important;
+}
+/* The entry row: four buttons of one shape, squared off like the field beside them.
+   Emoticon, attach and voice share the send button's class, so all of them used to come
+   out as filled circles. Send is filled only when there is something to send — while the
+   field is empty Steam marks it .disabled and greys the icon. */
+.chatSubmitButton,
+.VoiceToggle {
+  background: var(--gd-field) !important;
+  background-clip: padding-box !important;   /* the transparent border keeps a hair of air between neighbours */
+  border-color: transparent !important;
+  border-radius: 12px !important;
+  color: var(--gd-ink-soft) !important;
+}
+.chatSubmitButton:not(.EmoticonPickerButton):not(.EmbedButton):not(.disabled) {
+  background: var(--gd-accent, var(--gd-house)) !important;
+  color: var(--gd-accent-ink, #fff) !important;
+}
+.chatSubmitButton.disabled { color: var(--gd-ink-faint) !important; }
+.chatSubmitButton .SVGIcon_Submit path { fill: currentColor !important; }
+.inviteAnotherFriendButton { background: var(--gd-field) !important; }
 
 /* ═══════════════ window controls, everywhere ═══════════════ */
 

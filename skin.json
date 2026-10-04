@@ -2,7 +2,7 @@
   "name": "Glass Dusk",
   "description": "Smoked glass over the art of the game you have open: the client takes its accent colour from that art. Styles the library, store, menus, Big Picture and the in-game overlay.",
   "author": "Yareli",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "tags": [
     "Dark",
     "Glass",
@@ -259,6 +259,20 @@
           }
         },
         "Steam": {}
+      }
+    },
+    "Plugins": {
+      "description": "Millennium plugins that draw their own interface (HLTB for Steam, Achievement Groups, Player Count, Extendium): in the theme's colours, or as the plugin ships them.",
+      "tab": "Plugins",
+      "default": "Theme",
+      "values": {
+        "Theme": {
+          "TargetCss": {
+            "affects": [".*"],
+            "src": "css/plugins.css"
+          }
+        },
+        "Plugin's own": {}
       }
     }
   },

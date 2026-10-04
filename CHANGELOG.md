@@ -2,6 +2,34 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 1.5.0 — 2026-10-04
+
+**Plugins**
+- Millennium plugins that draw their own interface now wear the theme instead of Steam's stock blue and grey:
+  - *HLTB for Steam* — the strip over a game's art (it also no longer fades out with the bottom of the art), in Big Picture too, and its block on store pages;
+  - *Achievement Groups* — its whole page: search, filters, dropdowns, buttons, groups, rows and the preferences window. Unlocked achievements are tinted with the game's colour instead of green;
+  - *Player Count* and *Size on Disk* — their tiles in the play bar now read like Steam's own: grey caption and icon, white value. Player Count no longer paints its number red, gold or blue;
+  - *Extendium* — its menu on the address bar and the extensions window: extension cards, the details view, fields and links. The compatibility pill keeps its colour as a quiet tint.
+- New switch: *Plugins* (Theme / Plugin's own).
+
+**Store**
+- A game's page: the right column was a stack of square near-black blocks. They are now the same soft rounded cards as the purchase boxes on the left, the achievements block included.
+- Browser extensions added through Extendium get the same cards: SteamDB's and Augmented Steam's blocks, price lines and the app ID chip. Augmented Steam's column of link buttons was eight accent buttons; they are quiet chips now.
+- A game's page: the "already in your library" block and the review form were left in Steam's colours. The form is now themed; Yes / No are quiet until one is picked, and *Post review* is the accent button.
+- A game's page: the customer reviews section sat on dark bands that the theme itself put there. The bands are gone; review cards are rounded and their buttons match the theme. Rating colours and the thumb boxes stay Steam's.
+- A game's page: the rows of *Is this game relevant to you?* sat on dark plates. A rule meant for capsule blurbs caught them.
+
+**Settings, chat and dialogs**
+- Settings → Storage → *Move Content*: the dialog had no ground of its own and its text sat on top of the game list. Any dialog opened inside a settings window now gets its own panel.
+- Chat window: it kept Steam's grey ground, tab and entry row, and the emoticon, attach and voice buttons came out as filled circles like the send button. The window now matches the friends list; the four buttons share one shape, and send is filled only when there is something to send.
+- Switches, sliders, segmented choices, radio buttons and checkbox ticks stayed in Steam's blue. They now take the accent colour.
+- Settings: family members, the *Game update timing* note and the recording modes were grey square slabs.
+- Game Properties: the beta branches and DLC tables were grey.
+- Recordings & Screenshots: grey buttons, a blue title and grey recording tiles.
+
+**Achievements page**
+- The progress bar at the top was blue, Steam's slate sheet sat behind the list, and the *Scroll to top* tab was blue.
+
 ## 1.4.0 — 2026-10-01
 
 **Community and profiles**
