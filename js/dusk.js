@@ -336,9 +336,18 @@
   const heroElement = () => [...document.querySelectorAll('.Header img, .HeaderBackgroundImage img')]
     .find(i => /library_hero\.(jpg|png)|\/customimages\/\d+_hero\./.test(i.src));
 
+  // Installed on this machine. «Continue» and the recent shelf come from here:
+  // they are for what can be launched right now.
   const installedApps = o => o.appStore.allApps.filter(a => {
     try { return a.per_client_data && [...a.per_client_data].some(c => c.installed); } catch (e) { return false; }
   });
+
+  // The header's numbers are about the whole library, installed or not: every
+  // game Steam lists (family-shared ones too), minus the ones the user has hidden.
+  const libraryGames = o => {
+    const hidden = id => { try { return o.collectionStore.BIsHidden(id); } catch (e) { return false; } };
+    return o.appStore.allApps.filter(a => a.app_type === 1 && a.visible_in_game_list !== false && !hidden(a.appid));
+  };
 
   const lastPlayed = o => {
     const apps = installedApps(o);
@@ -605,6 +614,30 @@
   let homeChecked = 0;
   let homeSig = '';
 
+  // Space taken in every mounted Steam library folder: games, DLC, workshop
+  // items, shader caches and staged updates — the parts Settings → Storage lists.
+  // Steam answers asynchronously, so the header keeps the last answer and asks
+  // again once a minute, or at once when something is installed or removed.
+  let diskBytes = null;
+  let diskAsked = 0;
+  let diskFor = -1;
+
+  const askDisk = (o, installedCount) => {
+    const now = Date.now();
+    if (installedCount === diskFor && now - diskAsked < 60000) return;
+    diskFor = installedCount;
+    diskAsked = now;
+    try {
+      o.SteamClient.InstallFolder.GetInstallFolders().then(folders => {
+        diskBytes = folders.filter(f => f && f.bIsMounted !== false).reduce((sum, f) => {
+          const parts = [f.nAppSize, f.nDLCSize, f.nWorkshopSize, f.nShaderSize, f.nStagedSize].map(Number);
+          return sum + (parts.every(Number.isFinite) ? parts.reduce((a, b) => a + b, 0) : Number(f.nUsedSize) || 0);
+        }, 0);
+        homeChecked = 0;   // show it on the next pass
+      }).catch(() => {});
+    } catch (e) { /* a client without this call: the per-app sizes stand in */ }
+  };
+
   const buildHome = () => {
     const o = shared();
     const host = document.querySelector('.LibraryHome');
@@ -624,19 +657,24 @@
     homeChecked = now;
 
     const apps = installedApps(o);
-    const last = lastPlayed(o);
-    if (!apps.length || !last) return;
+    const games = libraryGames(o);
+    const last = lastPlayed(o);   // null when nothing installed has been played yet
+    if (!games.length && !apps.length) return;
 
-    const shelf = apps.filter(a => a.rt_last_time_played && a.app_type === 1 && a.appid !== last.appid)
+    const shelf = !last ? [] : apps.filter(a => a.rt_last_time_played && a.app_type === 1 && a.appid !== last.appid)
       .sort((a, b) => b.rt_last_time_played - a.rt_last_time_played)
       .slice(0, 7);
-    const minutes = apps.reduce((s, a) => s + (a.minutes_playtime_forever || 0), 0);
-    const bytes = apps.reduce((s, a) => s + Number(a.size_on_disk || 0), 0);
+    const minutes = games.reduce((s, a) => s + (a.minutes_playtime_forever || 0), 0);
+    askDisk(o, apps.length);
+    // until Steam answers, the installed apps' own sizes (no workshop items or shaders)
+    const bytes = diskBytes !== null ? diskBytes : apps.reduce((s, a) => s + Number(a.size_on_disk || 0), 0);
+    // 2^30, like Steam's own Storage page, which also calls the unit GB
+    const gigs = Math.round(bytes / 2 ** 30);
     const name = (document.querySelector('.SuperNav .MenuButton span') || {}).textContent || '';
 
-    const sig = [locale(), new Date().getHours(), name, apps.length, Math.round(minutes / 60), Math.round(bytes / 2 ** 30),
-      last.rt_last_time_played, last.minutes_playtime_forever,
-      ...[last, ...shelf].map(a => `${a.appid}:${a.rt_custom_image_mtime || 0}`)].join('|');
+    const sig = [locale(), new Date().getHours(), name, games.length, Math.round(minutes / 60), gigs,
+      ...(last ? [last.rt_last_time_played, last.minutes_playtime_forever] : []),
+      ...(last ? [last, ...shelf] : []).map(a => `${a.appid}:${a.rt_custom_image_mtime || 0}`)].join('|');
     if (existing && sig === homeSig) return;
     homeSig = sig;
 
@@ -649,11 +687,11 @@
           <strong>${esc(name)}</strong>
         </div>
         <div class="gd-stats">
-          <div><small>${W().games}</small><b class="gd-num">${apps.length}</b></div>
+          <div><small>${W().games}</small><b class="gd-num">${games.length}</b></div>
           <div><small>${W().hours}</small><b class="gd-num">${Math.round(minutes / 60)}</b></div>
-          <div><small>${W().disk}</small><b class="gd-num">${Math.round(bytes / 2 ** 30)}</b></div>
+          <div><small>${W().disk}</small><b class="gd-num">${gigs}</b></div>
         </div>
-      </div>
+      </div>${!last ? '' : `
       <div class="gd-continue" data-app="${last.appid}">
         <img class="gd-cont-art" alt="">
         <div class="gd-cont-body">
@@ -675,17 +713,19 @@
             <img alt="">
             <span>${relDay(a.rt_last_time_played)}</span>
           </button>`).join('')}
-      </div>`;
+      </div>`}`;
 
-    const art = artFor(o, last);
-    const hero = block.querySelector('.gd-cont-art');
-    chain(hero, art.hero, () => hero.remove());
+    if (last) {
+      const art = artFor(o, last);
+      const hero = block.querySelector('.gd-cont-art');
+      chain(hero, art.hero, () => hero.remove());
 
-    // the logo is optional; the game's name stands in when there is none
-    const logo = block.querySelector('.gd-cont-logo');
-    const title = block.querySelector('.gd-cont-name');
-    logo.addEventListener('load', () => title.remove(), { once: true });
-    chain(logo, art.logo, () => { logo.remove(); title.classList.add('on'); });
+      // the logo is optional; the game's name stands in when there is none
+      const logo = block.querySelector('.gd-cont-logo');
+      const title = block.querySelector('.gd-cont-name');
+      logo.addEventListener('load', () => title.remove(), { once: true });
+      chain(logo, art.logo, () => { logo.remove(); title.classList.add('on'); });
+    }
 
     // a game with no cover at all gets its name on a plain tile
     block.querySelectorAll('.gd-cap').forEach((cap, i) => {

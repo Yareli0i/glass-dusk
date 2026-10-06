@@ -2,6 +2,20 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 1.5.1 — 2026-10-06
+
+**Library home**
+- The three numbers in the header were all counted from the installed apps, so a large library showed a fraction of itself ([#1](https://github.com/Yareli0i/glass-dusk/issues/1), reported with a fix by @eviljjonahjameson):
+  - *Games* is every game in the library, installed or not. Family-shared games count, hidden ones do not. It used to count installed apps, tools and videos among them.
+  - *Hours played* adds up the whole library. Uninstalling a game no longer takes its hours away.
+  - *On disk* is what Steam's library folders hold on every drive: games, DLC, workshop items, shader caches and staged updates. It is the total that Settings → Storage shows, in the same units. It used to miss workshop items and shaders.
+- The header no longer disappears when nothing installed has been played yet. It shows the numbers without the *Continue* card.
+
+**Store**
+- A bundle's page: the right column had a square dark patch behind *Bundle details*. It is gone. SteamDB's *View on SteamDB* button there and on package pages was left in Steam's blue; it is a quiet chip now.
+- A package's page: the banner's black frame gets rounded corners, and the price summary under the list of items is a card.
+- A game's page: the list of DLC was grey slabs with an outlined *Browse all* box. The rows are quiet now and *Browse all* is a chip. The orange notice box, and the purple *Downloadable Content* notice on a DLC's page, have rounded corners.
+
 ## 1.5.0 — 2026-10-04
 
 **Plugins**

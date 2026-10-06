@@ -489,4 +489,40 @@ a.btn_black.steamdb_link {
   color: var(--gd-ink-soft) !important;
 }
 
+/* ═══════════════ bundle, package and DLC pages ═══════════════ */
+
+/* a bundle's right column is one tall card; Steam's own dark gradient inside it made a square patch */
+.rightcol.game_meta_data .block_content_inner { background: none !important; }
+
+/* SteamDB's "View on SteamDB" on bundle and package pages: a link, so the quiet chip */
+.rightcol.game_meta_data > .block > a.action_btn {
+  background: var(--gd-field) !important;
+  border-radius: 999px !important;
+  color: var(--gd-ink) !important;
+}
+.rightcol.game_meta_data > .block > a.action_btn:hover { background: rgba(255, 255, 255, .16) !important; }
+
+/* a package's banner sits in a black frame; the price summary under the list of its items */
+#package_header_container { border-radius: var(--gd-r-md) !important; overflow: hidden; }
+.package_totals_area {
+  background: rgba(255, 255, 255, .045) !important;
+  border-radius: var(--gd-r-md) !important;
+}
+
+/* a DLC's page: the purple "Downloadable Content" notice. Any page: the orange notice box. */
+.game_area_dlc_bubble,
+.notice_box_content { border-radius: var(--gd-r-md) !important; }
+
+/* the list of DLC on a game's page: the rows were Steam's grey slabs, "Browse all" an outlined box */
+.game_area_dlc_row {
+  background: rgba(255, 255, 255, .045) !important;
+  border-radius: 8px !important;
+}
+.game_area_dlc_row:hover { background: rgba(255, 255, 255, .1) !important; }
+.game_area_dlc_section h2 .note {
+  background: var(--gd-field) !important;
+  border-color: transparent !important;
+  border-radius: 999px !important;
+}
+
 }   /* :where(html.gd-store) */
