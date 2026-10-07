@@ -2,6 +2,12 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 1.5.3 — 2026-10-07
+
+**Library home**
+- For newer games the *Continue* card came up blank, with the game's name as plain text instead of its logo ([#5](https://github.com/Yareli0i/glass-dusk/issues/5)). These games keep their library art in hashed folders and have nothing at the old fixed address, neither in Steam's cache nor on the CDN, and the fixed address was the only place the theme looked. It asks Steam where the game's hero and logo are now.
+- The window background on the library home missed the same games, and the accent colour with it. Both come from the hero, so both are back.
+
 ## 1.5.2 — 2026-10-07
 
 **Game page**

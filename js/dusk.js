@@ -130,6 +130,35 @@
     return;
   }
 
+  /* ── where a game's art lives ── */
+
+  // Newer games keep their library files in hashed folders — /assets/<id>/<hash>/library_hero.jpg —
+  // and have nothing at the plain address, neither in Steam's cache nor on the CDN. The
+  // hash is in the app's details, and with those loaded Steam can list the candidates itself.
+  const steamArt = (o, fn, key, app) => {
+    try {
+      const list = o.appDetailsStore[fn](app)[key];
+      return Array.isArray(list) ? list.filter(Boolean) : [];
+    } catch (e) { return []; }
+  };
+
+  // Steam loads the details on demand, so a picture that depends on them waits for the
+  // answer: asked once per game, and 1.5 s without one means the plain addresses are tried.
+  const detailsAsked = new Map();
+  const detailsReady = (o, app) => {
+    let entry = detailsAsked.get(app.appid);
+    if (!entry) {
+      let ask = null;
+      try { if (!o.appDetailsStore.GetAppDetails(app.appid)) ask = o.appDetailsStore.RequestAppDetails(app.appid); }
+      catch (e) { /* no such store in this client: the plain addresses are all there is */ }
+      entry = { done: !ask };
+      entry.promise = !ask ? Promise.resolve()
+        : Promise.race([ask, new Promise(r => setTimeout(r, 1500))]).catch(() => {}).then(() => { entry.done = true; });
+      detailsAsked.set(app.appid, entry);
+    }
+    return entry;
+  };
+
   /* ── the game being played: its colour for the overlay and its panels ── */
 
   // In the overlay the accent should belong to the game on screen, not to whatever page
@@ -146,9 +175,10 @@
     let urls = [`/assets/${id}/library_hero.jpg`];
     try {
       const app = o.appStore.GetAppOverviewByAppID(id);
+      if (app) urls = [...steamArt(o, 'GetHeroImages', 'rgHeroImages', app), ...urls];
       if (app && app.rt_custom_image_mtime) {
         const custom = o.appStore.GetCustomHeroImageURLs(app);
-        urls = [...(Array.isArray(custom) ? custom : [custom]).filter(Boolean), ...urls];
+        urls = [...new Set([...(Array.isArray(custom) ? custom : [custom]).filter(Boolean), ...urls])];
       }
     } catch (e) { /* no custom art, the cached hero will do */ }
     const attempt = i => {
@@ -296,14 +326,19 @@
     } catch (e) { return []; }
   };
 
+  // Hero and logo take Steam's own candidates ahead of the plain addresses (see steamArt);
+  // callers wait for detailsReady first, or a newer game ends up with no picture at all.
   const artFor = (o, app) => {
     const id = app.appid;
     const custom = fn => (app.rt_custom_image_mtime ? listFrom(o, fn, app) : []);
+    const uniq = list => [...new Set(list)];
     return {
       portrait: [...custom('GetCustomVerticalCapsuleURLs'), ...listFrom(o, 'GetCachedVerticalCapsuleURL', app),
         ...listFrom(o, 'GetVerticalCapsuleURLForApp', app), `${CDN(id)}/library_600x900.jpg`],
-      hero: [...custom('GetCustomHeroImageURLs'), `/assets/${id}/library_hero.jpg`, `${CDN(id)}/library_hero.jpg`],
-      logo: [...custom('GetCustomLogoImageURLs'), `/assets/${id}/logo.png`, `${CDN(id)}/logo.png`],
+      hero: uniq([...custom('GetCustomHeroImageURLs'), ...steamArt(o, 'GetHeroImages', 'rgHeroImages', app),
+        `/assets/${id}/library_hero.jpg`, `${CDN(id)}/library_hero.jpg`]),
+      logo: uniq([...custom('GetCustomLogoImageURLs'), ...steamArt(o, 'GetLogoImages', 'rgLogoImages', app),
+        `/assets/${id}/logo.png`, `${CDN(id)}/logo.png`]),
     };
   };
 
@@ -371,7 +406,11 @@
 
     const o = shared();
     const last = o ? lastPlayed(o) : null;
-    return last ? artFor(o, last).hero : null;
+    if (!last) return null;
+    const ready = detailsReady(o, last);
+    if (ready.done) return artFor(o, last).hero;
+    if (!ready.woken) { ready.woken = true; ready.promise.then(() => soon()); }
+    return KEEP;
   };
 
   /* ═════════════ the home header ═════════════ */
@@ -716,15 +755,17 @@
       </div>`}`;
 
     if (last) {
-      const art = artFor(o, last);
       const hero = block.querySelector('.gd-cont-art');
-      chain(hero, art.hero, () => hero.remove());
-
-      // the logo is optional; the game's name stands in when there is none
       const logo = block.querySelector('.gd-cont-logo');
       const title = block.querySelector('.gd-cont-name');
       logo.addEventListener('load', () => title.remove(), { once: true });
-      chain(logo, art.logo, () => { logo.remove(); title.classList.add('on'); });
+      // both pictures wait until Steam knows where this game keeps its files
+      detailsReady(o, last).promise.then(() => {
+        const art = artFor(o, last);
+        chain(hero, art.hero, () => hero.remove());
+        // the logo is optional; the game's name stands in when there is none
+        chain(logo, art.logo, () => { logo.remove(); title.classList.add('on'); });
+      });
     }
 
     // a game with no cover at all gets its name on a plain tile
