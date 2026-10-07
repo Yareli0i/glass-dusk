@@ -316,21 +316,42 @@ body.fullheight #popup_target.popup_chat_frame,
 .playerName { color: var(--gd-ink) !important; }
 .richPresenceLabel,
 .gameName { color: var(--gd-ink-soft) !important; }
+/* In a game that reports what you are doing, the header holds three lines, and Steam's
+   own negative margin pulls the game's name up into yours. Without that margin the
+   three lines are exactly as tall as the avatar. The one place the theme moves anything. */
+.currentUserContainer .statusAndName.threeLines,
+.currentUserContainer .statusAndName:has(+ .richPresenceContainer > .richPresenceLabel + .richPresenceLabel) { margin-bottom: 0 !important; }
 .socialTabContainer { border-bottom: 1px solid var(--gd-line) !important; }
 .friendTab.socialListTab.activeTab { background: var(--gd-soft) !important; }
 .tabLabel { color: var(--gd-ink) !important; }
-.TabSearchButton,
-.friendRequestButton,
 .quickAccessFriends {
   background: var(--gd-field) !important;
   border: none !important;
   border-radius: 10px !important;
   color: var(--gd-ink-soft) !important;
 }
+/* "Got it!" lives in the box's bottom right corner — Steam's own place for it. As a
+   pill it stuck out over the dashed frame; as a corner tab it belongs to the box. */
 .quickAccessFriendsMessageDismiss {
   background: var(--gd-house) !important;
-  border-radius: 999px !important;
+  border-radius: 8px 0 0 0 !important;
   color: #fff !important;
+}
+/* The search is only a magnifier until it is opened. Its box is the whole strip the
+   field slides into, and painting that strip made a wide empty field that ran into
+   the requests button in a narrow window. Only the real field is painted. */
+.TabSearchButton,
+.friendRequestButton {
+  border: none !important;
+  color: var(--gd-ink-soft) !important;
+}
+.TabSearchButton .searchIconButton:hover,
+.friendRequestButton:hover { color: var(--gd-ink) !important; }
+.socialSearchContainer { background: transparent !important; }
+.friendSearchInput {
+  background: var(--gd-field) !important;
+  border-radius: 10px !important;
+  color: var(--gd-ink) !important;
 }
 .friend,
 .friendListRow { border-radius: 10px !important; transition: background .12s ease; }
@@ -360,6 +381,11 @@ body .ChatTabs.titleBarContainer {
 }
 body .ChatTabs .ChatTab { background: transparent !important; border-radius: 10px 10px 0 0 !important; }
 body .ChatTabs .ChatTab.Active { background: rgba(255, 255, 255, .07) !important; }
+/* A tab holds the same .friend label as a row of the friends list, and the row's hover
+   plate lit up inside the tab as a grey box narrower than the tab. The tab takes the hover. */
+body .ChatTabs .ChatTab .friend,
+body .ChatTabs .ChatTab .friend:hover { background: transparent !important; }
+body .ChatTabs .ChatTab:not(.Active):hover { background: var(--gd-hover) !important; }
 /* inside it the conversation and the entry row are bands, not cards */
 .chatDialogs .chatWindow { background: transparent !important; border-radius: 0 !important; }
 .chatDialogs .chatEntry {

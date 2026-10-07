@@ -456,28 +456,44 @@ svg#arrowBase { background: var(--gd-field) !important; border-radius: 999px !im
 .AchievementProgressRow { background: transparent !important; }
 .PlayBarDetailLabel.AchievementCountLabel { background: none !important; }
 
-.PlayButtonContainer.Green,
-.PlayButtonContainer.Green .PlayButton {
+/* The play bar's button in every state. Steam marks only Play and Launch with a
+   class (.Green); Install, Update, Stop and Cancel carry none, so a rule written
+   for .Green left them as Steam's blue slab with square corners. */
+.PlayButtonContainer,
+.PlayButtonContainer .PlayButton {
   background: var(--gd-accent, var(--gd-house)) !important;
   border-radius: 999px !important;
   color: var(--gd-accent-ink) !important;
 }
-.PlayButtonContainer.Green { overflow: hidden; }
+.PlayButtonContainer { overflow: hidden; }
 /* Only the resting bar gets the tall pill. Steam compacts this button in the
    sticky strip and in narrow windows, and a fixed height there spills out of it. */
-.AppDetailsOverviewPanel .Container.InPage .PlayButtonContainer.Green,
-.AppDetailsOverviewPanel .Container.InPage .PlayButtonContainer.Green .PlayButton,
-.AppDetailsOverviewPanel .Container.InPage .PlayButtonContainer.Green .StreamingSelector { height: 48px !important; }
-.PlayButtonContainer.Green:hover { filter: brightness(1.08); }
+.AppDetailsOverviewPanel .Container.InPage .PlayButtonContainer,
+.AppDetailsOverviewPanel .Container.InPage .PlayButtonContainer .PlayButton,
+.AppDetailsOverviewPanel .Container.InPage .PlayButtonContainer .StreamingSelector { height: 48px !important; }
+.PlayButtonContainer:hover { filter: brightness(1.08); }
 .PlayButton .ButtonText { color: var(--gd-accent-ink) !important; font-weight: 700 !important; }
 .PlayButton svg,
 .PlayButton .SVGIcon_Play path { fill: var(--gd-accent-ink) !important; color: var(--gd-accent-ink) !important; }
-.PlayButtonContainer.Green .StreamingSelector {
+.PlayButtonContainer .StreamingSelector {
   background: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 74%, #000) !important;
   border-radius: 0 999px 999px 0 !important;
 }
-.PlayButtonContainer.Green .StreamingSelector svg,
-.PlayButtonContainer.Green .StreamingSelector polygon { fill: var(--gd-accent-ink) !important; }
+.PlayButtonContainer .StreamingSelector svg,
+.PlayButtonContainer .StreamingSelector polygon { fill: var(--gd-accent-ink) !important; }
+/* Stop and Cancel (the ones with the cross) are not the page's call to action:
+   a quiet pill, so a running game does not look like one waiting to be played. */
+.PlayButtonContainer:has(.SVGIcon_X_Line),
+.PlayButtonContainer:has(.SVGIcon_X_Line) .PlayButton {
+  background: rgba(255, 255, 255, .14) !important;
+  color: var(--gd-ink) !important;
+}
+.PlayButtonContainer:has(.SVGIcon_X_Line) .ButtonText { color: var(--gd-ink) !important; }
+.PlayButtonContainer:has(.SVGIcon_X_Line) .PlayButton svg,
+.PlayButtonContainer:has(.SVGIcon_X_Line) .PlayButton svg path,
+.PlayButtonContainer:has(.SVGIcon_X_Line) .StreamingSelector svg,
+.PlayButtonContainer:has(.SVGIcon_X_Line) .StreamingSelector polygon { fill: var(--gd-ink) !important; color: var(--gd-ink) !important; }
+.PlayButtonContainer:has(.SVGIcon_X_Line) .StreamingSelector { background: rgba(255, 255, 255, .1) !important; }
 .AppButtonsContainer .MenuButton { border-radius: 999px !important; }
 .AppButtonsContainer .MenuButton:hover { background: var(--gd-hover) !important; }
 

@@ -2,6 +2,19 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 1.5.2 — 2026-10-07
+
+**Game page**
+- The play bar's button was themed only as *Play*. *Install*, *Update*, *Stop* and *Cancel* kept Steam's blue slab with square corners ([#2](https://github.com/Yareli0i/glass-dusk/issues/2)). Every state is the same pill now, in the page's strip and in the one that sticks to the top. *Install* and *Update* take the game's colour like *Play*; *Stop* and *Cancel* are quiet, so a running game does not look like one waiting to be played.
+
+**Friends list**
+- In a narrow window the search looked like a wide empty field that ran into the requests button ([#3](https://github.com/Yareli0i/glass-dusk/issues/3)). The theme was painting the whole strip the search slides into. The search is a magnifier until it is opened, as in Steam, and the opened field is themed.
+- *Got it!* on the quick-access box was a pill sticking out over the dashed frame. It is a corner tab of the box now.
+- In a game that reports what you are doing, the header shows three lines, and the game's name overlapped yours. Steam draws it that way without the theme too; the theme now gives the lines room.
+
+**Chat**
+- Hovering a chat tab lit up a grey box inside it, narrower than the tab. The whole tab is highlighted now.
+
 ## 1.5.1 — 2026-10-06
 
 **Library home**
