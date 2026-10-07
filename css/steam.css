@@ -483,9 +483,14 @@ svg#arrowBase { background: var(--gd-field) !important; border-radius: 999px !im
 .PlayButtonContainer .StreamingSelector polygon { fill: var(--gd-accent-ink) !important; }
 /* Stop and Cancel (the ones with the cross) are not the page's call to action:
    a quiet pill, so a running game does not look like one waiting to be played. */
-.PlayButtonContainer:has(.SVGIcon_X_Line),
-.PlayButtonContainer:has(.SVGIcon_X_Line) .PlayButton {
+.PlayButtonContainer:has(.SVGIcon_X_Line) {
   background: rgba(255, 255, 255, .14) !important;
+  color: var(--gd-ink) !important;
+}
+/* Only the container is painted. It is translucent, so a second translucent layer on the
+   button inside showed through as a lighter pill with a dark sliver before the arrow. */
+.PlayButtonContainer:has(.SVGIcon_X_Line) .PlayButton {
+  background: transparent !important;
   color: var(--gd-ink) !important;
 }
 .PlayButtonContainer:has(.SVGIcon_X_Line) .ButtonText { color: var(--gd-ink) !important; }
@@ -493,7 +498,7 @@ svg#arrowBase { background: var(--gd-field) !important; border-radius: 999px !im
 .PlayButtonContainer:has(.SVGIcon_X_Line) .PlayButton svg path,
 .PlayButtonContainer:has(.SVGIcon_X_Line) .StreamingSelector svg,
 .PlayButtonContainer:has(.SVGIcon_X_Line) .StreamingSelector polygon { fill: var(--gd-ink) !important; color: var(--gd-ink) !important; }
-.PlayButtonContainer:has(.SVGIcon_X_Line) .StreamingSelector { background: rgba(255, 255, 255, .1) !important; }
+.PlayButtonContainer:has(.SVGIcon_X_Line) .StreamingSelector { background: rgba(0, 0, 0, .22) !important; }
 .AppButtonsContainer .MenuButton { border-radius: 999px !important; }
 .AppButtonsContainer .MenuButton:hover { background: var(--gd-hover) !important; }
 
