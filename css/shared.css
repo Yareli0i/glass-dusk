@@ -109,6 +109,23 @@ body.DesktopUI .contextMenuItem:hover {
   background: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 28%, transparent) !important;
   color: #fff !important;
 }
+/* The game list's filter (Games, Software, Tools…, Group by…) is such a menu too, but its
+   rows sit straight inside `.contextMenu`, with no `.contextMenuContents` to carry the
+   glass — so it had no ground at all and the list read through it. */
+body.DesktopUI .contextMenu.DropDown:not(:has(> .contextMenuContents)) {
+  background: var(--gd-pane) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(1.3);
+  backdrop-filter: blur(26px) saturate(1.3);
+  border: 1px solid rgba(255, 255, 255, .1) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 30px 60px -22px rgba(0, 0, 0, .75) !important;
+  color: var(--gd-ink) !important;
+}
+body.DesktopUI .contextMenu.DropDown:not(:has(> .contextMenuContents)) .DialogCheckbox_Container.Row { border-radius: 8px; }
+body.DesktopUI .contextMenu.DropDown:not(:has(> .contextMenuContents)) .DialogCheckbox_Container.Row:not(.Disabled):hover {
+  background: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 28%, transparent);
+}
+body.DesktopUI .contextMenu.DropDown:not(:has(> .contextMenuContents)) .Rule { background: var(--gd-line) !important; }
 /* Steam's green "Play" row at the top of a game's menu */
 body.DesktopUI .contextMenuItem.Play,
 body.DesktopUI .contextMenuItem.Play:hover {

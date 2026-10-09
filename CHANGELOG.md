@@ -2,6 +2,11 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 1.5.5 — 2026-10-10
+
+**Library**
+- The filter menu above the game list (*Games*, *Software*, *Tools*, *Group by…*) had no background at all, so the list read through it. It has the same glass as the other menus now.
+
 ## 1.5.4 — 2026-10-09
 
 **News window**
