@@ -2,6 +2,15 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 1.5.4 — 2026-10-09
+
+**News window**
+- The window that opens from *What's New* or *View Latest News* was left as Steam draws it: a grey slab with a white glow in its header and footer, and square grey buttons beside it ([#6](https://github.com/Yareli0i/glass-dusk/issues/6)). It is a dark card in the theme's colours now. The buttons beside it are round, and *Rate Up*, *Discuss* and *Share* are pills.
+
+**Game page**
+- The page's text showed through the bar that sticks to the top while scrolling ([#7](https://github.com/Yareli0i/glass-dusk/issues/7)). The bar is opaque now.
+- A plugin that adds a button next to the gear got it stacked above the gear, and the sticky bar grew to two rows. The buttons sit side by side.
+
 ## 1.5.3 — 2026-10-07
 
 **Library home**

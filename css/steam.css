@@ -501,15 +501,20 @@ svg#arrowBase { background: var(--gd-field) !important; border-radius: 999px !im
 .PlayButtonContainer:has(.SVGIcon_X_Line) .StreamingSelector { background: rgba(0, 0, 0, .22) !important; }
 .AppButtonsContainer .MenuButton { border-radius: 999px !important; }
 .AppButtonsContainer .MenuButton:hover { background: var(--gd-hover) !important; }
+/* The gear sits in a container of its own, which Steam lays out as a block. A plugin
+   that puts its button in there gets it stacked above the gear, and the bar that
+   sticks to the top grows to two rows (#7). Side by side instead. */
+.AppButtonsContainer .MenuButtonContainer { display: flex !important; flex-flow: row nowrap; }
 
 /* The bar that sticks to the top while scrolling. It is `.PlayBar.Container`,
-   not `.StickyHeader`, and it must be opaque or the feed shows through it; its
-   top corners follow the pane, otherwise a square edge cuts across the curve.
-   At rest the whole thing sits at opacity 0, so painting it is safe. */
+   not `.StickyHeader`. It is fully opaque: at 90–97% the feed's text still read
+   through it, blur or not (#7). Its top corners follow the pane, otherwise a
+   square edge cuts across the curve. At rest the whole thing sits at opacity 0,
+   so painting it is safe. */
 .AppDetailsMain > .PlayBar.Container {
-  background: linear-gradient(180deg, rgba(12, 13, 19, .97), rgba(12, 13, 19, .9)) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  backdrop-filter: blur(20px) !important;
+  background: var(--gd-glass, #0c0d13) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
   border-bottom: 1px solid var(--gd-line);
   border-radius: var(--gd-r-xl) var(--gd-r-xl) 0 0 !important;
   overflow: hidden;
@@ -574,6 +579,58 @@ svg#arrowBase { background: var(--gd-field) !important; border-radius: 999px !im
   border-radius: var(--gd-r-md) !important;
   overflow: hidden;
 }
+
+/* ─── the news window: What's New on the home, «View Latest News» on a game's page ─── */
+
+/* Steam's grey slab with a white glow in its header and footer, and square grey buttons
+   beside it (#6). The events are a list next to `.ControlSection`, which is what tells
+   them from the news cards in the feed. `overflow: clip` rounds the picture on top
+   without making the card a scroll container. */
+.ControlSection + div > .PartnerEvent {
+  background-color: var(--gd-glass, #0c0d13) !important;
+  background-image: linear-gradient(100deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .015)) !important;
+  border: 1px solid var(--gd-line) !important;
+  border-radius: var(--gd-r-lg) !important;
+  box-shadow: 0 30px 80px -24px rgba(0, 0, 0, .85) !important;
+  overflow: clip;
+}
+.ControlSection + div > .PartnerEvent > img:first-child { border-radius: 0 !important; background: none !important; }
+/* the game's art, blurred, under the text: a tint, not a light grey sheet */
+.ControlSection + div > .PartnerEvent .EventBackgroundBlur { opacity: .1 !important; }
+.ControlSection + div > .PartnerEvent > div:has(> div > .EventDetailTitle) { box-shadow: none !important; border-bottom: 1px solid var(--gd-line); }
+.ControlSection + div > .PartnerEvent > div:has(> div > .EventDetailTitle) > div { background: none !important; }
+.ControlSection + div > .PartnerEvent .EventType { color: var(--gd-accent, var(--gd-house)) !important; }
+.ControlSection + div > .PartnerEvent .EventDetailTitle { color: var(--gd-ink) !important; font-weight: 600 !important; }
+/* rate, discuss, share */
+.ControlSection + div > .PartnerEvent > .Container.Panel { background: none !important; border-top: 1px solid var(--gd-line); }
+.ControlSection + div > .PartnerEvent .VoteContainer,
+.ControlSection + div > .PartnerEvent .DiscussContainer,
+.ControlSection + div > .PartnerEvent .ShareContainer { background: var(--gd-soft) !important; border-radius: var(--gd-r-md) !important; }
+.ControlSection + div > .PartnerEvent .DiscussionButton {
+  background: rgba(255, 255, 255, .09) !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  color: var(--gd-ink) !important;
+}
+.ControlSection + div > .PartnerEvent .DiscussionButton:hover { background: rgba(255, 255, 255, .16) !important; }
+.ControlSection + div > .PartnerEvent .VoteCount,
+.ControlSection + div > .PartnerEvent .DiscussionCount { color: var(--gd-accent, var(--gd-house)) !important; }
+.ControlSection + div > .PartnerEvent .VoteCount svg,
+.ControlSection + div > .PartnerEvent .VoteCount svg *,
+.ControlSection + div > .PartnerEvent .DiscussionCount svg,
+.ControlSection + div > .PartnerEvent .DiscussionCount svg * { fill: var(--gd-accent, var(--gd-house)) !important; }
+/* close, previous, next and the game beside the card */
+.ControlSection .CloseButton,
+.ControlSection .ScrollButton {
+  background: var(--gd-glass, #0c0d13) !important;
+  border: 1px solid var(--gd-line) !important;
+  box-shadow: 0 12px 30px -12px rgba(0, 0, 0, .8) !important;
+}
+.ControlSection .ScrollButton { border-radius: 999px !important; }
+.ControlSection .ScrollButton.GameArt { border-radius: var(--gd-r-sm) !important; overflow: hidden; }
+.ControlSection .CloseButton:hover,
+.ControlSection .ScrollButton:hover { background: linear-gradient(var(--gd-hover), var(--gd-hover)), var(--gd-glass, #0c0d13) !important; }
+
 .CommunityItem.Blank { background: var(--gd-soft) !important; border-radius: var(--gd-r-md) !important; }
 
 /* ═══════════════ downloads ═══════════════ */
