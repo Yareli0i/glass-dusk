@@ -198,6 +198,16 @@ body.DesktopUI .FullModalOverlay .ModalPosition .DialogContent {
 body.DesktopUI .FullModalOverlay .ModalPosition_TopBar {
   background: linear-gradient(to right, var(--gd-accent, var(--gd-house)), transparent 85%) !important;
 }
+/* a dialog that is a window of its own carries the same line of Steam's blue across its top */
+body.ModalDialogBody:not(.OverlayPopupBody) .ModalPosition_TopBar {
+  background: linear-gradient(to right, var(--gd-accent, var(--gd-house)), transparent 85%) !important;
+}
+/* What's New settings (the gear on that shelf): grey slabs with a 3 px corner */
+body.ModalDialogBody .WhatsNewSettings > div:not(.DialogLabel) {
+  background: var(--gd-soft) !important;
+  border-radius: var(--gd-r-md, 12px) !important;
+  box-shadow: none !important;
+}
 body.ModalDialogBody .PagedSettingsDialog_PageListColumn { border-right: 1px solid var(--gd-line) !important; }
 body.ModalDialogBody .PagedSettingsDialog_Title { color: var(--gd-ink) !important; }
 /* the page list on the left — Steam calls the row PagedSettingsDialog_PageListItem,
@@ -245,6 +255,13 @@ body.ModalDialogBody .Field { background: var(--gd-soft) !important; border-radi
 body.DesktopUI .ToggleRail::before,
 body.DesktopUI .SliderTrack::before,
 body.DesktopUI .Pip.ActivePip { background: var(--gd-accent, var(--gd-house)) !important; }
+/* The older switch (What's New settings) has no ::before: a second rail lights up over
+   the first, and the knob itself turns blue. Only that kind has a .Highlight rail. */
+body.DesktopUI .Toggle > .ToggleRail.Highlight.On { background: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 45%, #26292e) !important; }
+body.DesktopUI .Toggle > .ToggleRail.Highlight ~ .ToggleSwitch.On {
+  background: var(--gd-accent, var(--gd-house)) !important;
+  background-image: none !important;
+}
 body.DesktopUI .Shared_Radio_Group {
   background: var(--gd-field) !important;
   border-radius: 10px !important;

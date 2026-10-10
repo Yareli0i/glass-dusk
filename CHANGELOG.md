@@ -2,6 +2,13 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 1.6.1 — 2026-10-10
+
+**Library home**
+- With *What's New shelf* switched on, the shelf was still Steam's grey-blue slab from edge to edge ([#9](https://github.com/Yareli0i/glass-dusk/issues/9)). The theme hides that shelf by default and had never styled it. It sits on the home like the theme's own shelf now: the same small heading, rounded pictures, the game's name as a chip.
+- A news tile under the pointer gets dark glass and the accent colour instead of Steam's navy and blue, and its menu button is a dark dot instead of a light grey square.
+- The shelf's settings window (the gear next to *What's New*) is themed: soft rounded rows, and its switch follows the accent.
+
 ## 1.6.0 — 2026-10-10
 
 **Library home**

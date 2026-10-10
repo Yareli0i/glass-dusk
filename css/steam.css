@@ -730,6 +730,47 @@ body.DesktopUI,
 /* "What's New" shelf is off by default — the home already has your own shelf */
 .AppDetailsMain .Body.InnerContainer > div:has(.UpdatesContainer) { display: none !important; }
 
+/* Switched on (switch «What's New shelf»), the shelf belongs to the home like the rest
+   of it. Steam draws it as a grey-blue slab from edge to edge, with square tiles (#9). */
+.UpdatesContainer { background: none !important; }
+.UpdatesContainer .EventTime { color: var(--gd-ink-faint) !important; font-weight: 600 !important; }
+.UpdatesContainer .PartnerEventRowCapsule_Container > div { border-radius: var(--gd-r-md) !important; overflow: hidden; }
+.UpdatesContainer .PartnerEventRowCapsule_TextTitle { color: var(--gd-ink) !important; font-weight: 600 !important; }
+/* the game under a tile: a chip */
+.UpdatesContainer .GameIconAndName {
+  background: var(--gd-field) !important;
+  border-radius: 999px !important;
+  padding-right: 10px !important;
+}
+.UpdatesContainer .GameIconAndName:hover { background: rgba(255, 255, 255, .16) !important; }
+.UpdatesContainer .GameIconAndName .GameIcon { border-radius: 50% !important; overflow: hidden; }
+.UpdatesContainer .GameIconAndName .GameName { color: var(--gd-ink-soft) !important; }
+/* A tile under the pointer: Steam lays navy over the picture and prints the kind of news
+   in its blue. Dark glass and the accent instead. The type's colour is set for the
+   hovered tile only: at rest Steam keeps that text transparent, and it must stay so. */
+.UpdatesContainer .PartnerEventRowCapsule_Container.HoversEnabled:hover .EventSummaryContainer {
+  background-color: color-mix(in srgb, var(--gd-glass, #0c0d13) 74%, transparent) !important;
+}
+.UpdatesContainer .PartnerEventRowCapsule_Container.HoversEnabled:hover .EventSummaryType { color: var(--gd-accent, var(--gd-house)) !important; }
+/* The tile's menu button is a light grey square with a dark arrow, the arrow a picture.
+   Inverted it is a dark dot with a light arrow; under the pointer Steam swaps in a white
+   arrow, which goes on the accent. */
+.UpdatesContainer .EventOptions > div { filter: invert(1) hue-rotate(180deg); border-radius: 50%; }
+.UpdatesContainer .EventOptions:hover > div { filter: none; background-color: var(--gd-accent, var(--gd-house)) !important; }
+/* Under the theme's own header the shelf lines up with it and takes its small heading.
+   With «Library home → Steam» it keeps Steam's spacing and heading, like the shelves below. */
+.gd-home ~ div > .UpdatesContainer { padding: 2px 16px 0 28px !important; }
+.gd-home ~ div > .UpdatesContainer .HeaderPageControls { margin-bottom: 8px; }
+.gd-home ~ div > .UpdatesContainer .HeaderPageControls .Name {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--gd-ink-faint) !important;
+}
+.gd-home ~ div > .UpdatesContainer .SettingsButton { margin-top: 0 !important; opacity: .55; }
+.gd-home ~ div > .UpdatesContainer .SettingsButton:hover { opacity: 1; }
+
 /* ═══════════════ fixes round 3 ═══════════════ */
 
 /* The home has no frame — the greeting, the hero and the shelf sit straight on
