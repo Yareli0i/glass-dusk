@@ -420,7 +420,7 @@
   const locale = () => (isUk() ? 'uk' : 'en');
   // `sub` is the small second line under each number (switch «Home numbers: second line»)
   const WORDS = {
-    uk: { cont: 'Продовжити', recent: 'Нещодавні ігри', play: 'Грати', games: 'Ігор', hours: 'Награно, год',
+    uk: { cont: 'Продовжити', recent: 'Нещодавні ігри', play: 'Грати', stop: 'Зупинити', cancel: 'Скасувати', games: 'Ігор', hours: 'Награно, год',
         disk: 'На дисках, ГБ', twoWeeks: 'За 2 тижні, год', unplayed: 'Не запущено', perfect: 'Ідеальні ігри',
         today: 'Сьогодні', yday: 'Учора', inGame: 'у грі', inTwoWeeks: 'за два тижні',
         sub: {
@@ -431,7 +431,7 @@
           drives: n => `на ${n} ${plural(n, { one: 'диску', other: 'дисках' })}`,
         },
         hello: h => (h < 5 ? 'Доброї ночі,' : h < 12 ? 'Доброго ранку,' : h < 18 ? 'Доброго дня,' : h < 23 ? 'Доброго вечора,' : 'Доброї ночі,') },
-    en: { cont: 'Continue', recent: 'Recently played', play: 'Play', games: 'Games', hours: 'Hours played',
+    en: { cont: 'Continue', recent: 'Recently played', play: 'Play', stop: 'Stop', cancel: 'Cancel', games: 'Games', hours: 'Hours played',
         disk: 'On disk, GB', twoWeeks: 'Hours, 2 weeks', unplayed: 'Unplayed', perfect: 'Perfect games',
         today: 'Today', yday: 'Yesterday', inGame: 'played', inTwoWeeks: 'in two weeks',
         sub: {
@@ -777,6 +777,39 @@
     return recent > 0 && recent < (app.minutes_playtime_forever || 0) ? ` · ${hoursOf(recent)} ${W().inTwoWeeks}` : '';
   };
 
+  // The Continue button follows its game the way the button on the game's own page does:
+  // Play, Cancel while Steam is starting it, Stop while it runs (#11). Steam keeps the
+  // state per client; the numbers are its EDisplayStatus.
+  const LAUNCHING = 1, RUNNING = 4, TERMINATING = 36;
+  const playState = app => {
+    let status;
+    try {
+      const local = app.local_per_client_data;
+      status = local && local.display_status !== undefined ? local.display_status : app.display_status;
+    } catch (e) { /* an overview without it: Play */ }
+    return status === LAUNCHING ? 'cancel' : status === RUNNING || status === TERMINATING ? 'stop' : 'play';
+  };
+  const PLAY_ICONS = {
+    play: '<path fill="currentColor" d="M8 5.2v13.6a.8.8 0 0 0 1.2.7l10.9-6.8a.8.8 0 0 0 0-1.4L9.2 4.5A.8.8 0 0 0 8 5.2z"/>',
+    cross: '<path fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" d="M6.5 6.5l11 11m0-11l-11 11"/>',
+  };
+  const paintPlay = (button, state) => {
+    if (button.dataset.state === state) return;
+    button.dataset.state = state;
+    button.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">${state === 'play' ? PLAY_ICONS.play : PLAY_ICONS.cross}</svg>${W()[state]}`;
+  };
+  // The header is rebuilt only when what it shows changes, and that would redraw the art
+  // too. A game starting or stopping changes the button alone, so it is repainted in place.
+  const syncPlay = () => {
+    const button = document.querySelector('.gd-continue .gd-play');
+    const o = shared();
+    if (!button || !o) return;
+    try {
+      const app = o.appStore.GetAppOverviewByAppID(Number(button.closest('.gd-continue').dataset.app));
+      if (app) paintPlay(button, playState(app));
+    } catch (e) { /* the button stays as it is */ }
+  };
+
   const buildHome = () => {
     const o = shared();
     const host = document.querySelector('.LibraryHome');
@@ -854,10 +887,7 @@
           <span class="gd-cont-name">${esc(last.display_name)}</span>
           <div class="gd-cont-meta">${relDay(last.rt_last_time_played)}, ${clock.format(new Date(last.rt_last_time_played * 1000))}
             · ${hoursOf(last.minutes_playtime_forever || 0)} ${W().inGame}${twoWeeksOf(last)}</div>
-          <button class="gd-play" data-game="${esc(gameIdOf(last))}">
-            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M8 5.2v13.6a.8.8 0 0 0 1.2.7l10.9-6.8a.8.8 0 0 0 0-1.4L9.2 4.5A.8.8 0 0 0 8 5.2z"/></svg>
-            ${W().play}
-          </button>
+          <button class="gd-play" data-game="${esc(gameIdOf(last))}"></button>
         </div>
       </div>
       <h4 class="gd-label">${W().recent}</h4>
@@ -870,6 +900,7 @@
       </div>`}`;
 
     if (last) {
+      paintPlay(block.querySelector('.gd-play'), playState(last));
       const hero = block.querySelector('.gd-cont-art');
       const logo = block.querySelector('.gd-cont-logo');
       const title = block.querySelector('.gd-cont-name');
@@ -900,8 +931,11 @@
         e.stopPropagation();
         const id = play.dataset.game;
         if (!id) { console.warn('[Glass Dusk] немає ідентифікатора гри для запуску'); return; }
-        try { o.SteamClient.Apps.RunGame(id, '', -1, 100); }
-        catch (err) { console.warn('[Glass Dusk] RunGame не спрацював', err); }
+        try {
+          if (play.dataset.state === 'stop') o.SteamClient.Apps.TerminateApp(id, false);
+          else if (play.dataset.state === 'cancel') o.SteamClient.Apps.CancelLaunch(id);
+          else o.SteamClient.Apps.RunGame(id, '', -1, 100);
+        } catch (err) { console.warn('[Glass Dusk] кнопка гри не спрацювала', err); }
         return;
       }
       const card = e.target.closest('[data-app]');
@@ -920,6 +954,7 @@
     const want = wantedArt();
     if (want !== KEEP) applyArt(want);
     try { buildHome(); } catch (e) { /* the home header is a bonus, never break the client over it */ }
+    syncPlay();
   };
 
   // React swaps the page in one mutation burst — react to that instead of waiting

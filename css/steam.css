@@ -329,6 +329,9 @@ body.DesktopUI,
 }
 .gd-play:hover { filter: brightness(1.08); }
 .gd-play:active { transform: scale(.98); }
+/* Stop and Cancel are not the card's call to action: the quiet pill of the game page's bar */
+.gd-play[data-state="stop"],
+.gd-play[data-state="cancel"] { background: rgba(255, 255, 255, .14); color: var(--gd-ink); }
 
 .gd-label { margin: 24px 0 12px; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--gd-ink-faint); }
 .gd-shelf {

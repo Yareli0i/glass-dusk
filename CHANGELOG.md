@@ -2,6 +2,14 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 1.6.2 — 2026-10-10
+
+**Library home**
+- The *Continue* card's button said *Play* while its game was starting or already running ([#11](https://github.com/Yareli0i/glass-dusk/issues/11)). It follows the game now, like the button on the game's own page: *Cancel* while Steam is starting it, *Stop* while it runs, and it does what it says.
+
+**Store**
+- In a wide window the front page's main carousel showed a pale oval over the previous and next games at its sides ([#10](https://github.com/Yareli0i/glass-dusk/issues/10), reported with its cause by @AlExpler). The arrows there carry no backdrop now, and the neighbouring cards have rounded corners.
+
 ## 1.6.1 — 2026-10-10
 
 **Library home**

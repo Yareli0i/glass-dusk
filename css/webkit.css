@@ -267,6 +267,14 @@ header#global_header { display: none !important; }
   background: rgba(255, 255, 255, .08) !important;
   border-radius: 999px !important;
 }
+/* On a wide page the front page's main carousel shows its neighbours at both sides, and
+   an arrow there is as large as the neighbour it sits on: the round backdrop became a
+   pale oval over a square picture (#10). No backdrop there, and the neighbours get the
+   corners of a card. */
+.carousel_wide_mode .arrow.left,
+.carousel_wide_mode .arrow.right { background: none !important; border-radius: 0 !important; }
+.carousel_wide_mode .store_main_capsule.prev,
+.carousel_wide_mode .store_main_capsule.next { border-radius: var(--gd-r-md) !important; overflow: hidden; }
 .carousel_thumbs div.focus,
 .handle.focus { background: var(--gd-accent) !important; }
 
