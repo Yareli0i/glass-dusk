@@ -6,7 +6,7 @@ A [Millennium](https://steambrew.app) theme for the Steam desktop client. Smoked
 
 ## What it styles
 
-- **Library.** Two panes of smoked glass over the blurred art of the open game, with the game list on the right. The home page gets its own header: greeting, library stats, *Continue* for the last game, recent games.
+- **Library.** Two panes of smoked glass over the blurred art of the open game, with the game list on the right. The home page gets its own header: greeting, library stats of your choosing, *Continue* for the last game, recent games.
 - **Game page.** The hero art runs edge to edge, the play bar is one flat card, and page links become chips.
 - **Store.** A game's page uses its art and colour. Everything else sits on a plain dusk ground.
 - **Menus, settings, notifications, friends and chat.** All wear the same colour as the main window.
@@ -32,6 +32,9 @@ Millennium → Themes → Glass Dusk → ⋯ → Settings. Changes apply after S
 | Glass | **Normal** · Denser · Sheerer | How see-through the panels are. |
 | Corners | **Normal** · Softer · Sharper | Radius of panels and cards. |
 | Library home | **Theme** · Steam | The theme's home header, or Steam's shelves only. |
+| Home number: Games, Hours played, On disk | **on** · off | Three numbers in the home header, a switch for each. |
+| Home number: Hours, 2 weeks, Unplayed, Perfect games | on · **off** | Three more, a switch for each. *Perfect games* are the ones with every achievement unlocked. |
+| Home numbers: second line | on · **off** | A small line under each number: games installed, games played, share of the library, average completion, drives. |
 | What's New shelf | on · **off** | Steam's What's New shelf on the home page. |
 | Game list side | **Right** · Left | Where the game list sits. |
 | Big Picture | **Cover** · Steam | Whole-screen art of the focused game, or Big Picture untouched. |
@@ -54,6 +57,7 @@ Tested on Windows 11 with Steam client 1788652215 and Millennium 3.5.0.
 - The overlay cannot blur the game behind its panels. Steam composites the game outside the page, so the glass there is a denser tint instead.
 - Very large custom artwork slows Big Picture down, with or without this theme. Animated PNG covers from SteamGridDB can run to tens of megabytes. If Big Picture stutters when a cover scrolls into view, a lighter version of that cover helps.
 - The Big Picture chip is information only: a controller can't select it.
+- *Perfect games* counts games with every achievement unlocked. Steam has no idea whether you finished a game's story, so this is the closest it gets to "completed". While that number is on, the theme keeps Steam's achievement data fresh: Steam is asked about a game you played since it last looked, and about every played game once a day.
 
 ## Support
 

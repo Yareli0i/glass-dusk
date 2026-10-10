@@ -418,15 +418,34 @@
   // switch «Theme language» (css/options/lang-uk.css sets --gd-lang: uk); English by default
   const isUk = () => getComputedStyle(root).getPropertyValue('--gd-lang').trim() === 'uk';
   const locale = () => (isUk() ? 'uk' : 'en');
+  // `sub` is the small second line under each number (switch «Home numbers: second line»)
   const WORDS = {
     uk: { cont: 'Продовжити', recent: 'Нещодавні ігри', play: 'Грати', games: 'Ігор', hours: 'Награно, год',
-        disk: 'На дисках, ГБ', today: 'Сьогодні', yday: 'Учора', inGame: 'у грі',
+        disk: 'На дисках, ГБ', twoWeeks: 'За 2 тижні, год', unplayed: 'Не запущено', perfect: 'Ідеальні ігри',
+        today: 'Сьогодні', yday: 'Учора', inGame: 'у грі', inTwoWeeks: 'за два тижні',
+        sub: {
+          games: n => `${n} встановлено`,
+          inGames: n => `у ${n} ${plural(n, { one: 'грі', other: 'іграх' })}`,
+          share: n => `${n}% бібліотеки`,
+          average: n => `${n}% у середньому`,
+          drives: n => `на ${n} ${plural(n, { one: 'диску', other: 'дисках' })}`,
+        },
         hello: h => (h < 5 ? 'Доброї ночі,' : h < 12 ? 'Доброго ранку,' : h < 18 ? 'Доброго дня,' : h < 23 ? 'Доброго вечора,' : 'Доброї ночі,') },
     en: { cont: 'Continue', recent: 'Recently played', play: 'Play', games: 'Games', hours: 'Hours played',
-        disk: 'On disk, GB', today: 'Today', yday: 'Yesterday', inGame: 'played',
+        disk: 'On disk, GB', twoWeeks: 'Hours, 2 weeks', unplayed: 'Unplayed', perfect: 'Perfect games',
+        today: 'Today', yday: 'Yesterday', inGame: 'played', inTwoWeeks: 'in two weeks',
+        sub: {
+          games: n => `${n} installed`,
+          inGames: n => `in ${n} ${plural(n, { one: 'game', other: 'games' })}`,
+          share: n => `${n}% of the library`,
+          average: n => `${n}% average`,
+          drives: n => `on ${n} ${plural(n, { one: 'drive', other: 'drives' })}`,
+        },
         hello: h => (h < 5 ? 'Good night,' : h < 12 ? 'Good morning,' : h < 18 ? 'Good afternoon,' : h < 23 ? 'Good evening,' : 'Good night,') },
   };
   const W = () => WORDS[locale()];
+  // "one" or everything else is all the header's phrases need, in either language
+  const plural = (n, forms) => (new Intl.PluralRules(locale()).select(n) === 'one' ? forms.one : forms.other);
   const dayShort = { format: d => new Intl.DateTimeFormat(locale(), { day: 'numeric', month: 'short' }).format(d) };
   const clock = { format: d => new Intl.DateTimeFormat(locale(), { hour: '2-digit', minute: '2-digit' }).format(d) };
 
@@ -658,6 +677,7 @@
   // Steam answers asynchronously, so the header keeps the last answer and asks
   // again once a minute, or at once when something is installed or removed.
   let diskBytes = null;
+  let diskDrives = 0;   // library folders that actually hold something
   let diskAsked = 0;
   let diskFor = -1;
 
@@ -668,13 +688,93 @@
     diskAsked = now;
     try {
       o.SteamClient.InstallFolder.GetInstallFolders().then(folders => {
-        diskBytes = folders.filter(f => f && f.bIsMounted !== false).reduce((sum, f) => {
+        const mounted = folders.filter(f => f && f.bIsMounted !== false);
+        diskBytes = mounted.reduce((sum, f) => {
           const parts = [f.nAppSize, f.nDLCSize, f.nWorkshopSize, f.nShaderSize, f.nStagedSize].map(Number);
           return sum + (parts.every(Number.isFinite) ? parts.reduce((a, b) => a + b, 0) : Number(f.nUsedSize) || 0);
         }, 0);
+        diskDrives = mounted.filter(f => Number(f.nUsedSize) > 0).length;
         homeChecked = 0;   // show it on the next pass
       }).catch(() => {});
     } catch (e) { /* a client without this call: the per-app sizes stand in */ }
+  };
+
+  // Which numbers the header shows: the switches «Home number: …» (css/options/stat-*.css).
+  // Option files load before css/steam.css, so a default written there would always win.
+  // Hence no defaults in CSS at all: a number that is on by default stays on unless its
+  // variable says "off", and one that is off by default needs "on".
+  const STATS = [
+    ['games', 'games', true],
+    ['hours', 'hours', true],
+    ['twoWeeks', 'two-weeks', false],
+    ['unplayed', 'unplayed', false],
+    ['perfect', 'perfect', false],
+    ['disk', 'disk', true],
+  ];
+  const statsShown = () => {
+    const css = getComputedStyle(root);
+    const says = name => css.getPropertyValue(`--gd-stat-${name}`).trim();
+    return {
+      list: STATS.filter(([, name, byDefault]) => (byDefault ? says(name) !== 'off' : says(name) === 'on')).map(([key]) => key),
+      sub: says('sub') === 'on',
+    };
+  };
+
+  // Achievement progress as Steam caches it for the library: an entry for every game it
+  // has looked at, which covers the ones ever started. A game counts as perfect when all
+  // of its achievements are unlocked; `average` is over the games with at least one.
+  // Null when the client has no such cache.
+  const achievements = (o, games) => {
+    try {
+      const mine = new Set(games.map(a => a.appid));
+      let perfect = 0, started = 0, percent = 0;
+      for (const [id, e] of o.appAchievementProgressCache.m_achievementProgress.mapCache) {
+        if (!e || !(e.total > 0) || !mine.has(Number(id))) continue;
+        if (e.all_unlocked) perfect++;
+        if (e.unlocked > 0) { started++; percent += Number(e.percentage) || 0; }
+      }
+      return { perfect, average: started ? Math.round(percent / started) : 0 };
+    } catch (e) { return null; }
+  };
+
+  // That cache goes stale on its own. Steam renews an entry only when something asks about
+  // a game played since it was cached, and never for a game that got new achievements with
+  // a DLC: two such games stayed "perfect" here for a month. So while the number is on,
+  // the header keeps the cache current itself, through Steam's own queue (one batched
+  // request for everything queued). A played game is asked about when it has no entry,
+  // when it was played after the entry was made (Steam's own test), or when the entry is
+  // older than a day. A hundred games at a time, the next hundred once Steam has its
+  // answer, and no game more often than every six hours whatever comes back.
+  const ACH_MAX_AGE = 24 * 3600;       // seconds, like cache_time
+  const ACH_ASK_GAP = 6 * 3600 * 1000;
+  const ACH_BATCH = 100;
+  const achAsked = new Map();          // appid → when it was last asked about
+  let achSent = 0;
+  const renewAchievements = (o, games) => {
+    try {
+      const cache = o.appAchievementProgressCache;
+      const now = Date.now();
+      const waiting = cache.m_mapQueuedCacheMisses ? cache.m_mapQueuedCacheMisses.size : 0;
+      if (waiting && now - achSent < 60000) return;   // a minute without an answer: stop waiting for it
+      const known = (cache.m_achievementProgress && cache.m_achievementProgress.mapCache) || new Map();
+      let room = ACH_BATCH;
+      for (const a of games) {
+        if (!(a.minutes_playtime_forever > 0) || now - (achAsked.get(a.appid) || 0) < ACH_ASK_GAP) continue;
+        const e = known.get(a.appid);
+        if (e && a.rt_last_time_played <= e.cache_time && now / 1000 - e.cache_time < ACH_MAX_AGE) continue;
+        achAsked.set(a.appid, now);
+        cache.QueueCacheUpdate(a.appid);
+        achSent = now;
+        if (!--room) break;
+      }
+    } catch (e) { /* no such cache in this client: the number shows a dash */ }
+  };
+
+  // "· 1.4 h in two weeks" for the Continue card. Nothing when it would say zero or only
+  // repeat the total next to it.
+  const twoWeeksOf = app => {
+    const recent = app.minutes_playtime_last_two_weeks || 0;
+    return recent > 0 && recent < (app.minutes_playtime_forever || 0) ? ` · ${hoursOf(recent)} ${W().inTwoWeeks}` : '';
   };
 
   const buildHome = () => {
@@ -711,8 +811,25 @@
     const gigs = Math.round(bytes / 2 ** 30);
     const name = (document.querySelector('.SuperNav .MenuButton span') || {}).textContent || '';
 
-    const sig = [locale(), new Date().getHours(), name, games.length, Math.round(minutes / 60), gigs,
-      ...(last ? [last.rt_last_time_played, last.minutes_playtime_forever] : []),
+    // every number the header can show, with the small line that may go under it
+    const shown = statsShown();
+    const installed = new Set(apps.map(a => a.appid));
+    const played = games.filter(a => a.minutes_playtime_forever > 0).length;
+    const recent = games.filter(a => a.minutes_playtime_last_two_weeks > 0);
+    if (shown.list.includes('perfect')) renewAchievements(o, games);
+    const ach = shown.list.includes('perfect') ? achievements(o, games) : null;
+    const numbers = {
+      games: [games.length, () => W().sub.games(games.filter(a => installed.has(a.appid)).length)],
+      hours: [Math.round(minutes / 60), () => W().sub.inGames(played)],
+      twoWeeks: [Math.round(recent.reduce((s, a) => s + a.minutes_playtime_last_two_weeks, 0) / 60), () => W().sub.inGames(recent.length)],
+      unplayed: [games.length - played, () => W().sub.share(games.length ? Math.round((games.length - played) / games.length * 100) : 0)],
+      perfect: [ach ? ach.perfect : '–', () => (ach ? W().sub.average(ach.average) : '')],
+      disk: [gigs, () => (diskDrives ? W().sub.drives(diskDrives) : '')],
+    };
+    const stats = shown.list.map(key => ({ label: W()[key], value: numbers[key][0], sub: shown.sub ? numbers[key][1]() : '' }));
+
+    const sig = [locale(), new Date().getHours(), name, ...stats.map(s => `${s.label}=${s.value}/${s.sub}`),
+      ...(last ? [last.rt_last_time_played, last.minutes_playtime_forever, last.minutes_playtime_last_two_weeks || 0] : []),
       ...(last ? [last, ...shelf] : []).map(a => `${a.appid}:${a.rt_custom_image_mtime || 0}`)].join('|');
     if (existing && sig === homeSig) return;
     homeSig = sig;
@@ -725,11 +842,9 @@
           <small>${W().hello(new Date().getHours())}</small>
           <strong>${esc(name)}</strong>
         </div>
-        <div class="gd-stats">
-          <div><small>${W().games}</small><b class="gd-num">${games.length}</b></div>
-          <div><small>${W().hours}</small><b class="gd-num">${Math.round(minutes / 60)}</b></div>
-          <div><small>${W().disk}</small><b class="gd-num">${gigs}</b></div>
-        </div>
+        ${!stats.length ? '' : `<div class="gd-stats">${stats.map(s => `
+          <div><small>${s.label}</small><b class="gd-num">${s.value}</b>${s.sub ? `<i>${esc(s.sub)}</i>` : ''}</div>`).join('')}
+        </div>`}
       </div>${!last ? '' : `
       <div class="gd-continue" data-app="${last.appid}">
         <img class="gd-cont-art" alt="">
@@ -738,7 +853,7 @@
           <img class="gd-cont-logo" alt="">
           <span class="gd-cont-name">${esc(last.display_name)}</span>
           <div class="gd-cont-meta">${relDay(last.rt_last_time_played)}, ${clock.format(new Date(last.rt_last_time_played * 1000))}
-            · ${hoursOf(last.minutes_playtime_forever || 0)} ${W().inGame}</div>
+            · ${hoursOf(last.minutes_playtime_forever || 0)} ${W().inGame}${twoWeeksOf(last)}</div>
           <button class="gd-play" data-game="${esc(gameIdOf(last))}">
             <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M8 5.2v13.6a.8.8 0 0 0 1.2.7l10.9-6.8a.8.8 0 0 0 0-1.4L9.2 4.5A.8.8 0 0 0 8 5.2z"/></svg>
             ${W().play}

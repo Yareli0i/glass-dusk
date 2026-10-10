@@ -265,7 +265,11 @@ body.DesktopUI,
 .gd-hello { line-height: 1.05; }
 .gd-hello small { display: block; margin-bottom: 4px; font-size: 21px; font-weight: 600; color: var(--gd-ink-soft); }
 .gd-hello strong { display: block; font-size: 50px; font-weight: 800; letter-spacing: -.5px; text-shadow: 0 2px 24px rgba(0, 0, 0, .5); }
-.gd-stats { display: flex; gap: 34px; padding-bottom: 6px; }
+/* Up to six numbers (switches «Home number: …»). In a window too narrow for all of them
+   beside the greeting the row drops under it, and wraps there if it must; five or more
+   sit a little closer. */
+.gd-stats { display: flex; flex-wrap: wrap; gap: 16px 34px; padding-bottom: 6px; }
+.gd-stats:has(> div:nth-child(5)) { column-gap: 28px; }
 .gd-stats small {
   display: block;
   font-size: 11px;
@@ -275,6 +279,16 @@ body.DesktopUI,
   color: var(--gd-ink-faint);
 }
 .gd-stats b { display: block; margin-top: 6px; font-size: 30px; line-height: 1; color: var(--gd-ink); }
+/* the second line (switch «Home numbers: second line») */
+.gd-stats i {
+  display: block;
+  margin-top: 7px;
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gd-ink-soft);
+  white-space: nowrap;
+}
 
 .gd-continue {
   position: relative;

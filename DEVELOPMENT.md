@@ -24,6 +24,7 @@ assets/              number font (+ its OFL licence) and the meadow background
 - **Paint, don't resize.** Steam measures popup windows before the theme loads, so fonts and metrics stay Steam's wherever Steam owns the element.
 - **One pane of glass.** `backdrop-filter` is used on the two library panels only. Nested frosted boxes stack into a milky haze.
 - **Option files load before `css/steam.css`.** A rule in an option file that undoes a rule in `steam.css` needs more specificity (an `html` prefix): an equal `!important` loses to the later file.
+- **A switch `dusk.js` reads has no default in CSS.** The home-number switches set `--gd-stat-…` in an option file, and option files load before `css/steam.css`: a default written there would always win. So the script holds the defaults. A number that is on by default shows unless its variable says `off`; one that is off by default needs `on`.
 - **Relative asset paths.** The theme folder is named after the repository, so nothing may reference the folder by name.
 
 ## Web pages
@@ -32,6 +33,12 @@ assets/              number font (+ its OFL licence) and the meadow background
 - `css/shared.css` is for the client's own windows, and its class names (`.friend`, `.gameName`, `.avatarHolder`, the scrollbars) also exist in community markup. The whole file is nested in `:where(:root:not(.MillenniumWindow_SteamBrowser))`. `:where()` adds no specificity, so the cascade inside the client is unchanged.
 - `css/webkit.css` is nested in `:where(html.gd-store)`. `js/dusk.js` sets that class on store.steampowered.com. Matching by URL in `skin.json` is not reliable: `/wishlist/` and `/replay/` redirect, and the patch is decided before the redirect.
 - Community and profile pages get nothing from the theme. Check with a screenshot diff against the same page with the theme's stylesheets disabled: it should be zero.
+
+## Library home numbers
+
+- Everything comes from the client's own stores: `appStore.allApps` (games, hours, hours in two weeks, unplayed), `SteamClient.InstallFolder` (disk) and `appAchievementProgressCache` (perfect games, average completion).
+- That achievement cache is not kept current by Steam. An entry is renewed only when something asks about a game played since it was cached, and a game that gains achievements with a DLC is never looked at again. While *Perfect games* is on, `renewAchievements` queues played games through the cache's own `QueueCacheUpdate`: no entry, played since, or older than a day. A hundred at a time, the next hundred once the queue is empty, and no game more often than every six hours.
+- To check the number, compare with `steamcommunity.com/profiles/<id>/stats/<appid>/achievements`, which says "N of M" for each game.
 
 ## Menus
 

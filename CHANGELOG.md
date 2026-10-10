@@ -2,6 +2,14 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 1.6.0 — 2026-10-10
+
+**Library home**
+- You choose the numbers in the header. Each one has its own switch in the theme's settings: *Games*, *Hours played* and *On disk* as before, and three new ones, *Hours, 2 weeks*, *Unplayed* and *Perfect games* (every achievement unlocked). The first three are on by default, so the header looks the same until you touch a switch. With all six on, the row drops under the greeting in a narrow window.
+- *Home numbers: second line* puts a small line under each number: games installed, games played, the share of the library never started, average completion, drives in use.
+- *Perfect games* is kept right. Steam's own record of achievements goes stale: a game that got new achievements with a DLC went on counting as perfect for a month. While the number is on, the theme has Steam renew that record for a game played since it was last checked, and for every played game once a day.
+- The *Continue* card shows the hours of the last two weeks next to the total, when the two differ.
+
 ## 1.5.5 — 2026-10-10
 
 **Library**

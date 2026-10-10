@@ -2,7 +2,7 @@
   "name": "Glass Dusk",
   "description": "Smoked glass over the art of the game you have open: the client takes its accent colour from that art. Styles the library, store, menus, Big Picture and the in-game overlay.",
   "author": "Yareli",
-  "version": "1.5.5",
+  "version": "1.6.0",
   "tags": [
     "Dark",
     "Glass",
@@ -161,6 +161,118 @@
               "^Steam$"
             ],
             "src": "css/options/home-steam.css"
+          }
+        }
+      }
+    },
+    "Home number: Games": {
+      "description": "Every game in the library, installed or not.",
+      "tab": "Library",
+      "default": "yes",
+      "values": {
+        "yes": {},
+        "no": {
+          "TargetCss": {
+            "affects": [
+              "^Steam$"
+            ],
+            "src": "css/options/stat-games-off.css"
+          }
+        }
+      }
+    },
+    "Home number: Hours played": {
+      "description": "Hours across the whole library.",
+      "tab": "Library",
+      "default": "yes",
+      "values": {
+        "yes": {},
+        "no": {
+          "TargetCss": {
+            "affects": [
+              "^Steam$"
+            ],
+            "src": "css/options/stat-hours-off.css"
+          }
+        }
+      }
+    },
+    "Home number: Hours, 2 weeks": {
+      "description": "Hours played in the last two weeks.",
+      "tab": "Library",
+      "default": "no",
+      "values": {
+        "no": {},
+        "yes": {
+          "TargetCss": {
+            "affects": [
+              "^Steam$"
+            ],
+            "src": "css/options/stat-two-weeks-on.css"
+          }
+        }
+      }
+    },
+    "Home number: Unplayed": {
+      "description": "Games you have never started.",
+      "tab": "Library",
+      "default": "no",
+      "values": {
+        "no": {},
+        "yes": {
+          "TargetCss": {
+            "affects": [
+              "^Steam$"
+            ],
+            "src": "css/options/stat-unplayed-on.css"
+          }
+        }
+      }
+    },
+    "Home number: Perfect games": {
+      "description": "Games with every achievement unlocked.",
+      "tab": "Library",
+      "default": "no",
+      "values": {
+        "no": {},
+        "yes": {
+          "TargetCss": {
+            "affects": [
+              "^Steam$"
+            ],
+            "src": "css/options/stat-perfect-on.css"
+          }
+        }
+      }
+    },
+    "Home number: On disk": {
+      "description": "Space taken in Steam's library folders, in GB.",
+      "tab": "Library",
+      "default": "yes",
+      "values": {
+        "yes": {},
+        "no": {
+          "TargetCss": {
+            "affects": [
+              "^Steam$"
+            ],
+            "src": "css/options/stat-disk-off.css"
+          }
+        }
+      }
+    },
+    "Home numbers: second line": {
+      "description": "A small line under each number: installed, in how many games, average completion, drives.",
+      "tab": "Library",
+      "default": "no",
+      "values": {
+        "no": {},
+        "yes": {
+          "TargetCss": {
+            "affects": [
+              "^Steam$"
+            ],
+            "src": "css/options/stat-sub-on.css"
           }
         }
       }
