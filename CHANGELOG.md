@@ -2,6 +2,12 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 1.6.3 — 2026-10-11
+
+**Library home**
+- New switch *Recently played shelf* on the *Library* tab ([#12](https://github.com/Yareli0i/glass-dusk/issues/12)): the row of covers under the *Continue* card can be turned off. It is on by default, as before.
+- When there was nothing to put in that row (one installed game played so far), its heading stood alone. It is left out now.
+
 ## 1.6.2 — 2026-10-10
 
 **Library home**

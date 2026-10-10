@@ -833,7 +833,9 @@
     const last = lastPlayed(o);   // null when nothing installed has been played yet
     if (!games.length && !apps.length) return;
 
-    const shelf = !last ? [] : apps.filter(a => a.rt_last_time_played && a.app_type === 1 && a.appid !== last.appid)
+    // switch «Recently played shelf» (css/options/recent-hide.css)
+    const rowOff = getComputedStyle(root).getPropertyValue('--gd-recent').trim() === 'off';
+    const shelf = !last || rowOff ? [] : apps.filter(a => a.rt_last_time_played && a.app_type === 1 && a.appid !== last.appid)
       .sort((a, b) => b.rt_last_time_played - a.rt_last_time_played)
       .slice(0, 7);
     const minutes = games.reduce((s, a) => s + (a.minutes_playtime_forever || 0), 0);
@@ -889,7 +891,7 @@
             · ${hoursOf(last.minutes_playtime_forever || 0)} ${W().inGame}${twoWeeksOf(last)}</div>
           <button class="gd-play" data-game="${esc(gameIdOf(last))}"></button>
         </div>
-      </div>
+      </div>${!shelf.length ? '' : `
       <h4 class="gd-label">${W().recent}</h4>
       <div class="gd-shelf">
         ${shelf.map(a => `
@@ -897,7 +899,7 @@
             <img alt="">
             <span>${relDay(a.rt_last_time_played)}</span>
           </button>`).join('')}
-      </div>`}`;
+      </div>`}`}`;
 
     if (last) {
       paintPlay(block.querySelector('.gd-play'), playState(last));

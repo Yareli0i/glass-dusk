@@ -333,6 +333,9 @@ body.DesktopUI,
 .gd-play[data-state="stop"],
 .gd-play[data-state="cancel"] { background: rgba(255, 255, 255, .14); color: var(--gd-ink); }
 
+/* with no row under it (switch «Recently played shelf», or nothing else played yet) the card
+   ends the block and keeps the gap the row had below itself */
+.gd-home > .gd-continue:last-child { margin-bottom: 10px; }
 .gd-label { margin: 24px 0 12px; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--gd-ink-faint); }
 .gd-shelf {
   display: grid;
