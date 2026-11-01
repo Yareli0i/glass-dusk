@@ -182,6 +182,24 @@ body.DesktopUI .ContextMenuSeparator + .contextMenuItem {
 .DialogDropDownMenu .DropDownItems:is(:hover, :focus) { background: var(--gd-hover) !important; color: var(--gd-ink) !important; }
 .DialogDropDownMenu .DropDownItems.OptionsRule { border-top-left-radius: 0 !important; border-top-right-radius: 0 !important; }
 
+/* Every tip the client shows: dark text on Steam's pale grey, and the one bright thing left (#33) */
+.TextToolTip {
+  background: rgb(16, 19, 30) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 0 0 1px var(--gd-line), 0 14px 30px -10px rgba(0, 0, 0, .85) !important;
+  color: var(--gd-ink) !important;
+}
+
+/* The lists in Steam's dialogs (Add Non-Steam Game, Players, Game Servers): a grey head on a grey
+   slab, the one thing in those windows that stayed Steam's (#33) */
+.ModalDialogBody .GameList,
+.ModalDialogBody .PlayersListBody { background: rgba(255, 255, 255, .04) !important; border-radius: 0 0 12px 12px !important; }
+.ModalDialogBody .Header:has(+ .GameList),
+.ModalDialogBody :has(> .PlayersListBody) > div:first-child { background: var(--gd-field) !important; border-radius: 12px 12px 0 0 !important; }
+.ModalDialogBody .ServerList { background: rgba(255, 255, 255, .04) !important; border-color: transparent !important; border-radius: 12px !important; overflow: hidden; }
+.ModalDialogBody .ServerList > div:first-child { background: var(--gd-field) !important; }
+.ModalDialogBody .ServerList > div:first-child span { background: none !important; }
+
 /* ═══════════════ settings and other modal windows ═══════════════ */
 
 /* In-game overlay panels are ModalDialogBody windows too (plus OverlayPopupBody), framed
@@ -325,6 +343,8 @@ input[type=checkbox] { accent-color: var(--gd-accent, var(--gd-house)); }
 
 /* the dialog that asks how to launch a game with several ways to start (#24): grey rows in a
    dark well, and Steam's blue Play */
+/* it lets the desktop through; the Starting game window beside it is solid (#33) */
+.LaunchOptionDialog { background: rgb(16, 19, 30) !important; }
 .LaunchOptionDialog .OptionList,
 .LaunchOptionDialog .ListContainer {
   background: var(--gd-soft) !important;
@@ -398,6 +418,23 @@ body.fullheight #popup_target.popup_chat_frame,
 .statusHeaderGlow { opacity: .7; }
 .currentUserContainer { border-bottom: 1px solid var(--gd-line); }
 .playerName { color: var(--gd-ink) !important; }
+/* Status in the colours Steam gives it, softened for the dark glass: the rule above had every name
+   the same white (#33). Your own avatar glows in yours. */
+.labelHolder.online .playerName { color: #7cc7f2 !important; }
+.labelHolder.ingame .playerName,
+.FriendStatusHover .playerName { color: #a3d060 !important; }
+.labelHolder.offline .playerName { color: var(--gd-ink-soft) !important; }
+.labelHolder.awayOrSnooze .playerName { opacity: .72; }
+.currentUserContainer .avatarHolder.online { box-shadow: 0 0 12px 1px rgba(124, 199, 242, .7); }
+.currentUserContainer .avatarHolder.ingame { box-shadow: 0 0 12px 1px rgba(163, 208, 96, .7); }
+/* the friends who play a game, from the icon beside it in the list: a square grey box */
+.FriendStatusHover {
+  background: rgb(16, 19, 30) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 0 0 1px var(--gd-line), 0 14px 30px -10px rgba(0, 0, 0, .85) !important;
+}
+/* the rule over the online friends was Steam's blue */
+.friendGroup.onlineFriends { border-top-color: var(--gd-line) !important; }
 .richPresenceLabel,
 .gameName { color: var(--gd-ink-soft) !important; }
 /* In a game that reports what you are doing, the header holds three lines, and Steam's

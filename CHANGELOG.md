@@ -2,6 +2,20 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 1.7.9 — 2026-11-01
+
+**Library**
+- Downloads: a row you dragged hung well below the cursor ([#33](https://github.com/Yareli0i/glass-dusk/issues/33), reported by @Scrapper1824). The glass over the page moved the point the row is placed from. The row in hand and the places it can land are in the theme now too.
+- Small Mode (View → Small Mode) is in the theme: it kept Steam's grey ground and gradients (#33).
+- Downloads: the block with the graph was a square of Steam's navy inside the rounded glass, and it stopped short of the edge on one side (#33, reported by @Veterian).
+- The game list's search field had two plates, one over the other, with their corners showing. The filter button lost its square under the pointer, and a shelf's sort drop-down the grey behind its arrow (#33).
+- Friends' names are in the colours of their status again: the theme had them all white. Your own avatar glows in yours, and the rule over the online friends is no longer Steam's blue (#33).
+- The friends shown beside a game in the list sat in a square grey box (#33).
+- The lists in *Add Non-Steam Game*, *Players* and *Game Servers* were Steam's grey (#33).
+- The window that asks how to launch a game is solid now, like the *Starting game* window, instead of letting the desktop through (#33).
+- Tips everywhere were dark text on Steam's pale grey; they are on the theme's dark ground (#33).
+- Web pages: the address pill sat against the top of its strip (#33).
+
 ## 1.7.8 — 2026-10-30
 
 **Store**

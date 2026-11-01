@@ -183,9 +183,13 @@ body.DesktopUI,
 .SuperNav .Arrow { color: var(--gd-ink-soft) !important; }
 
 /* the web address strip: a thin translucent rail, the URL a quiet pill */
+/* Steam pads it below only: the pill sat against the top unless something taller stood beside
+   it (#33). Its height from min-height instead, and the row centres what is in it. */
 .URLBar {
   background: rgba(255, 255, 255, .035) !important;
   border-bottom: 1px solid var(--gd-line) !important;
+  min-height: 30px;
+  padding-block: 0 !important;
 }
 .URLBarText {
   background: var(--gd-field) !important;
@@ -204,6 +208,16 @@ body.DesktopUI,
   border: none !important;
   border-radius: 999px !important;
   color: var(--gd-ink) !important;
+}
+
+/* Small Mode (View → Small Mode): the game list alone in a window of its own, with Steam's grey
+   ground and the gradient on its collections (#33). Nothing else keeps the search bar straight
+   inside the frame, so that is what tells it from the full window. */
+.ContentFrame > .Container:has(> .Bar) { background: rgba(14, 17, 27, .84) !important; background-image: none !important; }
+.ContentFrame > .Container:has(> .Bar) > .Container:has(> .SearchInput) { background: none !important; }
+.ContentFrame > .Container:has(> .Bar) .ReactVirtualized__Grid__innerScrollContainer .Panel > .Container[class*="CollapseIcon"] {
+  background: none !important;
+  background-image: none !important;
 }
 
 /* ═══════════════ the two panes of glass ═══════════════ */
@@ -252,13 +266,17 @@ body.DesktopUI,
 .GameListHomeAndSearch .CollectionsButton { flex: 0 0 auto !important; }
 .HomeBox .Bar,
 .SearchInput .DialogInput,
-.SearchInput .DialogInput_Wrapper.Panel,
 .AdvancedSearchButton {
   background: var(--gd-field) !important;
   border: none !important;
   border-radius: var(--gd-r-md) !important;
   color: var(--gd-ink) !important;
 }
+/* the field has a wrapper of the same size, and the input ran 7 px past it: two see-through
+   plates, one over the other, with their corners showing (#33) */
+.SearchInput .DialogInput_Wrapper.Panel { background: none !important; }
+.SearchInput .DialogInput { box-sizing: border-box !important; width: 100% !important; }
+.AdvancedSearchButton:hover { background: rgba(255, 255, 255, .14) !important; }
 .HomeBox .Bar.Selected {
   background: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 30%, transparent) !important;
 }
@@ -468,7 +486,8 @@ svg#arrowBase { background: var(--gd-field) !important; border-radius: 999px !im
    the middle of the bar it comes up on: anchored to that bar it is, 2 px for the picture's own
    margin. The page arrows filled their round buttons. */
 .ShowcaseHeader .DialogDropDown { padding: 1px 6px 1px 10px !important; border-radius: 999px !important; }
-.ShowcaseHeader .DialogDropDown_CurrentDisplay { background: none !important; padding: 0 4px 0 0 !important; }
+.ShowcaseHeader .DialogDropDown_CurrentDisplay { padding: 0 4px 0 0 !important; }
+.ShowcaseHeader .DialogDropDown > div { background: none !important; }
 .ShowcaseHeader .Rule { anchor-name: --gd-shelf-rule; border-radius: 999px; }
 .ShowcaseHeader .DragHandle { left: anchor(--gd-shelf-rule center) !important; transform: translateX(calc(-50% + 2px)); }
 .ShowcaseHeader .PageButtons svg { box-sizing: border-box; padding: 5px; width: 24px; height: 24px; }
@@ -878,6 +897,30 @@ svg#arrowBase { background: var(--gd-field) !important; border-radius: 999px !im
   background: var(--gd-soft) !important;
   border-radius: var(--gd-r-md) !important;
 }
+/* The block with the graph was Steam's navy, square inside the rounded glass (#33) */
+.DownloadsPage .Section.Active { background: none !important; }
+/* A row is dragged by react-beautiful-dnd, which pins it with position: fixed. A backdrop-filter
+   on an ancestor moves the origin of fixed to that ancestor, so the row hung below the cursor by
+   the pane's own offset (#33). On this page the glass goes without its blur: the art under it
+   is blurred already. */
+.MainPanel > .AppDetailsTransitionGroup:has(.DownloadsPage) {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+/* the row in hand, and the places it can land: Steam's grey and blue */
+.DownloadsPage .SectionItem.Dragging {
+  background: #141824 !important;
+  border-radius: var(--gd-r-md) !important;
+  box-shadow: 0 18px 40px -12px rgba(0, 0, 0, .85);
+}
+.DownloadsPage .SectionList.DropOption {
+  border-color: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 45%, transparent) !important;
+  border-radius: var(--gd-r-md) !important;
+}
+.DownloadsPage .SectionList.DropOption.DragOver {
+  background: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 18%, transparent) !important;
+  background-image: none !important;
+}
 /* Every progress bar in the client is one component, driven by two variables,
    and its fill is a ::after — there is no child element to paint. So the whole
    job is the variables. The old `[class*=Progress] > div` rule never reached the
@@ -1132,6 +1175,9 @@ body.DesktopUI,
 :root:not(.gd-on-web) .AdvancedSearchPane { top: 0 !important; right: calc(100% + 19px) !important; }
 /* while it is open Steam joins the button to it with a grey tab; the panel stands apart now,
    so the button shows it is on the way the collection button does */
+/* (and the square it comes up on under the pointer, #33) */
+.AdvancedSearchContainer,
+.AdvancedSearchContainer:hover,
 .AdvancedSearchContainer.Extended { background: transparent !important; }
 /* the same tab's other half; it hangs from the container, which is static above, so it landed on
    the search field as a grey bar (#32) */
