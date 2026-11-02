@@ -72,6 +72,7 @@
 [data-gd-rv-specs] {
   background: rgba(255, 255, 255, .06) !important;
   border-radius: 8px;
+  padding: 6px 10px;
 }
 [data-gd-rv-specs] > div { color: var(--gd-ink-soft) !important; }
 /* VaporLens (a browser extension) puts its strip between the scores and the graph */

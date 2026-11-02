@@ -197,7 +197,9 @@
         // the thumb, known by the svg in it: while the head is hovered Steam slips a screen-wide
         // tooltip layer, a plain div as well, in front of it, and that one stays unpainted (#23)
         ['rv', '[data-gd-rv-thumbwrap] > div:not([class*=" "]):has(> svg)', 'data-gd-rv-thumb'],
-        ['rv', '[data-gd-rv-inner] .Panel.Focusable > div:not(.Panel):not(.Focusable):has(> div + div)', 'data-gd-rv-specs'],   // the reviewer's PC
+        // the reviewer's PC. First children are skipped: the date row, a long review's text and the
+        // "found this helpful" lines have the same shape (#33). Not yet checked against a real specs block
+        ['rv', '[data-gd-rv-inner] .Panel.Focusable > div:not(.Panel):not(.Focusable):not(:first-child):has(> div + div)', 'data-gd-rv-specs'],
       ];
       const markReviews = ctn => {
         const rv = ctn.querySelector('[data-featuretarget=appreviews]');

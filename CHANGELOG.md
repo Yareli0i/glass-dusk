@@ -2,6 +2,11 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 1.7.11 — 2026-11-03
+
+**Store**
+- Reviews: the date, the text of a long review and the "found this helpful" lines each sat on a plate with no room inside. They had been taken for the reviewer's PC specs ([#33](https://github.com/Yareli0i/glass-dusk/issues/33), reported by @Veterian).
+
 ## 1.7.10 — 2026-11-03
 
 **Settings**
