@@ -109,6 +109,15 @@ body.DesktopUI .contextMenuItem:hover {
   background: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 28%, transparent) !important;
   color: #fff !important;
 }
+/* The item whose submenu is open, and the one the keyboard is on: Steam's white bar, with our
+   light text on it (#33). Friends' menus have no DesktopUI on the body, hence no prefix here. */
+.contextMenuItem.active,
+.contextMenuItem.SubMenu.active,
+.contextMenuItem.Focused,
+body.ContextMenuPopupBody .contextMenuItem:hover {
+  background: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 28%, transparent) !important;
+  color: #fff !important;
+}
 /* The game list's filter (Games, Software, Tools…, Group by…) is such a menu too, but its
    rows sit straight inside `.contextMenu`, with no `.contextMenuContents` to carry the
    glass — so it had no ground at all and the list read through it. */

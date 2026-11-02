@@ -29,6 +29,7 @@ Millennium → Themes → Glass Dusk → ⋯ → Settings. Changes apply after S
 
 | Setting | Values | What it does |
 |---|---|---|
+| Wallet balance | **Show** · Blur until hover | The balance in the top bar. Blurred, it shows when you point at it. |
 | Theme language | **English** · Українська · Français | Text the theme draws itself: home header, Big Picture chip, dates. Steam's own text follows Steam. |
 | Background | **Game art** · Meadow · Plain dusk | What sits behind the glass. |
 | Background art | **Normal** · Subtle · Vivid | How strongly the game art shows through. |

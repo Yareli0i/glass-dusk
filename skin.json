@@ -2,7 +2,7 @@
   "name": "Glass Dusk",
   "description": "Smoked glass over the art of the game you have open: the client takes its accent colour from that art. Styles the library, store, menus, Big Picture and the in-game overlay.",
   "author": "Yareli",
-  "version": "1.7.9",
+  "version": "1.7.10",
   "tags": [
     "Dark",
     "Glass",
@@ -21,6 +21,22 @@
   "Steam-WebKit": "css/webkit.css",
   "RootColors": "css/root.css",
   "Conditions": {
+    "Wallet balance": {
+      "description": "The balance in the top bar. Blurred, it shows when you point at it.",
+      "tab": "Look",
+      "default": "Show",
+      "values": {
+        "Show": {},
+        "Blur until hover": {
+          "TargetCss": {
+            "affects": [
+              ".*"
+            ],
+            "src": "css/options/wallet-blur.css"
+          }
+        }
+      }
+    },
     "Theme language": {
       "description": "Text the theme draws itself: home header, Big Picture chip, dates.",
       "tab": "Look",

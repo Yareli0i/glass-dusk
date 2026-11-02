@@ -489,8 +489,18 @@ svg#arrowBase { background: var(--gd-field) !important; border-radius: 999px !im
 .ShowcaseHeader .DialogDropDown_CurrentDisplay { padding: 0 4px 0 0 !important; }
 .ShowcaseHeader .DialogDropDown > div { background: none !important; }
 .ShowcaseHeader .Rule { anchor-name: --gd-shelf-rule; border-radius: 999px; }
-.ShowcaseHeader .DragHandle { left: anchor(--gd-shelf-rule center) !important; transform: translateX(calc(-50% + 2px)); }
+.ShowcaseHeader .DragHandle {
+  left: anchor(--gd-shelf-rule center) !important;
+  top: anchor(--gd-shelf-rule center) !important;
+  transform: translate(calc(-50% + 2px), -10px);   /* its bars are the top 20 px of a 25 px box (#33) */
+}
 .ShowcaseHeader .PageButtons svg { box-sizing: border-box; padding: 5px; width: 24px; height: 24px; }
+
+/* The card over an item in Available Content is the store's markup with none of the store's
+   styles: a serif face and text nearly as dark as the card (#33) */
+.StoreHover { color: var(--gd-ink-soft) !important; font-family: "Motiva Sans", Arial, sans-serif !important; }
+.StoreHover *:not(.game_review_summary) { color: var(--gd-ink-soft) !important; font-family: inherit !important; }
+.StoreHover :is(h1, h2, h3, h4, h5, .hover_title) { color: var(--gd-ink) !important; }
 
 /* The rest of the Recent Games shelf, after the theme's own row: the dates over each group take
    the theme's small heading, the big card's footer is dark glass tinted by its art instead of
@@ -906,6 +916,9 @@ svg#arrowBase { background: var(--gd-field) !important; border-radius: 999px !im
 .MainPanel > .AppDetailsTransitionGroup:has(.DownloadsPage) {
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
+  /* the game list is gone here, and with it the reason for a gap on one side only (#33) */
+  margin-inline: 14px !important;
+  width: calc(100% - 28px) !important;
 }
 /* the row in hand, and the places it can land: Steam's grey and blue */
 .DownloadsPage .SectionItem.Dragging {
@@ -1213,7 +1226,9 @@ body.DesktopUI,
 
 /* ═══════════════ the game page, per the sketch ═══════════════ */
 
-.AppDetailsMain .Header .TopCapsule { height: auto !important; }
+/* Steam later put its 320 px cap on this box as well, so the picture was cut off at the bottom
+   and read as off-centre (#33) */
+.AppDetailsMain .Header .TopCapsule { height: auto !important; max-height: none !important; }
 
 /* (a facts panel lived here — it only repeated what the play bar already says) */
 

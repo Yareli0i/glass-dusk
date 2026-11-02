@@ -386,9 +386,10 @@ header#global_header { display: none !important; }
 
 /* The strip under a capsule's picture (tags, an update's text, a creator's name) is Steam's
    blue radial gradient; here it is the capsule's own quiet half. */
-.deep_dive_key_tags,
 .recently_updated_desc,
 .creator_capsule_ctn { background: rgba(255, 255, 255, .05) !important; }
+/* under the cards of "Because You Played" that read as grey; the store's navy instead (#33) */
+.deep_dive_key_tags { background: rgba(120, 140, 255, .08) !important; }
 .deep_dive_tag,
 .tab_preview .tags a {
   background: var(--gd-field) !important;

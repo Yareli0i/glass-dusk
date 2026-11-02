@@ -2,6 +2,21 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 1.7.10 — 2026-11-03
+
+**Settings**
+- *Wallet balance*: Look → Wallet balance → Blur until hover hides the balance in the top bar until you point at it ([#34](https://github.com/Yareli0i/glass-dusk/issues/34), suggested by @junkFOx-x).
+
+**Library**
+- A game's banner was cut off at the bottom and read as off-centre: Steam had put a height limit on it that the theme no longer lifted ([#33](https://github.com/Yareli0i/glass-dusk/issues/33), reported by @Veterian).
+- Menus: the item whose submenu is open was a white bar with its text gone (#33).
+- Downloads: the glass had a gap on one side only (#33).
+- A shelf's grip sat low on its bar (#33, reported by @Scrapper1824).
+- The card over an item in *Available Content* is readable now, in Steam's own face (#33).
+
+**Store**
+- The tags under the *Because You Played* cards were grey (#33).
+
 ## 1.7.9 — 2026-11-01
 
 **Library**

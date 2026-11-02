@@ -1,0 +1,3 @@
+/* Wallet balance: Blur until hover (#34) — for screenshots and streams */
+html .WalletBalance { transition: filter .15s ease; }
+html .WalletBalance:not(:hover) { filter: blur(5px); }
