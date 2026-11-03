@@ -481,13 +481,12 @@ svg#arrowBase { background: var(--gd-field) !important; border-radius: 999px !im
 .HoversEnabled .LibraryItemActionButton.Play:not(.Disabled):hover { filter: brightness(1.08); }
 .RecentGameFooter .PlaytimeDetails.Header { padding-inline-start: 42px !important; }
 
-/* A shelf's heading (#32). Its drop-downs had no room inside, and the sort one kept a square of
-   Steam's grey within the pill. The grip sits at the middle of the whole heading, which is not
+/* A shelf's heading (#32) and a collection's. Their drop-downs had no room inside.
+   The grip sits at the middle of the whole heading, which is not
    the middle of the bar it comes up on: anchored to that bar it is, 2 px for the picture's own
    margin. The page arrows filled their round buttons. */
-.ShowcaseHeader .DialogDropDown { padding: 1px 6px 1px 10px !important; border-radius: 999px !important; }
-.ShowcaseHeader .DialogDropDown_CurrentDisplay { padding: 0 4px 0 0 !important; }
-.ShowcaseHeader .DialogDropDown > div { background: none !important; }
+:is(.ShowcaseHeader, .CollectionOptions) .DialogDropDown { padding: 1px 6px 1px 10px !important; border-radius: 999px !important; }
+:is(.ShowcaseHeader, .CollectionOptions) .DialogDropDown_CurrentDisplay { padding: 0 4px 0 0 !important; }
 .ShowcaseHeader .Rule { anchor-name: --gd-shelf-rule; border-radius: 999px; }
 .ShowcaseHeader .DragHandle {
   left: anchor(--gd-shelf-rule center) !important;
@@ -1103,6 +1102,11 @@ body.DesktopUI,
   color: var(--gd-ink-soft) !important;
 }
 .ReviewThumbButton:hover { background: rgba(255, 255, 255, .16) !important; }
+/* the like buttons under a post: their hover was square at the end of a rounded bar */
+.RatingContainer .LikeButton { border-radius: var(--gd-r-md) !important; }
+/* the zoom button on a screenshot, and the buttons of the alert at the window's foot */
+.ZoomInButton { border-radius: 8px !important; }
+.AlertButton { border-radius: 999px !important; }
 /* Steam's information strip is a flat blue band */
 .AppDetailsMain .Alert {
   background: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 22%, transparent) !important;

@@ -2,6 +2,17 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 1.7.12 — 2026-11-03
+
+**Client**
+- Drop-downs: the text and the arrow no longer stick out of the field's rounded corners. A collection's sort drop-down is a pill, like a shelf's.
+- The like buttons under a post, the zoom button on a screenshot and the buttons of an alert at the window's foot have rounded corners.
+
+**Store**
+- Wishlist and the newer pages: a plain discount was a green square on the plate of a double one. Both are the same chip in the accent colour now.
+- Front page: the capsule in the middle of the main carousel has rounded corners.
+- Reviews: a filter under the pointer stays dark, and the thumb of a negative review keeps inside its rounded head.
+
 ## 1.7.11 — 2026-11-03
 
 **Store**

@@ -327,12 +327,11 @@ header#global_header { display: none !important; }
 :is([data-gd-discounts-and-events], [data-gd-personal-calendar-home]) .carousel__dot--selected rect { fill: var(--gd-accent) !important; }
 /* On a wide page the front page's main carousel shows its neighbours at both sides, and
    an arrow there is as large as the neighbour it sits on: the round backdrop became a
-   pale oval over a square picture (#10). No backdrop there, and the neighbours get the
-   corners of a card. */
+   pale oval over a square picture (#10). No backdrop there. Every capsule gets the corners
+   of a card: the one in the middle stuck out of the rounded carousel around it. */
 .carousel_wide_mode .arrow.left,
 .carousel_wide_mode .arrow.right { background: none !important; border-radius: 0 !important; }
-.carousel_wide_mode .store_main_capsule.prev,
-.carousel_wide_mode .store_main_capsule.next { border-radius: var(--gd-r-md) !important; overflow: hidden; }
+.store_main_capsule { border-radius: var(--gd-r-md) !important; overflow: hidden; }
 .carousel_thumbs div.focus,
 .handle.focus { background: var(--gd-accent) !important; }
 
@@ -785,6 +784,8 @@ body:has(> #StoreTemplate) { background: transparent !important; }
 }
 /* a discount there: the percent lime on green, as everywhere in the newer store */
 #StoreTemplate [role=link][aria-label*="%"] > div:first-child { background: var(--gd-accent) !important; border-radius: 8px; }
+/* with one discount Steam paints the percent itself, green and square, over that plate */
+#StoreTemplate [role=link][aria-label*="%"] > div:first-child > div { background: none !important; }
 #StoreTemplate [role=link][aria-label*="%"] > div:first-child,
 #StoreTemplate [role=link][aria-label*="%"] > div:first-child * { color: var(--gd-accent-ink) !important; }
 #StoreTemplate [role=link][aria-label*="%"] > div:last-child > div:first-child { color: rgba(238, 241, 248, .45) !important; }
@@ -1130,6 +1131,7 @@ form:has(> div > input[type=text]) button { background: var(--gd-accent) !import
 .Panel[data-gd-strip] a.Focusable[href*="/app/"][data-gd-imgtile] > div:nth-child(n+3) { background: rgba(12, 15, 24, .84) !important; box-shadow: none !important; border-radius: 0 0 6px 0; color: var(--gd-ink) !important; }
 /* a row's discount: lime on green */
 .Panel[data-gd-strip] [role=link][aria-label*="%"] > div:first-child { background: var(--gd-accent) !important; border-radius: 4px !important; }
+.Panel[data-gd-strip] [role=link][aria-label*="%"] > div:first-child > div { background: none !important; }
 .Panel[data-gd-strip] [role=link][aria-label*="%"] > div:first-child,
 .Panel[data-gd-strip] [role=link][aria-label*="%"] > div:first-child * { color: var(--gd-accent-ink) !important; }
 .Panel[data-gd-strip] [role=link][aria-label*="%"] > div:last-child > div:first-child { color: rgba(238, 241, 248, .45) !important; }

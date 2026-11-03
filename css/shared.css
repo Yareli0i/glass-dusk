@@ -300,6 +300,9 @@ body.ModalDialogBody .Field { background: var(--gd-soft) !important; border-radi
   border-radius: 10px !important;
   color: var(--gd-ink) !important;
 }
+/* A drop-down is one field. Steam paints its text and its arrow apart, each with corners of its
+   own, and those stuck out of the rounder field. */
+.DialogDropDown > div { background: none !important; }
 .DialogToggle_On { background: var(--gd-accent, var(--gd-house)) !important; }
 
 /* controls Steam paints in its own blue: switches, sliders, segmented choices, radio pips */

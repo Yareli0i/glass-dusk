@@ -198,7 +198,7 @@
         // tooltip layer, a plain div as well, in front of it, and that one stays unpainted (#23)
         ['rv', '[data-gd-rv-thumbwrap] > div:not([class*=" "]):has(> svg)', 'data-gd-rv-thumb'],
         // the reviewer's PC. First children are skipped: the date row, a long review's text and the
-        // "found this helpful" lines have the same shape (#33). Not yet checked against a real specs block
+        // "found this helpful" lines have the same shape and come first in their parent; the specs do not (#33)
         ['rv', '[data-gd-rv-inner] .Panel.Focusable > div:not(.Panel):not(.Focusable):not(:first-child):has(> div + div)', 'data-gd-rv-specs'],
       ];
       const markReviews = ctn => {

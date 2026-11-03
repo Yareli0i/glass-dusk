@@ -10,12 +10,12 @@
 :where(html.gd-store) {
 
 /* ═══════════════ a game's page: the review filters ═══════════════
-   Review Type, Language, Date Range…: an open one turned light grey with black text and
-   dropped a light panel. */
-[data-gd-rv-filter]:has(> button[aria-expanded=true]) { background: rgba(255, 255, 255, .1) !important; border-radius: 8px !important; }
-[data-gd-rv-filter] > button[aria-expanded=true] { color: var(--gd-ink) !important; }
-[data-gd-rv-filter] > button[aria-expanded=true] svg path,
-[data-gd-rv-filter] > button[aria-expanded=true] svg polygon { fill: currentColor !important; }
+   Review Type, Language, Date Range…: one under the pointer or open turned light grey with
+   black text, and an open one dropped a light panel. */
+[data-gd-rv-filter]:is(:hover, :has(> button[aria-expanded=true])) { background: rgba(255, 255, 255, .1) !important; border-radius: var(--gd-r-md) !important; }
+[data-gd-rv-filter]:is(:hover, :has(> button[aria-expanded=true])) > button { color: var(--gd-ink) !important; }
+[data-gd-rv-filter]:is(:hover, :has(> button[aria-expanded=true])) > button svg path,
+[data-gd-rv-filter]:is(:hover, :has(> button[aria-expanded=true])) > button svg polygon { fill: currentColor !important; }
 [data-gd-rv-pop] {
   background: #171b27 !important;
   border: 1px solid rgba(255, 255, 255, .08);
@@ -67,7 +67,7 @@
 /* the thumb in a card's head: Steam's blue for "recommended" (the red of the other kind
    carries a second class and is left alone) */
 [data-gd-rv-thumb] { background: color-mix(in srgb, var(--gd-accent) 38%, #10131d) !important; border-radius: 8px 0 0 8px; }
-[data-gd-rv-thumbwrap] { border-radius: 8px; }
+[data-gd-rv-thumbwrap] { border-radius: 8px; overflow: hidden; }
 /* "Reviewer's PC specs": a blue plate. Among its siblings it alone is a plain div holding several lines. */
 [data-gd-rv-specs] {
   background: rgba(255, 255, 255, .06) !important;
