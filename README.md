@@ -2,7 +2,7 @@
 
 A [Millennium](https://steambrew.app) theme for the Steam desktop client. Smoked glass panels sit over the art of the game you have open, and the client takes its accent colour from that art. Open another game and the whole client changes colour with it.
 
-![Library home](images/library.jpg)
+![Glass Dusk in motion: the library home, games in their own colours (installed or not), the store and Big Picture](images/glass-dusk.webp)
 
 ## What it styles
 
