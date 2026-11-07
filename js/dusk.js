@@ -133,7 +133,11 @@
     // css/webkit.css reaches every web page (Steam-WebKit); its rules wait for this class.
     // A URL patch was tried and missed pages that redirect (/wishlist/ → /wishlist/id/…,
     // /replay/ → /replay/<id>/…). Checkout, help and login pages stay Steam's own.
-    if (location.hostname === 'store.steampowered.com') {
+    // The landing pages (Steam Deck, the hardware ones, About Steam) stay as Steam draws them:
+    // the hardware pages are light, with black text, and on the theme's dark ground it could not
+    // be read (#33).
+    const LANDING = /^\/(hardware|steamdeck\w*|about)(\/|$)/i;
+    if (location.hostname === 'store.steampowered.com' && !LANDING.test(location.pathname)) {
       root.classList.add('gd-store');
       // Marks for css/webkit.css, so its rules need no `:has()` to find their place. The long
       // wishlist adds rows and moves them as it scrolls, and every rule loaded in a page costs on

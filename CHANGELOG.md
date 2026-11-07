@@ -2,6 +2,15 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 1.7.13 — 2026-11-07
+
+**Library**
+- The art of the game you have open never showed behind the glass, and *Background art* had nothing to change: Normal, Subtle and Vivid looked the same (from Discord). The window loads two of the theme's style sheets, and the one for every window came last. It put the art layer under the window's dark ground, so none of it showed, and gave it a filter of its own that the switch does not reach. The main window's rules come first now, so the art shows, in the strength the switch sets.
+
+**Store**
+- In a hub, pointing at a game's discount turned the whole window the accent colour ([#35](https://github.com/Yareli0i/glass-dusk/issues/35), reported by @Kvtg-dotcom). Steam opens the discount's tip on a layer that covers the window, and puts that layer inside the price block, where the theme took it for one of the price's chips and painted it. Only the chips themselves are painted now.
+- Valve's hardware pages (Steam Machine, Steam Frame, Steam Controller) had black text on the theme's dark ground ([#33](https://github.com/Yareli0i/glass-dusk/issues/33), reported by @junkFOx-x). They are light pages of their own. The theme now leaves them, the Steam Deck page and About Steam as Steam draws them, as the README already said it would.
+
 ## 1.7.12 — 2026-11-03
 
 **Client**

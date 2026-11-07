@@ -625,7 +625,7 @@ dialog [role=dialog] [role=button][aria-label=Previous] {
    Queue window). Its last child is the price; "New", "Prepurchase" and the percent come
    before it as leaves: lime on green there, and the final price lime too. */
 .StoreSalePriceWidgetContainer { background: none !important; align-items: center; }
-.StoreSalePriceWidgetContainer > div:not(:last-child) {
+.StoreSalePriceWidgetContainer > div:not(:last-child):not(:empty):not(:has(*)) {
   margin-right: 4px;
   background: var(--gd-accent) !important;
   border-radius: 6px !important;
