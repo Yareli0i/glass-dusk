@@ -466,10 +466,12 @@ body.fullheight #popup_target.popup_chat_frame,
 /* "Got it!" lives in the box's bottom right corner — Steam's own place for it. As a
    pill it stuck out over the dashed frame; as a corner tab it belongs to the box. */
 .quickAccessFriendsMessageDismiss {
-  background: var(--gd-house) !important;
+  background: var(--gd-accent, var(--gd-house)) !important;
   border-radius: 8px 0 0 0 !important;
-  color: #fff !important;
+  color: var(--gd-accent-ink, #fff) !important;
 }
+/* the hint inside it was Steam's cyan, text and dashed frame */
+.quickAccessFriendsMessage { color: var(--gd-ink-soft) !important; border-color: rgba(255, 255, 255, .18) !important; }
 /* The search is only a magnifier until it is opened. Its box is the whole strip the
    field slides into, and painting that strip made a wide empty field that ran into
    the requests button in a narrow window. Only the real field is painted. */

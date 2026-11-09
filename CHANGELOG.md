@@ -2,6 +2,14 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 1.7.14 — 2026-11-09
+
+**Friends**
+- The hint for favourites at the top of the friends list (*Drag Friends & Chats here for easy access*) was Steam's cyan, text and dashed frame, and its *Got it!* was a fixed blue. The hint is in the theme's soft ink now, and *Got it!* wears the accent like every other button.
+
+**Store**
+- The discounts in the front page's *Discounts & Events* were Steam's lime squares again. Steam now paints the percent itself over the theme's plate there, as it did on the wishlist; it goes clear, and the chip is the accent again.
+
 ## 1.7.13 — 2026-11-07
 
 **Library**

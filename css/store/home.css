@@ -39,6 +39,8 @@
   border-radius: 11px !important;
 }
 [data-gd-discounts-and-events] .carousel__inner-slide a > div + div > div:not([role]) { padding: 0 7px !important; }
+/* Steam now paints the percent itself, a lime square, over that plate, as on the wishlist */
+[data-gd-discounts-and-events] [role=link][aria-label*="%"] > div:first-child > div { background: none !important; }
 [data-gd-discounts-and-events] [role=link][aria-label*="%"] > div:first-child > div,
 [data-gd-discounts-and-events] .carousel__inner-slide a > div + div > div:not([role]),
 [data-gd-discounts-and-events] .carousel__inner-slide a > div + div > div:not([role]) * {
