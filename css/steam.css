@@ -313,16 +313,24 @@ body.DesktopUI,
    Steam's cyan, as a fill on the icon and a stroke on its lines */
 .Filters .CheckboxWithImage.Active .SVGIcon_Button { fill: var(--gd-accent, var(--gd-house)) !important; }
 .Filters .CheckboxWithImage.Active .SVGIcon_Button [stroke-width] { stroke: var(--gd-accent, var(--gd-house)) !important; }
+/* A row of the game list. The row's .Panel used to sit inside the grid cell; since Steam's update
+   of 11 November 2026 the cell itself is the .Panel. Both are written out, for either client. */
+.ReactVirtualized__Grid__innerScrollContainer > .Panel,
 .ReactVirtualized__Grid__innerScrollContainer > div .Panel { border-radius: var(--gd-r-sm); }
+.ReactVirtualized__Grid__innerScrollContainer > .Panel:hover,
 .ReactVirtualized__Grid__innerScrollContainer > div .Panel:hover { background: var(--gd-hover) !important; }
 /* Each game answers in its own colour: js/dusk.js gives the row under the pointer the pair its
    art gave (--gd-own, --gd-own-2), and the wash under the pointer is that game's, not the open
    one's. */
+.ReactVirtualized__Grid__innerScrollContainer > .Panel[data-gd-own]:hover,
 .ReactVirtualized__Grid__innerScrollContainer > div .Panel[data-gd-own]:hover {
   background: linear-gradient(90deg,
     color-mix(in srgb, var(--gd-own) 30%, transparent),
     color-mix(in srgb, var(--gd-own-2) 14%, transparent)) !important;
 }
+/* Inside the selected row Steam paints whatever is under the pointer its slate blue (the row, the
+   icon, the name, each on its own). The selected row keeps the accent it already wears. */
+.ReactVirtualized__Grid__innerScrollContainer .Selected :hover { background-color: transparent !important; }
 .ReactVirtualized__Grid__innerScrollContainer .Selected {
   background: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 30%, transparent) !important;
   border-radius: var(--gd-r-sm) !important;

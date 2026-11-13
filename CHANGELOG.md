@@ -2,6 +2,11 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 2.0.1 — 2026-11-13
+
+**Library**
+- The game list stopped answering the pointer after Steam's client update of 11 November. A row under the pointer got no wash at all, neither the soft one nor its own game's colours, and the selected row turned Steam's slate blue under the pointer. Steam had moved a class in the list's markup; the theme finds the rows either way now, and the selected row keeps its accent.
+
 ## 2.0.0 — 2026-11-13
 
 **New**
