@@ -1,0 +1,5 @@
+/* Transitions: Instant — js/dusk.js reads --gd-motion: the accent and the art change at once;
+   and the still stands without its drift */
+:root { --gd-motion: off; }
+html.gd-still .gd-still-stage,
+html.gd-still .gd-still-words { animation: none !important; }

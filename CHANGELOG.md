@@ -2,6 +2,69 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 2.0.0 — 2026-11-13
+
+**New**
+- **Two-tone accent.** The art now lends two colours instead of one. The second is the art's next strongest hue, kept within 50° of the first and brought to the same brightness, so the pair always sits together and the same text reads on both. The Play button, the open tab at the top, the announcements button, *Continue* and the achievement bars run from one to the other, and so does the main button of every dialog. Switch *Accent style*: Two-tone by default, Solid for one colour.
+- **The colour flows.** Opening another game, the accent moves from the old colour to the new one in a fifth of a second instead of jumping, and the art behind the glass fades over. Both go in a few steps, not on every frame, so a change costs a handful of repaints. Switch *Transitions*: Flowing or Instant. The system's "reduce motion" turns it off as well.
+- **The glass has a finish.** A fine grain lies over the panes, and their top and left edges are lit in the accent, as if the game's light fell on them. The library's two panes, the rail of the game list beside the store and Millennium's settings have it. Switch *Glass finish*: Grain and lit edge, Grain, Lit edge, or Plain for the smooth glass of earlier versions. Scrolling a game page measured the same with the finish and without.
+- **The still.** Left alone on the library for five minutes, Steam becomes the art of the game in view: the hero unblurred across the window, the game's logo, the time and the date. The first move of the pointer, a key or a click brings the client back, and that click or key does nothing else: it cannot press what lies under the picture. It stays away while a video plays, while something is downloading, over the store and other web pages, and when the window is hidden. The picture drifts a few dozen pixels over minutes, one step every two seconds, so nothing stands in one place for hours and the client draws next to nothing. Switch *When idle*: After 5 minutes, After 2, After 15, Never.
+- **Two weeks in colour.** Under the greeting on the library home lies one bar: every game played in the last two weeks is a part of it, as wide as its share of the hours and in its own two colours. Point at a part and the line under the bar names the game and its hours; a click opens it. Switch *Home: two weeks in colour*.
+- **Each game answers in its own colour.** The theme has always kept the colour each game's art gave. The row under the pointer in the game list is now washed in the colours of that game, not of the open one. A game not seen yet gets its colours once the pointer has rested on it for a quarter of a second, so sweeping down the list asks for nothing. With *Accent colour → Fixed* the one colour stays.
+- **One accent on every tab.** With *Accent colour → Game art* the pill on STORE, COMMUNITY and your profile wore the Colors tab's *Accent*, and only the one on LIBRARY the game's. The colour now stays a game's wherever the window is. On a game's page in the store it is that game's, taken from the art the page itself uses, so the window and the page agree. With no game in view (the store's front page, the community, downloads) it is the last game's, kept between sessions. The Colors tab's *Accent* is what shows before any game has been seen, for art with no colour in it, and with *Fixed*.
+
+**Big Picture**
+- The game's art lies under every screen now, not the home alone, and it is the picture itself, softened, where it used to be a wash of colour. A game's page wears its own art; the library, the settings and the rest keep the last one, further back.
+- The focused game's numbers stand under the carousel, to the right of Steam's own label: time played, when it was last played, and achievements with their bar. They replace the chip in the top bar, which had not shown for some time: a constant in that code had taken the name of the theme's word list and broke it.
+- Big Picture uses the same colours as the desktop for every game, and the second colour too: the open tab, the action button of a game's page and the glow of the focus run from one to the other. On a light accent (Cyberpunk's yellow) filled surfaces are cut deeper, so the white words on them read.
+- A game's page: Steam's grey sheet under it is gone, the action button is one pill in the game's colours, and the buttons beside it are round glass.
+- The Steam menu and the Quick Access menu are smoked glass over the blurred screen, and the item the controller is on wears the game's colours. They are pages of their own that Millennium loads nothing into; the theme reaches them from the Big Picture window.
+- What the controller is on always shows: a ring in a light cut of the game's colour, with its glow. In the settings, rows and buttons had lost their focus highlight to the theme's own plates, so a focused button looked like any other. They have it back, in the accent. What Steam frames itself (a news card, a capsule of the store) wore a white hairline with square corners, a cover in the library's grid had only a glow under it, and a tile of *Recently updated* showed nothing at all: they all wear the same ring now.
+- Settings are two panes of glass with soft rows. The page you are on, the switches, the kind of news on the home's cards, *New to library* and the store's capsules under *Recommended* follow the accent.
+- **The home, art first.** The focused game's art, sharp, fills the first screen and the carousel sits at its foot: the look of Steam's Big Art Mode, whether or not that setting of Steam's (Settings → Home) is on. Steam's mode is one class and seven rules; the theme uses the same values on the same blocks, so the home scrolls and pins its tabs as it does in Steam's own mode. The softened art stays underneath and shows where the picture fades out. Switch *Big Picture home*: Big art, or Steam's, which leaves the layout to Steam's setting.
+- The art shows under the library and the settings as well. Steam paints both on an opaque ground of its own, and the glass there lay on flat paint.
+- The softened art keeps its proportions on any screen. It was drawn for 16:9 and stretched to fit: a third too wide on an ultrawide, too tall on 4:3. Its canvas now takes the shape of the screen and is drawn again when the window changes shape.
+- A picture is asked for once, however fast the carousel runs, and a request for a game already left behind is dropped instead of being read to the end. Custom art can be tens of megabytes.
+- The icons and the clock of the top bar have a soft dark edge and a fade of dusk behind them, so they read over art at full brightness. *Recent Games* over the carousel has the same.
+- *Recently updated on this device* was square grey tiles; they are the smoked glass of the news cards. *+6* after the friends on a capsule was a slate square.
+- An optional screensaver for Big Picture is in `extras/screensaver`: the theme's dusk with two drifting fields of its colours, the time and the date, as a page of the kind Steam's own screensaver is, to be copied into Steam by hand. It is experimental: the theme does not install it, it was not tried inside Steam, and Steam serves a screensaver apart from the client, so it cannot show the game you had in view. Its README says what is known and what is not.
+
+**Friends and chat**
+- The friends list: your own tile is rounded and ringed in the colour of your status. A friend's status is a ring round the avatar instead of a bar down its side, in Steam's own colours for it: blue online, green in a game, amber away, grey offline. A friend in a game has a breath of that green across the row. The plate under the pointer is rounded and stops short of the window's edges.
+- The heads of the groups (*In Game*, *Online Friends*, *Offline*, your categories) are small capitals with the count in a pill. Group chats have round badges.
+- A conversation: its head was Steam's grey slab and the open channel of a group a grey plate with a blue bar; both are glass and accent now. The day between messages is small capitals between two hairlines, the field you type in lights its edge, and *scroll to bottom* is a pill, in the accent when something new waits below.
+- Messages keep Steam's layout, and a speaker's name keeps Steam's colour for their status. Only the rest changes colour: times in the faint ink, links and mentions in the accent, a link's preview on a soft card.
+- The friends list and the chat let a little of the open game's art through their glass.
+
+**Library**
+- Community content on a game's page (guides, artwork, screenshots, videos) was Steam's grey cards, with white chips and blue icons under the pointer. They are glass cards now, with the accent around the one under the pointer and dark chips.
+- A major update in a game's activity feed kept Steam's blue ground, its blue frame and a blue bar hanging off the left edge. The event's own picture is its ground now, in colour, and the accent marks the kind of news and the edge.
+- The head of a game's achievements page lies over its art, and under bright art (Cyberpunk's yellow, a white sky) the white words on it could hardly be read. The picture is at half its brightness there now and reads over any art.
+- Steam's blue or slate was left on the announcements button while there is news, the two filters beside the game list's drop-down, the round button that closes the achievements page, a hidden achievement's tile, the header of *Community Content* and *Change preferred copy* under a shared game.
+- The search field of the game list and the Library Filters button stood flush, two rounded plates with a notch where their corners met. They are 8 px apart, like the Home bar and its button (from Discord).
+- A game more than one of the family owns: the row under Play (*From your Steam library*) took a card of its own, corners against the bar's corners. The two are one card (from Discord).
+- On a page too short to scroll (a game added from outside Steam) the art stopped short of the pane's edge, where Steam keeps room for a scrollbar that never came. It runs to the edge (from Discord).
+- A *Featured* update on a game's page had one pixel of the accent down its right edge: the card's gradient began again under its border (from Discord).
+- **The home's own controls work from the keyboard.** Every one of them says what it is (a cover in the recent row names its game and when it was played, a part of the two-week bar its game and hours, Play its game). The Continue card can be reached with Tab and opened with Enter or Space. The preview of a recent game opens for the cover Tab has landed on and closes with Escape. Each control shows where the keyboard is, and a rebuild of the header no longer takes the focus away.
+
+**Speed**
+- Scrolling the game list ran at less than half the frames it runs at without the theme: 49–55 a second against about 130, measured by scrolling it from a script with the theme's style sheets on and off. Two rules were the cost, each on pages where it matched nothing: `:has()` on a parent, with a bare `div` after it. With `:has()` on the element styled the list runs at 101–108. The glass, its grain and the blurred art cost the list nothing; each was switched off in turn to see.
+- The windows that follow the main one (menus, friends, settings) wrote the accent and the art to the page every second and a half whether or not anything had changed. The home's numbers were counted every few seconds with Steam minimised or on the store. The still asked Steam about its downloads on every pass. None of that happens now.
+
+**Overlay**
+- The class of the overlay's backdrop is found a second way, in Steam's own bundle, when Millennium's helper is not there; and a class that arrives as two names no longer breaks the rule built from it. Checked against the current client: the name in `css/overlay.css` is still Steam's.
+
+**Settings and dialogs**
+- The arrow of every drop-down was Steam's blue. Links in the settings pages and in a game's Properties, and Steam Cloud's "available", were its light blue. They follow the accent.
+- Storage: a drive's bar, the dot for free space and the square button beside the bar were slate. Voice: the bar of the microphone test. Family: *Me* was a green tag.
+- Recordings & Screenshots: the bands its head and foot stand on faded into Steam's slate.
+- A text field you are typing in gets a hairline of the accent. Selected text is the accent in every window, the store included, instead of Steam's blue.
+
+**Store**
+- A game's page: Steam's blue glow behind its top, the headings inside the description, the ticks in the table of languages, *Bundle* and *Includes N items*, the plates under what a game supports, and the lime *In library* tab on a package you own.
+- The kind of news on an event card (*Small Update / Patch Notes*, *Game Discount*), on a game's page and on the sale pages.
+- The line under the open list on the front page, *Your New Release Queue*, the open page in the charts' side list and *Pre-Purchase* beside a price.
+
 ## 1.7.14 — 2026-11-09
 
 **Friends**

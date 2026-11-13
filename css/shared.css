@@ -19,6 +19,13 @@
   --gd-field: rgba(255, 255, 255, .08);
   --gd-line: rgba(255, 255, 255, .08);
 }
+/* the accent as a surface, as in css/steam.css: two colours with «Accent style → Two-tone» */
+:root { --gd-accent-fill: linear-gradient(135deg, var(--gd-accent, var(--gd-house)), var(--gd-accent-2, var(--gd-accent, var(--gd-house)))); }
+
+/* The picture behind a window changing (see #gd-art::after below). Keyframes cannot stand inside
+   the block that follows, and two names let the fade start again without a forced layout. */
+@keyframes gd-art-out-a { from { opacity: 1; } to { opacity: 0; } }
+@keyframes gd-art-out-b { from { opacity: 1; } to { opacity: 0; } }
 
 /* Everything below is for the client's own windows. Millennium loads this file into
    web pages too (store, community, profiles), where these generic class names — .friend,
@@ -40,6 +47,19 @@
   transition: opacity .3s ease-out;
 }
 #gd-art.on { opacity: .55; }
+/* The picture changing: the one before it stays over the new one and fades out. js/dusk.js puts
+   the old picture in --gd-art-was and switches between the two class names to start the fade.
+   Eight steps and not every frame: each one is the whole window blurred again, and a field of
+   blurred colour turning over in eight steps reads as smooth. */
+#gd-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gd-art-was, none) center / cover no-repeat;
+  opacity: 0;
+}
+#gd-art.gd-turn-a::after { animation: gd-art-out-a .44s steps(8, end) both; }
+#gd-art.gd-turn-b::after { animation: gd-art-out-b .44s steps(8, end) both; }
 /* Menus and toasts are rounded panels inside a square window, and the art layer
    fills that window — so it showed as a lit rectangle behind their corners.
    These windows go without it; the glass alone carries them. */
@@ -203,8 +223,11 @@ body.DesktopUI .ContextMenuSeparator + .contextMenuItem {
    slab, the one thing in those windows that stayed Steam's (#33) */
 .ModalDialogBody .GameList,
 .ModalDialogBody .PlayersListBody { background: rgba(255, 255, 255, .04) !important; border-radius: 0 0 12px 12px !important; }
+/* the head is the first block beside the list; `:has()` on the head itself, not on their parent
+   (`:has(> .PlayersListBody) > div:first-child` cost the main window's game list a quarter of its
+   frames: see the same note in css/steam.css) */
 .ModalDialogBody .Header:has(+ .GameList),
-.ModalDialogBody :has(> .PlayersListBody) > div:first-child { background: var(--gd-field) !important; border-radius: 12px 12px 0 0 !important; }
+.ModalDialogBody div:first-child:has(~ .PlayersListBody) { background: var(--gd-field) !important; border-radius: 12px 12px 0 0 !important; }
 .ModalDialogBody .ServerList { background: rgba(255, 255, 255, .04) !important; border-color: transparent !important; border-radius: 12px !important; overflow: hidden; }
 .ModalDialogBody .ServerList > div:first-child { background: var(--gd-field) !important; }
 .ModalDialogBody .ServerList > div:first-child span { background: none !important; }
@@ -288,7 +311,7 @@ body.ModalDialogBody .Field { background: var(--gd-soft) !important; border-radi
 /* the tall tiles on Settings → Account are buttons too; a pill that high is a blob */
 .DialogButton.FatButton { border-radius: var(--gd-r-md, 12px) !important; }
 .DialogButton.Primary {
-  background: var(--gd-accent, var(--gd-house)) !important;
+  background: var(--gd-accent-fill) !important;
   color: var(--gd-accent-ink, #fff) !important;
 }
 .DialogInput,
@@ -303,6 +326,21 @@ body.ModalDialogBody .Field { background: var(--gd-soft) !important; border-radi
 /* A drop-down is one field. Steam paints its text and its arrow apart, each with corners of its
    own, and those stuck out of the rounder field. */
 .DialogDropDown > div { background: none !important; }
+/* and its arrow was Steam's blue */
+.DialogDropDown_Arrow svg,
+.DialogDropDown_Arrow svg * { fill: var(--gd-ink-soft) !important; }
+/* A field being typed in: Steam only darkens it a little. A hairline of the accent says where
+   you are. */
+.DialogInput:focus,
+.DialogInput:focus-within,
+.DialogTextInputBase:focus,
+.DialogTextInputBase:focus-within { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gd-accent, var(--gd-house)) 75%, transparent) !important; }
+/* selected text: Steam's blue, and a blue-grey of its own in the friends list's search */
+::selection,
+.friendSearchInput::selection {
+  background: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 60%, transparent) !important;
+  color: #fff !important;
+}
 .DialogToggle_On { background: var(--gd-accent, var(--gd-house)) !important; }
 
 /* controls Steam paints in its own blue: switches, sliders, segmented choices, radio pips */
@@ -337,6 +375,30 @@ body.ModalDialogBody .FakeContainer,
 body.ModalDialogBody .RecordingModeOption {
   background: var(--gd-soft) !important;
   border-radius: var(--gd-r-md, 12px) !important;
+}
+/* links inside the settings pages and a game's Properties, and the "N MB available" of Steam
+   Cloud: Steam's light blue */
+body.ModalDialogBody :is(.FieldDescription, .SectionTopLine) a,
+body.ModalDialogBody .SectionTopLine a span,
+body.ModalDialogBody .BlueHighlight { color: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 72%, #fff) !important; }
+body.ModalDialogBody :is(.FieldDescription, .SectionTopLine) a:hover { color: var(--gd-ink) !important; }
+/* Settings → Storage: a drive's bar, the dot for free space and the button beside the bar were
+   Steam's slate, the button a square */
+body.ModalDialogBody .DriveUsageIndicator { background: var(--gd-field) !important; border-radius: 999px !important; }
+body.ModalDialogBody .DriveUsageDot.DriveUsageFreeSpace { background: rgba(255, 255, 255, .22) !important; }
+body.ModalDialogBody .DriveSettingsButton {
+  background: var(--gd-field) !important;
+  border-radius: 999px !important;
+  transition: background .12s ease;
+}
+body.ModalDialogBody .DriveSettingsButton:hover { background: rgba(255, 255, 255, .14) !important; }
+/* Settings → Voice: the bar of the microphone test */
+body.ModalDialogBody .MicrophoneTest .ProgressBar { background: var(--gd-field) !important; border-radius: 999px !important; }
+/* Settings → Family: "Me" was a green tag */
+body.ModalDialogBody .FamilyMemberStatus .MeBadge {
+  background: var(--gd-accent, var(--gd-house)) !important;
+  color: var(--gd-accent-ink, #fff) !important;
+  border-radius: 999px !important;
 }
 /* tables in a game's Properties window: beta branches, DLC */
 body.ModalDialogBody .BetaHeaderRow,
@@ -389,6 +451,10 @@ body.DesktopUI .ButtonBox.Secondary.Active:hover {
 body.ModalDialogBody .TopListTitle { color: var(--gd-ink) !important; }
 body.ModalDialogBody .BackgroundRecordingListItem,
 body.ModalDialogBody .BackgroundRecordingListScaler { background: var(--gd-soft) !important; }
+/* Recordings & Screenshots: the band its head stands on and the one along its foot fade into
+   Steam's slate; into the window's own dusk instead */
+body.ModalDialogBody .ClipManager .StickyHeader { background-image: linear-gradient(0deg, rgba(14, 17, 27, 0) 0.62%, rgb(14, 17, 27) 40%) !important; }
+body.ModalDialogBody .ClipManager .DesktopBottomGlass { background-image: linear-gradient(180deg, rgba(14, 17, 27, 0) 0.62%, rgb(14, 17, 27) 40%) !important; }
 
 /* ═══════════════ notification toasts ═══════════════ */
 
@@ -557,6 +623,125 @@ body .ChatTabs .ChatTab:not(.Active):hover { background: var(--gd-hover) !import
 .chatSubmitButton.disabled { color: var(--gd-ink-faint) !important; }
 .chatSubmitButton .SVGIcon_Submit path { fill: currentColor !important; }
 .inviteAnotherFriendButton { background: var(--gd-field) !important; }
+
+/* ─── friends list and chat, second take (2.0) ───
+   Status keeps Steam's own colours everywhere (online blue, in a game green, away amber,
+   offline grey): the accent never stands in for them. What the accent marks is yours: the open
+   conversation, your own name, the field you type in.
+   The rows of the list are virtual and of a fixed height, so nothing here moves or resizes one:
+   the plate under a row is a layer of its own inside it. */
+
+/* the windows let a little of the game's art through their glass */
+.chat_main_flex { background: linear-gradient(160deg, rgba(20, 23, 36, .84), rgba(10, 12, 22, .92)) !important; }
+.chatDialogs { background: linear-gradient(160deg, rgba(20, 23, 36, .88), rgba(10, 12, 22, .94)) !important; }
+
+/* your own tile at the top: rounded, ringed in the colour of your status */
+.currentUserContainer .currentUserAvatar {
+  border-radius: 14px !important;
+  overflow: hidden;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, .16), 0 10px 22px -10px rgba(0, 0, 0, .8);
+}
+.currentUserContainer.online .currentUserAvatar { box-shadow: 0 0 0 2px #7cc7f2, 0 0 20px -2px rgba(124, 199, 242, .6); }
+.currentUserContainer.ingame .currentUserAvatar { box-shadow: 0 0 0 2px #a3d060, 0 0 20px -2px rgba(163, 208, 96, .6); }
+.currentUserContainer.away .currentUserAvatar,
+.currentUserContainer.snooze .currentUserAvatar { box-shadow: 0 0 0 2px #e0b757, 0 0 20px -2px rgba(224, 183, 87, .5); }
+.currentUserContainer .avatarHolder { box-shadow: none !important; }
+
+/* a friend: the plate under the pointer stops short of the window's edges */
+.friendlistListContainer .friend { isolation: isolate; background: none !important; }
+.friendlistListContainer .friend::before {
+  content: '';
+  position: absolute;
+  inset: 1px 6px;
+  z-index: -1;
+  border-radius: 12px;
+  transition: background .14s ease;
+}
+.friendlistListContainer .friend:hover::before { background: rgba(255, 255, 255, .075); }
+/* in a game: a breath of Steam's green from the side the game's icon is on */
+.friendlistListContainer .friend.ingame::before { background: linear-gradient(90deg, rgba(163, 208, 96, .13), rgba(163, 208, 96, 0) 62%); }
+.friendlistListContainer .friend.ingame:hover::before { background: linear-gradient(90deg, rgba(163, 208, 96, .2), rgba(255, 255, 255, .06) 70%); }
+
+/* Avatars: rounded tiles. The status was a 2 px bar down the side; it is a ring round the tile
+   now, in the same colour. The holder no longer clips, or the ring would be cut. */
+.friend .avatarHolder { overflow: visible !important; }
+.friend .avatarHolder .avatarStatus { opacity: 0; }
+.friend .avatarHolder .avatar { border-radius: 9px !important; border-color: transparent !important; }
+.friend .avatarHolder.online .avatar { box-shadow: 0 0 0 1.5px rgba(124, 199, 242, .95); }
+.friend .avatarHolder.ingame .avatar { box-shadow: 0 0 0 1.5px rgba(163, 208, 96, .95); }
+.friend .avatarHolder.away .avatar,
+.friend .avatarHolder.snooze .avatar,
+.friend .avatarHolder.awayOrSnooze .avatar { box-shadow: 0 0 0 1.5px rgba(224, 183, 87, .9); }
+.friend .avatarHolder.offline .avatar { box-shadow: 0 0 0 1px rgba(255, 255, 255, .12); filter: saturate(.55) brightness(.82); }
+.friend .FriendInGameIcon .gameIcon { border-radius: 6px !important; }
+
+/* the heads of the groups (In Game, Online Friends, Offline, your own categories): small
+   capitals, the count in a pill; the count of those in a game stays green */
+.friendGroup .groupName,
+.friendGroup .gameGroupContainer {
+  color: var(--gd-ink-faint) !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.friendGroup .groupCount {
+  margin-left: 8px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .08);
+  color: var(--gd-ink-soft) !important;
+  font-size: 11px !important;
+  letter-spacing: 0;
+}
+.friendGroup.gameGroup .groupCount { background: rgba(163, 208, 96, .16); color: #a3d060 !important; }
+
+/* group chats: round badges */
+.ChatRoomListGroupItem .ChatRoomGroupAvatar { border-radius: 50% !important; border-color: rgba(255, 255, 255, .14) !important; overflow: hidden; }
+.ChatRoomListGroupItem .ChatRoomGroupAvatar_Avatar { border-radius: 50% !important; }
+
+/* the head of a conversation was Steam's grey slab: glass, with a hairline under it */
+.chatWindow .chatHeader {
+  background: rgba(255, 255, 255, .035) !important;
+  background-image: none !important;
+  border-bottom: 1px solid var(--gd-line);
+}
+/* the open channel of a group: a grey slab with a blue bar beside it */
+.chatRoomTextChannel.ActiveTextChannel {
+  background: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 24%, transparent) !important;
+  border-radius: 10px !important;
+}
+.chatRoomTextChannel.ActiveTextChannel::after { background: var(--gd-accent, var(--gd-house)) !important; }
+/* the tab of the open conversation */
+body .ChatTabs .ChatTab.Active { background: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 20%, rgba(255, 255, 255, .05)) !important; }
+/* the day between messages: small capitals between two hairlines */
+.chatHistory .msg.timeDivision { color: var(--gd-ink-faint) !important; letter-spacing: .08em; text-transform: uppercase; }
+.chatHistory .msg.timeDivision > div { background: var(--gd-line) !important; }
+/* Messages keep Steam's layout, and a speaker's name keeps Steam's colour for their status
+   (blue online, green in a game): it says something. Colour only for the rest: times in the faint
+   ink, links and mentions in the accent, a link's preview on a soft card. Your own messages stay
+   a shade dimmer than other people's, as Steam writes them. */
+.chatHistory .speakerTimeStamp,
+.chatHistory .FriendChatTimeStamp { color: var(--gd-ink-faint) !important; }
+.chatHistory .msgText a { color: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 72%, #fff) !important; }
+.chatHistory .mention { background: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 26%, transparent) !important; border-radius: 6px; color: var(--gd-ink) !important; }
+.msg div.ChatMessageOpenGraph,
+.msg div.SteamPublishedFile {
+  background: rgba(255, 255, 255, .05) !important;
+  background-image: none !important;
+  border-radius: 12px !important;
+  box-shadow: inset 0 0 0 1px var(--gd-line);
+}
+/* "scroll to bottom", amber when something new is waiting below: a pill, the accent for new */
+.ScrollToBottomButton > span {
+  background: rgba(16, 19, 30, .94) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 0 0 1px var(--gd-line), 0 10px 24px -10px rgba(0, 0, 0, .8) !important;
+  color: var(--gd-ink-soft) !important;
+}
+.ScrollToBottomButton.UnreadMessages > span { background: var(--gd-accent, var(--gd-house)) !important; color: var(--gd-accent-ink, #fff) !important; }
+/* the field you type in lights its edge */
+.chatEntry .chatTextarea:focus { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gd-accent, var(--gd-house)) 75%, transparent) !important; }
 
 /* ═══════════════ window controls, everywhere ═══════════════ */
 

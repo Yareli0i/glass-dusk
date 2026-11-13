@@ -1,2 +1,2 @@
-/* Big Picture hours chip: off */
-#gd-bpm-chip { display: none !important; }
+/* Big Picture hours chip: off — the focused game's numbers under the carousel are not shown */
+#gd-bpm-marquee { display: none !important; }

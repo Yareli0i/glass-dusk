@@ -1465,6 +1465,16 @@ a.linkbar,
 p.reason a,
 a.all_languages,
 .block_header .right a { color: var(--gd-link) !important; }
+/* and in the older blocks: the headings inside a description, the ticks in the table of
+   languages, "Bundle" before a bundle's name and "Includes N items" under it, "Your New Release
+   Queue"; the kind of news on an event card, which js/dusk.js marks */
+.game_area_description h2.bb_tag,
+.game_area_description h2.bb_tag strong,
+td.checkcol span,
+.game_area_purchase_game .bundle_label,
+.package_contents b,
+.discovery_queue_h2 > a,
+[data-gd-evtype] { color: var(--gd-link) !important; }
 
 /* ═══════════════ new since the first pass (October 2026) ═══════════════
    What Steam added or redrew after the store was first done, and is not tied to one kind of
@@ -1493,6 +1503,32 @@ a.all_languages,
   background: var(--gd-accent) !important;
   border-radius: 6px !important;
   color: var(--gd-accent-ink) !important;
+}
+
+/* ═══════════════ the design pass (November 2026) ═══════════════
+   What was still Steam's own colour once every page had been gone through. */
+
+/* selected text */
+::selection { background: color-mix(in srgb, var(--gd-accent) 60%, transparent) !important; color: #fff !important; }
+
+/* home: the line under the open list (Popular New Releases, Top Sellers…) */
+.home_tab_button.active { border-bottom-color: var(--gd-accent) !important; }
+
+/* a game's page: Steam's blue glow behind its top, over the art */
+.game_page_background_ctn { background-image: none !important; }
+/* "In library" on a package you own: a lime tab */
+.package_in_library_flag.in_own_library {
+  background: var(--gd-accent) !important;
+  border-radius: 6px 6px 0 0;
+  color: var(--gd-accent-ink) !important;
+}
+/* what a game supports (Single-player, Steam Cloud…): each name on a plate of Steam's blue */
+.game_area_details_specs_ctn .label { background: rgba(255, 255, 255, .05) !important; }
+
+/* "Pre-Purchase" beside a price, on a slate tab */
+.StoreSalePrepurchaseLabel > span {
+  background: rgba(12, 15, 24, .84) !important;
+  color: var(--gd-ink) !important;
 }
 
 }   /* :where(html.gd-store) */

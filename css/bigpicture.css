@@ -7,7 +7,9 @@
    ║  and those are what these rules use.                                      ║
    ║                                                                           ║
    ║  The whole-screen art is js/dusk.js's #gd-bpm-bg: the focused game's hero  ║
-   ║  blurred ONCE into a small canvas and stretched. A CSS blur on Steam's own ║
+   ║  softened ONCE into a small canvas and stretched. It lies under every      ║
+   ║  screen: <html data-gd-bpm> says which (home, game, far) and how far back  ║
+   ║  the art stands. A CSS blur on Steam's own                                 ║
    ║  background images cost 19 frames over 50 ms per carousel run (0 without   ║
    ║  it): Steam cross-fades two full-screen images on every move, and the blur ║
    ║  was recomputed each frame. No backdrop-filter here for the same reason —  ║
@@ -19,22 +21,79 @@
   --gd-bpm-accent: var(--gd-accent, #5e90e4);
   /* Big Picture renders colours brighter than the CSS says (a captured rgb(200,0,0) comes
      out as 255,9,5), so filled surfaces take a darker cut of the accent to keep white text readable */
-  --gd-bpm-fill: color-mix(in srgb, var(--gd-bpm-accent) 70%, #000);
+  /* --gd-bpm-cut is how much of the colour stays: js/dusk.js lowers it for a light accent (a
+     yellow, a lime), where white words would not read on the usual cut */
+  --gd-bpm-fill: color-mix(in srgb, var(--gd-bpm-accent) var(--gd-bpm-cut, 70%), #000);
   --gd-bpm-glass: rgba(12, 12, 18, .62);
   --gd-bpm-edge: rgba(255, 255, 255, .12);
+  /* the game's second colour (js/dusk.js, with «Accent style → Two-tone»); filled surfaces run
+     from one to the other, in the same darker cut */
+  --gd-bpm-second: var(--gd-bpm-accent-2, var(--gd-bpm-accent));
+  --gd-bpm-run: linear-gradient(135deg, color-mix(in srgb, var(--gd-bpm-accent) var(--gd-bpm-cut, 76%), #000), color-mix(in srgb, var(--gd-bpm-second) var(--gd-bpm-cut, 76%), #000));
+  /* What the controller is on: a ring in a light cut of the game's colour and its glow under it.
+     One focus for the whole of Big Picture, seen from the sofa and never dependent on a pointer. */
+  --gd-bpm-lit: color-mix(in srgb, var(--gd-bpm-accent) 62%, #fff);
+  --gd-bpm-ring: 0 0 0 3px var(--gd-bpm-lit), 0 12px 40px -8px var(--gd-bpm-accent);
+  --gd-bpm-soft: rgba(255, 255, 255, .06);
 }
 
 /* ── the art: dusk.js paints it; Steam's own images stay in the DOM (they tell which
       game is focused) but are not drawn once the layer is up ── */
 .GamepadMode .BasicHome.OpaqueBackground { background: #0b0d14 !important; }
 .gd-bpm-bg .GamepadMode .RecentGamesBackgroundImages { visibility: hidden !important; }
+/* Big Art Mode (Settings → Home) gives the top of the screen to the focused game's art, sharp:
+   that is the point of the mode, so there Steam's own pictures stay. The theme's softened layer
+   lies under them and shows where they fade out, and the colours and the numbers work as ever. */
+.gd-bpm-bg .GamepadMode .BigArtMode .RecentGamesBackgroundImages { visibility: visible !important; }
+
+/* ── the home, art first ──
+   Switch «Big Picture home» (Big art unless css/options/bpm-home-steam.css says otherwise). The
+   focused game's art, Steam's own picture and sharp, fills the first screen and the carousel sits
+   at its foot: Steam's Big Art Mode, whether that setting of Steam's is on or not. The mode is
+   seven rules of Steam's under one class (.BigArtMode); these are the same values on the same
+   blocks, so the home scrolls and pins its tabs exactly as it does in Steam's own mode. The
+   softened layer of js/dusk.js stays underneath and shows where the picture fades out, at its
+   foot and behind the rows further down.
+   A style query on a custom property: no script has to mark anything, so the home is laid out
+   once, as it appears. */
+:root { --gd-bpm-home: art; }
+@container style(--gd-bpm-home: art) {
+  .GamepadMode .RecentGamesContainer {
+    height: calc(100vh - 50px); box-sizing: border-box;
+    display: flex; flex-direction: column; justify-content: flex-end;
+  }
+  .GamepadMode .RecentGamesInnerContainer { transform: scale(.85); transform-origin: left bottom; width: 117.647%; }
+  .GamepadMode .RecentGamesBackgroundImage { opacity: 1; filter: brightness(1); }
+  .GamepadMode .RecentGamesBackgroundContainer,
+  .GamepadMode .RecentGamesBackgroundImages {
+    -webkit-mask-image: linear-gradient(to top, transparent 0%, #000 20%, #000 75%, rgba(0, 0, 0, .85) 100%);
+    mask-image: linear-gradient(to top, transparent 0%, #000 20%, #000 75%, rgba(0, 0, 0, .85) 100%);
+  }
+  .GamepadMode .TabbedContent { margin-top: -45px; }
+  .gd-bpm-bg .GamepadMode .RecentGamesBackgroundImages { visibility: visible !important; }
+  /* "Recent Games" stands on the picture itself, and on a bright sky it was white on white */
+  .GamepadMode .RecentGamesHeader { text-shadow: 0 1px 2px rgba(0, 0, 0, .7), 0 0 12px rgba(0, 0, 0, .45); }
+}
+
+/* ── the art under every screen ──
+   Steam paints the library and the settings on grounds of their own (a near-black radial fade,
+   and a slate sheet under the settings' two columns), and the art layer lay hidden behind them:
+   on those screens the glass was laid on flat paint. With the layer up those grounds go. The
+   library keeps a veil, deepest at the top where its tabs are; the settings have their two panes. */
+.gd-bpm-bg .GamepadMode .GamepadLibrary { background: linear-gradient(180deg, rgba(8, 10, 16, .62), rgba(8, 10, 16, .4) 240px) !important; }
+.gd-bpm-bg .GamepadMode .GamepadPage.DialogBackground,
+.gd-bpm-bg .GamepadMode .PagedSettingsDialog { background: none !important; }
 #gd-bpm-bg {
   position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
   opacity: 0; transition: opacity .4s ease;
 }
 #gd-bpm-bg.show { opacity: 1; }
+/* away from the home and a game's page (library, settings, downloads…) the art stands further back */
+html[data-gd-bpm=far] #gd-bpm-bg.show { opacity: .42; }
+/* js/dusk.js gives the canvas the shape of the screen; `cover` holds the picture's proportions for
+   the moment between a change of that shape (a window resized) and the next drawing */
 #gd-bpm-bg canvas {
-  position: absolute; inset: 0; width: 100%; height: 100%;
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
   opacity: 0; transition: opacity .55s ease;
 }
 #gd-bpm-bg canvas.on { opacity: 1; }
@@ -43,7 +102,12 @@
   background: linear-gradient(180deg, rgba(0, 0, 0, .18), rgba(0, 0, 0, .04) 40%, rgba(6, 8, 14, .62) 100%);
 }
 
-/* ── header: icons and clock in one glass pill ── */
+/* ── header ── */
+/* Over art at full brightness (the home, art first) white icons on a white sky are gone. A fade
+   of dusk the height of the bar, and a soft dark edge round each icon and the clock: they read
+   on any picture and are not seen on a dark one. */
+.GamepadMode .Header.GamepadMode { background-image: linear-gradient(180deg, rgba(6, 8, 14, .5), rgba(6, 8, 14, 0)); }
+.GamepadMode .Header.GamepadMode .HeaderItem { filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .7)) drop-shadow(0 0 9px rgba(0, 0, 0, .35)); }
 .GamepadMode .Header.GamepadMode .HeaderItem.Clock { font-weight: 650; }
 .GamepadMode .Header.GamepadMode .Avatar img,
 .GamepadMode .Header.GamepadMode .avatarHolder { border-radius: 50%; }
@@ -77,15 +141,16 @@
 .GamepadMode .BasicGameCarouselItem .LibraryItemBox { box-shadow: 0 14px 34px -10px rgba(0, 0, 0, .6); }
 .GamepadMode .BasicGameCarouselItem.gpfocus .LibraryItemBox,
 .GamepadMode .BasicGameCarouselItem.gpfocuswithin .LibraryItemBox,
-.GamepadMode .BasicGameCarouselItemMediaContainer.gpfocus .LibraryItemBox {
-  box-shadow: 0 0 0 3px var(--gd-bpm-accent), 0 18px 50px -6px var(--gd-bpm-accent) !important;
-}
+.GamepadMode .BasicGameCarouselItemMediaContainer.gpfocus .LibraryItemBox,
+/* a cover in the library's grid, a collection or a shelf: Steam marks it with a glow under the
+   cover and a passing shine, and from the sofa nothing said which cover it was */
+.GamepadMode .LibraryItemBox.gpfocus { box-shadow: var(--gd-bpm-ring) !important; }
 /* Steam's own thin white ring (outline) on focus and mouse hover */
 .GamepadMode .LibraryItemBox.gpfocus,
 .GamepadMode .LibraryItemBox:hover { outline-color: color-mix(in srgb, var(--gd-bpm-accent) 70%, #fff) !important; }
 
 /* ── tabs: the chosen one wears the accent ── */
-.GamepadMode .TabRowTabs .Tab.Selected { background: var(--gd-bpm-fill) !important; color: #fff !important; border-radius: 999px !important; }
+.GamepadMode .TabRowTabs .Tab.Selected { background: var(--gd-bpm-run) !important; color: #fff !important; border-radius: 999px !important; }
 
 /* ── news cards: smoked glass instead of grey plates ── */
 .GamepadMode .EventPreviewContainer { border-radius: 14px !important; overflow: hidden; border: 1px solid var(--gd-bpm-edge); }
@@ -100,16 +165,140 @@
   border: 1px solid rgba(255, 255, 255, .1); box-shadow: 0 16px 40px -12px rgba(0, 0, 0, .7);
 }
 
-/* ── the chip (dusk.js): focused game, its hours, when it was last played ── */
-#gd-bpm-chip {
-  position: absolute; left: 24px; top: 50%; transform: translateY(-50%); z-index: 2;
-  height: 32px; padding: 0 14px 0 8px; display: flex; align-items: center; gap: 10px;
-  border-radius: 999px; background: var(--gd-bpm-glass);
-  border: 1px solid var(--gd-bpm-edge); color: rgba(255, 255, 255, .78);
-  font-size: 13px; font-weight: 600; white-space: nowrap; pointer-events: none;
-  transition: opacity .25s ease;
+/* ── the marquee (dusk.js): what Steam knows about the focused game ──
+   Time played, last played and achievements, in the row of the label Steam prints under the
+   carousel: the name and the state on the left are Steam's, the numbers on the right the theme's.
+   It hangs on the row that holds the carousel, so it stays put while the covers move and
+   scrolls away with them. */
+#gd-bpm-marquee {
+  position: absolute; right: 56px; bottom: 36px; z-index: 2;
+  height: 52px; display: flex; align-items: flex-start; gap: 36px; padding-top: 5px; box-sizing: border-box;
+  white-space: nowrap; pointer-events: none;
 }
-#gd-bpm-chip canvas, #gd-bpm-chip img { height: 20px; width: auto; max-width: 110px; object-fit: contain; }
-#gd-bpm-chip .gd-name { color: #fff; }
-#gd-bpm-chip b { color: color-mix(in srgb, var(--gd-bpm-accent) 45%, #fff); font-weight: 700; }
-.Header:has(.SearchBox:focus-within) #gd-bpm-chip { opacity: 0; }
+#gd-bpm-marquee > div { display: flex; flex-direction: column; gap: 3px; }
+#gd-bpm-marquee small { font-size: 10.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255, 255, 255, .58); }
+#gd-bpm-marquee b { font-size: 19px; line-height: 22px; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; }
+#gd-bpm-marquee i { display: block; width: 100%; min-width: 96px; height: 3px; border-radius: 3px; background: rgba(255, 255, 255, .2); overflow: hidden; }
+#gd-bpm-marquee u { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--gd-bpm-accent), var(--gd-bpm-second)); }
+
+/* ══════════════ beyond the home ══════════════ */
+
+/* ── a game's page: its art under the page, the action in the game's two colours ── */
+.GamepadMode .AppDetailsMain .Body.ScrollContainer.Glassy { background: none !important; background-image: none !important; }
+.GamepadMode .AppDetailsOverviewPanel .Backdrop { display: none !important; }
+.GamepadMode .AppDetailsOverviewPanel .AppDetailsRoot {
+  background: linear-gradient(180deg, rgba(9, 11, 18, .72), rgba(9, 11, 18, .86) 320px) !important;
+}
+.GamepadMode .AppActionButton.PlayButtonContainer {
+  background: var(--gd-bpm-run) !important;
+  border-radius: 999px !important;
+  overflow: hidden;
+}
+.GamepadMode .AppActionButton .PlayButton { background: transparent !important; border-radius: 999px !important; }
+.GamepadMode .AppActionButton .PlayButton .ButtonText { color: #fff !important; font-weight: 700 !important; }
+.GamepadMode .AppActionButton .PlayButton svg,
+.GamepadMode .AppActionButton .PlayButton svg * { fill: #fff !important; }
+.GamepadMode .AppActionButton.PlayButtonContainer:has(.gpfocus),
+.GamepadMode .AppActionButton.PlayButtonContainer.gpfocuswithin { box-shadow: var(--gd-bpm-ring) !important; filter: brightness(1.12); }
+.GamepadMode .AppButtons .MenuButton {
+  background: rgba(255, 255, 255, .1) !important;
+  border-radius: 999px !important;
+}
+.GamepadMode .AppButtons .MenuButton.gpfocus { background: var(--gd-bpm-fill) !important; box-shadow: var(--gd-bpm-ring) !important; }
+.GamepadMode .PlayBarGameIcon { border-radius: 8px !important; overflow: hidden; }
+
+/* ── tabs under the controller ── */
+.GamepadMode .TabRowTabs .Tab.gpfocus { box-shadow: var(--gd-bpm-ring) !important; }
+
+/* ── Steam's own frame ──
+   Whatever has no focus look of its own (a news card, a capsule of the store, a tile) Steam
+   frames with a block that follows the focus, .FocusRing: a hairline at 60 % white with square
+   corners. It takes the theme's ring instead, so the controller's place looks the same wherever
+   it is. `!important`: Steam animates this outline in, and an animation gives way only to that. */
+.FocusRing {
+  outline: 3px solid var(--gd-bpm-lit) !important;
+  outline-offset: 2px !important;
+  border-radius: 15px;
+  box-shadow: 0 12px 40px -8px var(--gd-bpm-accent);
+}
+
+/* ── settings: two panes of smoked glass, soft rows, the accent on what is on ── */
+.GamepadMode .PagedSettingsDialog .PageListColumn {
+  background: rgba(9, 11, 18, .62) !important;
+  border-right: 1px solid var(--gd-bpm-edge);
+}
+.GamepadMode .PagedSettingsDialog .PagedSettingDialog_ContentColumn { background: rgba(9, 11, 18, .44) !important; }
+.GamepadMode .DialogControlsSection .Background.Panel,
+.GamepadMode .DialogBody > .Background.Panel {
+  background: var(--gd-bpm-soft) !important;
+  border-radius: 12px !important;
+}
+.GamepadMode .ToggleRail::before { background: var(--gd-bpm-accent) !important; }
+/* the page you are on in the side list: Steam's blue, as a fade and a line */
+.GamepadMode .PagedSettingsDialog_PageListItem.Active {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--gd-bpm-accent) 46%, transparent), transparent) !important;
+  border-color: var(--gd-bpm-lit) !important;
+}
+.GamepadMode .PagedSettingsDialog_PageListItem.gpfocus { box-shadow: inset 0 0 0 2px var(--gd-bpm-lit); }
+/* What the controller is on. Steam lights a row by animating its background and turns a button
+   white; the soft plate above and the buttons of css/shared.css (which this window loads too)
+   held both still, so nothing showed where the controller was. The row takes the game's colour
+   and its ring, the button the two colours. */
+.GamepadMode .Field.gpfocuswithin {
+  background: color-mix(in srgb, var(--gd-bpm-accent) 20%, rgba(255, 255, 255, .07)) !important;
+  box-shadow: inset 0 0 0 2px var(--gd-bpm-lit);
+}
+.GamepadMode .DialogButton.gpfocus {
+  background: var(--gd-bpm-run) !important;
+  color: #fff !important;
+  box-shadow: var(--gd-bpm-ring) !important;
+}
+
+/* ── what was left of Steam's colours ── */
+/* the home: the kind of news, "New to library", the dot on a tab with something new */
+.GamepadMode .EventSummary .EventType { color: var(--gd-bpm-lit) !important; }
+.GamepadMode .AppPortraitBanner { background: var(--gd-bpm-run) !important; }
+.GamepadMode .TabBadge.TabDotBadge { background: var(--gd-bpm-lit) !important; }
+/* the store's capsules under Recommended: slate cards with a blue foot */
+.GamepadMode .GameCapsule.Panel { background: rgba(10, 10, 16, .66) !important; border-radius: 14px !important; overflow: hidden; }
+.GamepadMode .GameCapsule .BottomBar { background: rgba(255, 255, 255, .06) !important; }
+.GamepadMode .GameCapsule .InLibrary { background: rgba(12, 15, 24, .84) !important; color: #fff !important; }
+/* "+6" after the friends' pictures on a capsule: a slate square */
+.GamepadMode .GameCapsule .Avatar.Remainder { background: rgba(255, 255, 255, .16) !important; border-radius: 6px; }
+/* "Recently updated on this device": square grey tiles; the smoked glass of the news cards */
+.GamepadMode .RecentlyCompleted .Panel:has(> .TopSection) {
+  background: rgba(10, 10, 16, .66) !important;
+  border: 1px solid var(--gd-bpm-edge); border-radius: 14px !important; overflow: hidden;
+}
+.GamepadMode .RecentlyCompleted .BottomSection { background: rgba(255, 255, 255, .05) !important; }
+/* a tile under the controller showed nothing at all */
+.GamepadMode .RecentlyCompleted .Panel.gpfocus { box-shadow: var(--gd-bpm-ring) !important; }
+.GamepadMode .StoreSaleNewItem,
+.GamepadMode .StoreSaleDiscountBox { background: var(--gd-bpm-fill) !important; color: #fff !important; }
+/* a game's page: "Scroll To Top" and "Post" */
+.GamepadMode .ScrollToTopButton > div { background: var(--gd-bpm-run) !important; }
+.GamepadMode .ScrollToTopButton > div > div { color: #fff !important; }
+.GamepadMode .AddToFeed .PostButton { background: rgba(255, 255, 255, .1) !important; border-radius: 999px !important; }
+
+/* ══════════════ the Steam menu and the Quick Access menu ══════════════
+   Pages of their own, which js/dusk.js gives this file and marks (data-gd-bpm-view). Steam
+   draws them over the blurred screen, so their ground can be glass: what is under shows through. */
+html[data-gd-bpm-view] #MainNavMenuContainer .Menu {
+  background: linear-gradient(170deg, rgba(18, 21, 33, .72), rgba(9, 11, 18, .82)) !important;
+  border-right: 1px solid var(--gd-bpm-edge);
+}
+html[data-gd-bpm-view] #MainNavMenuContainer .Menu .Item { border-radius: 14px !important; }
+html[data-gd-bpm-view] #MainNavMenuContainer .Menu .Item.Active { background: rgba(255, 255, 255, .08) !important; }
+html[data-gd-bpm-view] #MainNavMenuContainer .Menu .Item.gpfocus {
+  background: var(--gd-bpm-run) !important;
+  box-shadow: 0 0 0 2px var(--gd-bpm-lit), 0 10px 30px -8px var(--gd-bpm-accent);
+}
+html[data-gd-bpm-view] #MainNavMenuContainer .Menu .ActiveDot { background: var(--gd-bpm-lit) !important; }
+html[data-gd-bpm-view] #QuickAccess-Menu {
+  background: linear-gradient(190deg, rgba(18, 21, 33, .72), rgba(9, 11, 18, .82)) !important;
+  border-left: 1px solid var(--gd-bpm-edge);
+}
+html[data-gd-bpm-view] #QuickAccess-Menu .Title { background: none !important; }
+html[data-gd-bpm-view] #QuickAccess-Menu .Tabs .Tab { border-radius: 14px !important; }
+html[data-gd-bpm-view] #QuickAccess-Menu .Tabs .Tab.Selected { background: color-mix(in srgb, var(--gd-bpm-accent) 34%, transparent) !important; }
+html[data-gd-bpm-view] #QuickAccess-Menu .Tabs .Tab.gpfocus { background: var(--gd-bpm-run) !important; box-shadow: 0 0 0 2px var(--gd-bpm-lit); }

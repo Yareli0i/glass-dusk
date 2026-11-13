@@ -2,7 +2,7 @@
   "name": "Glass Dusk",
   "description": "Smoked glass over the art of the game you have open: the client takes its accent colour from that art. Styles the library, store, menus, Big Picture and the in-game overlay.",
   "author": "Yareli",
-  "version": "1.7.14",
+  "version": "2.0.0",
   "tags": [
     "Dark",
     "Glass",
@@ -110,7 +110,7 @@
       }
     },
     "Accent colour": {
-      "description": "Colour of buttons and highlights. Fixed uses Accent from the Colors tab.",
+      "description": "Colour of buttons and highlights. Game art: the colours of the game in view, and with none in view (store, community) the last one's. Fixed uses Accent from the Colors tab.",
       "tab": "Look",
       "default": "Game art",
       "values": {
@@ -121,6 +121,22 @@
               ".*"
             ],
             "src": "css/options/accent-fixed.css"
+          }
+        }
+      }
+    },
+    "Accent style": {
+      "description": "Two-tone takes a second colour from the game art, close to the first and as bright, and runs the main buttons and the progress bars from one to the other. Solid is one colour.",
+      "tab": "Look",
+      "default": "Two-tone",
+      "values": {
+        "Two-tone": {},
+        "Solid": {
+          "TargetCss": {
+            "affects": [
+              ".*"
+            ],
+            "src": "css/options/accent-solid.css"
           }
         }
       }
@@ -149,6 +165,38 @@
         }
       }
     },
+    "Glass finish": {
+      "description": "The surface of the glass panels: a fine grain, and the edges that face the light lit in the accent. Plain is the smooth glass of earlier versions.",
+      "tab": "Look",
+      "default": "Grain and lit edge",
+      "values": {
+        "Grain and lit edge": {},
+        "Grain": {
+          "TargetCss": {
+            "affects": [
+              "^Steam$"
+            ],
+            "src": "css/options/finish-grain.css"
+          }
+        },
+        "Lit edge": {
+          "TargetCss": {
+            "affects": [
+              "^Steam$"
+            ],
+            "src": "css/options/finish-lit.css"
+          }
+        },
+        "Plain": {
+          "TargetCss": {
+            "affects": [
+              "^Steam$"
+            ],
+            "src": "css/options/finish-plain.css"
+          }
+        }
+      }
+    },
     "Corners": {
       "description": "Radius of panels and cards.",
       "tab": "Look",
@@ -169,6 +217,22 @@
               ".*"
             ],
             "src": "css/options/radius-sharp.css"
+          }
+        }
+      }
+    },
+    "Transitions": {
+      "description": "Opening another game: the accent flows from the old colour to the new one and the art behind the glass fades over. Instant changes both at once.",
+      "tab": "Look",
+      "default": "Flowing",
+      "values": {
+        "Flowing": {},
+        "Instant": {
+          "TargetCss": {
+            "affects": [
+              ".*"
+            ],
+            "src": "css/options/motion-off.css"
           }
         }
       }
@@ -217,6 +281,38 @@
               ".*"
             ],
             "src": "css/options/login-steam.css"
+          }
+        }
+      }
+    },
+    "When idle": {
+      "description": "Left alone on the library, Steam becomes the art of the game in view, with its logo, the time and the date; the first move brings everything back. Never while something is downloading or a video is playing.",
+      "tab": "Look",
+      "default": "After 5 minutes",
+      "values": {
+        "After 5 minutes": {},
+        "After 2 minutes": {
+          "TargetCss": {
+            "affects": [
+              "^Steam$"
+            ],
+            "src": "css/options/still-2.css"
+          }
+        },
+        "After 15 minutes": {
+          "TargetCss": {
+            "affects": [
+              "^Steam$"
+            ],
+            "src": "css/options/still-15.css"
+          }
+        },
+        "Never": {
+          "TargetCss": {
+            "affects": [
+              "^Steam$"
+            ],
+            "src": "css/options/still-off.css"
           }
         }
       }
@@ -345,6 +441,22 @@
               "^Steam$"
             ],
             "src": "css/options/stat-sub-on.css"
+          }
+        }
+      }
+    },
+    "Home: two weeks in colour": {
+      "description": "A bar under the greeting: every game played in the last two weeks, as wide as its share of the hours and in its own colours. Point at a part to see the game and its hours; a click opens it.",
+      "tab": "Library",
+      "default": "yes",
+      "values": {
+        "yes": {},
+        "no": {
+          "TargetCss": {
+            "affects": [
+              "^Steam$"
+            ],
+            "src": "css/options/fortnight-off.css"
           }
         }
       }
@@ -525,8 +637,24 @@
         "Steam": {}
       }
     },
+    "Big Picture home": {
+      "description": "Big art: the focused game's art, sharp, across the whole first screen with the carousel at its foot, as in Steam's Big Art Mode, whether or not that setting of Steam's (Settings → Home) is on. Steam's: the layout is left to that setting, over the theme's softened art.",
+      "tab": "Big Picture & overlay",
+      "default": "Big art",
+      "values": {
+        "Big art": {},
+        "Steam's": {
+          "TargetCss": {
+            "affects": [
+              "GamepadUIPopupWindowBody"
+            ],
+            "src": "css/options/bpm-home-steam.css"
+          }
+        }
+      }
+    },
     "Big Picture hours chip": {
-      "description": "Top-left chip: logo, hours played, last played.",
+      "description": "The focused game's numbers under the carousel, beside Steam's own label: time played, last played, achievements.",
       "tab": "Big Picture & overlay",
       "default": "yes",
       "values": {

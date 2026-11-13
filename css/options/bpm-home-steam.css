@@ -1,0 +1,2 @@
+/* Big Picture home → Steam's: the layout of the home is left to Steam's own Big Art setting */
+html:root { --gd-bpm-home: steam !important; }

@@ -1,0 +1,2 @@
+/* When idle: after 15 minutes — js/dusk.js reads --gd-still, the minutes (5 without a file; 0 is never) */
+:root { --gd-still: 15; }

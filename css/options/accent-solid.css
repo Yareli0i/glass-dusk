@@ -1,0 +1,2 @@
+/* Accent style: Solid — one colour; js/dusk.js reads --gd-accent-style and gives no second one */
+:root { --gd-accent-style: solid; }

@@ -19,6 +19,10 @@
   color: var(--gd-ink) !important;
 }
 &.gd-p-charts .SteamChartsShell .Panel:has(> a[href*="/charts/"]) > a[href*="/charts/"]:not(.Focusable):hover { background: rgba(255, 255, 255, .16) !important; }
+/* the open page in the side list: Steam's slate. Only that link has a class besides .Focusable. */
+&.gd-p-charts .Panel > a.Focusable[href*="/charts/"]:not([class="Focusable"]) {
+  background: color-mix(in srgb, var(--gd-accent) 30%, transparent) !important;
+}
 &.gd-p-charts .SteamChartsShell a[href*="/charts/bestofyear"] {
   background-image: linear-gradient(90deg, #1b1f2c 5%, #2b3350 60%, #1b1f2c) !important;
   border-radius: var(--gd-r-md);

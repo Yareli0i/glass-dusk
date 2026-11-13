@@ -61,14 +61,34 @@
       const acc = buckets[k] || (buckets[k] = [0, 0, 0, 0]);
       acc[0] += data[i] * w; acc[1] += data[i + 1] * w; acc[2] += data[i + 2] * w; acc[3] += w;
     }
-    const best = Object.values(buckets).sort((a, b) => b[3] - a[3])[0];
+    const ranked = Object.values(buckets).sort((a, b) => b[3] - a[3]);
+    const best = ranked[0];
     if (!best) return null;
 
     // keep the art's hue, hold saturation and lightness in a band that reads on dark glass
-    const [h, s] = rgb2hsv(best[0] / best[3], best[1] / best[3], best[2] / best[3]);
-    const rgb = hsl2rgb(h, Math.min(Math.max(s, 0.42), 0.68), 0.56);
-    const lum = (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]) / 255;
-    return { accent: '#' + rgb.map(hex).join(''), ink: lum > 0.62 ? '#10131a' : '#ffffff' };
+    const hsvOf = b => rgb2hsv(b[0] / b[3], b[1] / b[3], b[2] / b[3]);
+    const [h, s] = hsvOf(best);
+    const sat = Math.min(Math.max(s, 0.42), 0.68);
+    const rgb = hsl2rgb(h, sat, 0.56);
+    const lumOf = c => (0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]) / 255;
+    const lum = lumOf(rgb);
+
+    // The second colour of the two-tone accent (switch «Accent style»). The art's next hue of any
+    // weight says which way round the wheel to go; how far is held between 26° and 50°, so the
+    // two always sit side by side, and a picture of one colour gets a neighbour 30° on. Its
+    // lightness is then set so that it is as bright as the first: the same ink reads on both
+    // ends, and the surface changes in hue alone.
+    const turn = hue => ((hue - h + 1.5) % 1) - 0.5;   // from the first hue, −½…½ of the wheel
+    const other = ranked.slice(1).find(b => b[3] > best[3] * 0.12 && Math.abs(turn(hsvOf(b)[0])) > 0.06);
+    const way = other ? turn(hsvOf(other)[0]) : 1 / 12;
+    const h2 = (h + Math.sign(way) * Math.min(Math.max(Math.abs(way), 0.072), 0.139) + 1) % 1;
+    let lo = 0.3, hi = 0.76, rgb2 = rgb;
+    for (let i = 0; i < 8; i++) {
+      const mid = (lo + hi) / 2;
+      rgb2 = hsl2rgb(h2, sat, mid);
+      if (lumOf(rgb2) > lum) hi = mid; else lo = mid;
+    }
+    return { accent: '#' + rgb.map(hex).join(''), second: '#' + rgb2.map(hex).join(''), ink: lum > 0.62 ? '#10131a' : '#ffffff' };
   };
 
   /* ═════════════ the art layer, in every window ═════════════ */
@@ -83,23 +103,72 @@
   // recolouring anything and --gd-accent stays whatever the Colors tab says
   const accentLocked = () => getComputedStyle(root).getPropertyValue('--gd-accent-lock').trim() === '1';
 
-  const tint = (accent, ink) => {
-    if (accent && !accentLocked()) {
-      root.style.setProperty('--gd-accent', accent);
-      root.style.setProperty('--gd-accent-ink', ink || '#fff');
-    } else {
+  // «Accent style → Solid» (css/options/accent-solid.css): the art gives one colour, as it did
+  // before the two-tone accent
+  const twoTone = () => getComputedStyle(root).getPropertyValue('--gd-accent-style').trim() !== 'solid';
+  // «Transitions → Instant» (css/options/motion-off.css), or the system asked to reduce motion:
+  // the colour and the picture change at once
+  const calm = () => getComputedStyle(root).getPropertyValue('--gd-motion').trim() === 'off' ||
+    matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const toRgb = c => (/^#[0-9a-f]{6}$/i.test(c || '') ? [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16)) : null);
+  const setAccent = (first, second, ink) => {
+    root.style.setProperty('--gd-accent', first);
+    root.style.setProperty('--gd-accent-ink', ink || '#fff');
+    if (second) root.style.setProperty('--gd-accent-2', second); else root.style.removeProperty('--gd-accent-2');
+  };
+  // The accent flows from one game's colour to the next instead of jumping: five steps in a fifth
+  // of a second. Steps, and not a transition on a registered property: every change of the accent
+  // restyles the whole window, and a transition would do that on each frame.
+  const FLOW_STEPS = 5, FLOW_EVERY = 40;
+  // the timer, where it is heading (null: cleared), whether it is there, the pair on screen as [r, g, b]s
+  let flow = 0, flowTo = '', landed = false, shown = null;
+  const tint = (accent, ink, second) => {
+    if (!accent || accentLocked()) {
+      if (flowTo === null) return;   // cleared already
+      clearInterval(flow); flow = 0; flowTo = null; landed = false; shown = null;
       root.style.removeProperty('--gd-accent');
       root.style.removeProperty('--gd-accent-ink');
+      root.style.removeProperty('--gd-accent-2');
+      return;
     }
+    const two = twoTone() && second ? second : '';
+    const key = accent + '|' + two + '|' + (ink || '');
+    // Already on its way there, or already there. The windows that follow the main one ask every
+    // second and a half, and an answer that has not changed writes nothing to the page.
+    if (key === flowTo && (flow || landed)) return;
+    clearInterval(flow); flow = 0; flowTo = key; landed = false;
+    const to = [toRgb(accent), toRgb(two || accent)];
+    const from = shown;
+    const land = () => { setAccent(accent, two, ink); shown = to[0] && to[1] ? to : null; landed = true; };
+    if (!from || !to[0] || !to[1] || String(from) === String(to) || calm() || document.hidden) { land(); return; }
+    const at = t => from.map((c, k) => c.map((v, i) => v + (to[k][i] - v) * t));
+    let step = 0;
+    flow = setInterval(() => {
+      if (++step >= FLOW_STEPS) { clearInterval(flow); flow = 0; land(); return; }
+      shown = at(step / FLOW_STEPS);
+      setAccent(...shown.map(c => '#' + c.map(hex).join('')), ink);
+    }, FLOW_EVERY);
   };
-  const paint = (src, accent, ink) => {
+  let artShown = '';   // the picture on the layer
+  const paint = (src, accent, ink, second) => {
     if (src) {
-      layer.style.backgroundImage = `url("${src}")`;
+      // The picture before this one stays over it and fades out (css/shared.css, #gd-art::after).
+      // The two class names take turns, which starts the fade again without a forced layout.
+      if (artShown && artShown !== src && layer.classList.contains('on') && !calm() && !document.hidden) {
+        layer.style.setProperty('--gd-art-was', `url("${artShown}")`);
+        const a = layer.classList.contains('gd-turn-a');
+        layer.classList.toggle('gd-turn-a', !a);
+        layer.classList.toggle('gd-turn-b', a);
+      }
+      if (artShown !== src) layer.style.backgroundImage = `url("${src}")`;
       layer.classList.add('on');
+      artShown = src;
     } else {
       layer.classList.remove('on');
+      artShown = '';
     }
-    tint(accent, ink);
+    tint(accent, ink, second);
   };
 
   /* ── web pages: the store gets its app's art; community and profiles are left alone ── */
@@ -151,6 +220,7 @@
       //                           whose last block holds one thing), [data-gd-calbtn] (the calendar's
       //                           button). The strip is watched on its own and marked before it paints.
       //   [data-gd-<mount>]       where Steam puts a part of the page ([data-featuretarget=<mount>])
+      //   [data-gd-evtype]        the kind of news on an event card ("Major Update", "Game Discount")
       // What only one kind of page needs is in css/store/<part>.css, loaded on that page alone.
       const PAGES = [['wishlist', /^\/wishlist/], ['calendar', /^\/personalcalendar/], ['recommender', /^\/recommender/],
         ['charts', /^\/charts/], ['account', /^\/account/], ['points', /^\/points/], ['cart', /^\/cart/]];
@@ -265,6 +335,11 @@
           markReviews(ctn);
           new MutationObserver(() => markReviews(ctn)).observe(ctn, { childList: true, subtree: true });
         }
+        // the kind of news on an event card ("Small Update / Patch Notes", "Game Discount"), on a
+        // game's page and the sale pages: Steam's blue, spelled out under a hashed class
+        for (const e of document.querySelectorAll('.OtherEvents_EventCtn > div:first-child > div:first-child:not([data-gd-evtype]), .OtherEvents_EventCtn > div:last-child > div:last-child > div > div:first-child:not([data-gd-evtype])')) {
+          e.setAttribute('data-gd-evtype', '');
+        }
         if (!base) base = findBase();
         if (base) {
           for (const [name, wanted] of PARTS) {
@@ -305,22 +380,43 @@
         }
       }, 800);
     }
-    const appid = (location.pathname.match(/\/app\/(\d+)/) || [])[1];
+    // The page's accent. A game's page takes it from that game's art; every other page of the
+    // store keeps the Colors tab's Accent.
+    // A page is not told the colour of the window around it, though Steam has a way: a window can
+    // post a message to the web view it shows, and the page can listen for it through
+    // SteamClient.BrowserView.RegisterForMessageFromParent. But a view holds one such listener,
+    // the last to register (measured: a second takes the first one's place, and taking the second
+    // off does not bring the first back; a frame of the page's shares the same seat). The store's
+    // own code sits there: controller input, PayPal's answer at checkout and the overlay's pinned
+    // view all reach the page that way. So the theme does not listen.
+    const appOfPage = () => (location.pathname.match(/\/app\/(\d+)/) || [])[1] || '';
+    const appid = appOfPage();
     if (appid) {
       const url = `https://shared.steamstatic.com/store_item_assets/steam/apps/${appid}/library_hero.jpg`;
       root.style.setProperty('--gd-art', `url("${url}")`);
       const flag = () => document.body && document.body.classList.add('gd-art');
       if (document.body) flag(); else addEventListener('DOMContentLoaded', flag);
+      // the colour of a game's art holds only while the address is still that game's, should the
+      // store ever move on from the page without loading anew
+      let own = null;
+      const wear = () => {
+        if (own && !accentLocked() && appOfPage() === appid) {
+          root.style.setProperty('--gd-accent', own[0]);
+          root.style.setProperty('--gd-accent-ink', own[1]);
+        } else {
+          root.style.removeProperty('--gd-accent');
+          root.style.removeProperty('--gd-accent-ink');
+        }
+      };
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => {
         const picked = accentFrom(img);
-        if (picked && !accentLocked()) {
-          root.style.setProperty('--gd-accent', picked.accent);
-          root.style.setProperty('--gd-accent-ink', picked.ink);
-        }
+        if (picked) { own = [picked.accent, picked.ink]; wear(); }
       };
       img.src = url;
+      addEventListener('popstate', wear);
+      try { window.navigation.addEventListener('navigatesuccess', wear); } catch (e) { /* popstate alone */ }
     }
     return;
   }
@@ -391,7 +487,8 @@
     attempt(0);
   };
   const storedAccent = () => {
-    try { return [localStorage.getItem('gd-accent'), localStorage.getItem('gd-accent-ink')]; } catch (e) { return [null, null]; }
+    try { return [localStorage.getItem('gd-accent'), localStorage.getItem('gd-accent-ink'), localStorage.getItem('gd-accent-2')]; }
+    catch (e) { return [null, null, null]; }
   };
 
   /* ── in-game overlay: the game has to show through ── */
@@ -414,18 +511,38 @@
         } catch (e) { /* no access from this window */ }
         if (mod) break;
       }
+      // Without Millennium's helper, the same module straight out of Steam's bundle, known by the
+      // names it exports. Every module's text is looked through, so this is tried on three of
+      // the thirty passes only.
+      if (!mod && (tries === 2 || tries === 10 || tries === 25)) {
+        try {
+          const W = window.opener && window.opener.webpackChunksteamui ? window.opener : window;
+          let req = null;
+          W.webpackChunksteamui.push([[Symbol('gd-overlay')], {}, r => { req = r; }]);
+          const id = req && req.m && Object.keys(req.m).find(k => {
+            const text = String(req.m[k]);
+            return text.includes('PreviewPinnedView') && text.includes('ToolbarContainer') && text.includes('Wrapper:');
+          });
+          if (id) mod = req(id);
+        } catch (e) { /* no bundle to look in: the hash in css/overlay.css is all there is */ }
+      }
       if (!mod) return false;
+      // Millennium's reclass turns an entry into "hash Readable": two names, and written out as one
+      // selector that read as "a <Readable> element inside .hash", which matches nothing. The hash
+      // alone is what the element is sure to carry.
+      const name = String(mod.Wrapper || '').split(/\s+/).filter(Boolean)[0];
+      if (!name) return false;
       const style = document.createElement('style');
       style.id = 'gd-overlay-map';
-      style.textContent = `.${mod.Wrapper}{background:var(--gd-overlay-backdrop)!important;box-shadow:var(--gd-overlay-shadow)!important}`;
+      style.textContent = `.${CSS.escape(name)}{background:var(--gd-overlay-backdrop)!important;box-shadow:var(--gd-overlay-shadow)!important}`;
       document.head.appendChild(style);
       return true;
     };
     const follow = () => {
       layer.remove();
       const picked = runningAccent.picked;
-      const [accent, ink] = picked ? [picked.accent, picked.ink] : storedAccent();
-      paint(null, accent, ink);
+      const [accent, ink, second] = picked ? [picked.accent, picked.ink, picked.second] : storedAccent();
+      paint(null, accent, ink, second);
     };
     let tries = 0;
     const timer = setInterval(() => { if (mapBackdrop() || ++tries > 30) clearInterval(timer); }, 1000);
@@ -451,13 +568,14 @@
         layer.remove();
         runningAccent(() => {});
         const picked = runningAccent.picked;
-        const [accent, ink] = picked ? [picked.accent, picked.ink] : storedAccent();
-        paint(null, accent, ink);
+        const [accent, ink, second] = picked ? [picked.accent, picked.ink, picked.second] : storedAccent();
+        paint(null, accent, ink, second);
         return;
       }
       mountLayer();
       try {
-        paint(localStorage.getItem('gd-art'), localStorage.getItem('gd-accent'), localStorage.getItem('gd-accent-ink'));
+        paint(localStorage.getItem('gd-art'), localStorage.getItem('gd-accent'), localStorage.getItem('gd-accent-ink'),
+          localStorage.getItem('gd-accent-2'));
       } catch (e) { /* storage can be unavailable in some popups */ }
     };
     addEventListener('storage', follow);
@@ -466,11 +584,12 @@
     return;
   }
 
-  const publish = (src, accent, ink) => {
+  const publish = (src, accent, ink, second) => {
     try {
       if (src) localStorage.setItem('gd-art', src); else localStorage.removeItem('gd-art');
       if (accent) { localStorage.setItem('gd-accent', accent); localStorage.setItem('gd-accent-ink', ink || '#fff'); }
       else { localStorage.removeItem('gd-accent'); localStorage.removeItem('gd-accent-ink'); }
+      if (accent && second) localStorage.setItem('gd-accent-2', second); else localStorage.removeItem('gd-accent-2');
     } catch (e) { /* nothing to share with, fine */ }
   };
 
@@ -497,16 +616,73 @@
     try { return new Map(JSON.parse(localStorage.getItem('gd-app-accents') || '[]')); } catch (e) { return new Map(); }
   })();
   const keepAppAccent = (id, picked) => {
-    const v = picked ? [picked.accent, picked.ink] : null;
+    const v = picked ? [picked.accent, picked.ink, picked.second] : null;
     if (JSON.stringify(appAccents.get(id)) === JSON.stringify(v)) return;
     appAccents.delete(id);
     appAccents.set(id, v);
     try { localStorage.setItem('gd-app-accents', JSON.stringify([...appAccents].slice(-400))); } catch (e) { /* this session only */ }
   };
 
+  /* ── no game in view: the picture goes, the colour stays ── */
+
+  // On the store, the community, a profile or the downloads there is no art to show, and the
+  // accent used to go with it, back to the Colors tab's: the pill on STORE was one colour and
+  // the pill on LIBRARY another, with «Accent colour → Game art» on. The accent now stays a
+  // game's wherever the window is:
+  //   · on a game's page in the store or its community hub, that game's own, worked out from the
+  //     art the store page itself uses, so the window agrees with the page inside it;
+  //   · anywhere else, the colours of the last game that was in view, kept between sessions.
+  // The Colors tab's Accent is what shows before any game has been seen, for art with no colour
+  // in it, and with «Accent colour → Fixed».
+  let lastPick = (() => {
+    try { const v = JSON.parse(localStorage.getItem('gd-last-accent') || 'null'); return Array.isArray(v) && v[0] ? v : null; }
+    catch (e) { return null; }
+  })();
+  const keepLast = picked => {
+    const v = picked ? [picked.accent, picked.ink, picked.second] : null;
+    if (JSON.stringify(v) === JSON.stringify(lastPick)) return;
+    lastPick = v;
+    try { if (v) localStorage.setItem('gd-last-accent', JSON.stringify(v)); else localStorage.removeItem('gd-last-accent'); }
+    catch (e) { /* this session only */ }
+  };
+  // the game whose page the web view is on: store.steampowered.com/app/<id>, steamcommunity.com/app/<id>
+  const webApp = () => {
+    if (!onWebPage()) return '';
+    try {
+      const m = /^https?:\/\/(?:store\.steampowered\.com|steamcommunity\.com)\/app\/(\d+)/.exec(shared().MainWindowBrowserManager.m_URL || '');
+      return m ? m[1] : '';
+    } catch (e) { return ''; }
+  };
+  const webPicks = new Map();   // appid → its pair from the store's art (undefined while it loads, null for none)
+  const learnWeb = id => {
+    if (webPicks.has(id)) return;
+    webPicks.set(id, undefined);
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => { const p = accentFrom(img); webPicks.set(id, p ? [p.accent, p.ink, p.second] : null); soon(); };
+    img.onerror = () => { webPicks.set(id, null); };
+    img.src = `${CDN(id)}/library_hero.jpg`;
+  };
+  const restAccent = () => {
+    if (accentLocked()) return null;
+    const id = webApp();
+    if (id) {
+      // The page takes its colour from the store's art, so the window does too: the library's
+      // pair can be another colour altogether (custom art). That pair stands in while the
+      // store's art loads, and for a game the store has no such art for.
+      learnWeb(id);
+      if (webPicks.get(id)) return webPicks.get(id);
+      const known = appAccents.get(id);
+      if (known && known.length > 2) return known;
+    }
+    return lastPick;
+  };
+
   const applyArt = list => {
     const urls = (Array.isArray(list) ? list : [list]).filter(Boolean);
-    const key = urls.join('|');
+    // with no picture, the colour is part of what is shown: it can change while the picture stays away
+    const rest = urls.length ? null : restAccent();
+    const key = urls.length ? urls.join('|') : 'rest:' + (rest ? rest.join(',') : '');
     if (key === state.art) return;
     // the page's own hero arriving after the game's candidates: the picture already up
     if (urls.length === 1 && state.src && new URL(urls[0], location.href).href === state.src) { state.art = key; return; }
@@ -515,10 +691,12 @@
     const appId = artForApp;
 
     const clear = () => {
-      paint(null, null);
-      state.accent = HOUSE;
+      const pair = urls.length ? restAccent() : rest;   // a game whose art would not load rests the same way
+      paint(null, pair && pair[0], pair && pair[1], pair && pair[2]);
+      state.accent = pair ? pair[0] : HOUSE;
       state.src = null;
-      publish(null, null);
+      state.app = '';
+      publish(null, pair && pair[0], pair && pair[1], pair && pair[2]);
     };
     if (!urls.length) { clear(); return; }
 
@@ -526,8 +704,10 @@
     const show = (src, picked) => {
       state.accent = picked ? picked.accent : HOUSE;
       state.src = src;
-      paint(src, picked && picked.accent, picked && picked.ink);
-      publish(src, picked && picked.accent, picked && picked.ink);
+      state.app = appId || homeId || '';   // whose picture it is, for the still
+      keepLast(picked);
+      paint(src, picked && picked.accent, picked && picked.ink, picked && picked.second);
+      publish(src, picked && picked.accent, picked && picked.ink, picked && picked.second);
       if (homeId) rememberForSignIn(src, homeId, picked || {});
       if (appId) keepAppAccent(appId, picked);
     };
@@ -682,11 +862,9 @@
   const wantedArt = () => {
     artFromHome = 0;
     artForApp = '';
-    // On the store, community or downloads there is no game in view, so the client stays
-    // neutral — that way the window chrome never disagrees with the page inside it. Steam keeps
-    // the library in the page, hidden, once it has been shown, so what the page holds says
-    // nothing here: the store went on wearing the last game's colour, and the Colors tab's
-    // Accent never came back.
+    // On the store, community or downloads there is no game in view and no art to show (the
+    // colour is another matter: see restAccent). Steam keeps the library in the page, hidden,
+    // once it has been shown, so what the page holds says nothing here.
     if (onWebPage()) return null;
     const o = shared();
     const hero = heroElement();
@@ -914,6 +1092,7 @@
         disk: 'На дисках, ГБ', twoWeeks: 'За 2 тижні, год', unplayed: 'Не запущено', perfect: 'Ідеальні ігри',
         today: 'Сьогодні', yday: 'Учора', inGame: 'у грі', inTwoWeeks: 'за два тижні', min: 'хв', h: 'год',
         slOpen: 'Показати список ігор', slClose: 'Сховати список ігор',
+        bpm: { played: 'Час у грі', last: 'Востаннє', ach: 'Досягнення' },
         ach: (n, of) => `${n} з ${of} досягнень`,
         sub: {
           games: n => `${n} встановлено`,
@@ -929,6 +1108,7 @@
         disk: 'On disk, GB', twoWeeks: 'Hours, 2 weeks', unplayed: 'Unplayed', perfect: 'Perfect games',
         today: 'Today', yday: 'Yesterday', inGame: 'played', inTwoWeeks: 'in two weeks', min: 'min', h: 'h',
         slOpen: 'Show the game list', slClose: 'Hide the game list',
+        bpm: { played: 'Time played', last: 'Last played', ach: 'Achievements' },
         ach: (n, of) => `${n} of ${of} achievements`,
         sub: {
           games: n => `${n} installed`,
@@ -945,6 +1125,7 @@
         disk: 'Espace disque (Go)', twoWeeks: 'Heures (14 jours)', unplayed: 'Non lancés', perfect: 'Jeux terminés à 100%',
         today: 'Aujourd’hui', yday: 'Hier', inGame: 'jouées', inTwoWeeks: 'ces deux dernières semaines', min: 'min', h: 'h',
         slOpen: 'Afficher la liste des jeux', slClose: 'Masquer la liste des jeux',
+        bpm: { played: 'Temps de jeu', last: 'Dernière session', ach: 'Succès' },
         ach: (n, of) => `${n} sur ${of} succès`,
         sub: {
           games: n => `${n} ${plural(n, { one: 'installé', other: 'installés' })}`,
@@ -985,12 +1166,16 @@
   // first, the outgoing one marked OffScreen. Reading the last one showed the game just
   // left, so the chip and the colour were always one step behind.
   //
-  // That art is blurred here ONCE per game into a small canvas and stretched over the
+  // That art is softened here ONCE per game into a small canvas and stretched over the
   // screen; two canvases cross-fade. A CSS blur on Steam's own images was redone on every
   // frame of its cross-fade: 19 frames over 50 ms per carousel run, 0 without it. The image
   // is fetched, decoded and scaled down off the main thread before it is touched (drawing
   // the full hero stalled frames too), and fast scrolling skips the games in between.
-  // The chip is plain DOM, so the gamepad never lands on it: it only tells.
+  // The layer lies under every screen of Big Picture, not the home alone: a game's page wears
+  // its own art, and the library, the settings and the rest keep the last one, further back
+  // (<html data-gd-bpm="home | game | far">, css/bigpicture.css).
+  // The marquee, the focused game's numbers under the carousel, is plain DOM, so the gamepad
+  // never lands on it: it only tells.
   if (isGamepad) {
     const enabled = () => getComputedStyle(root).getPropertyValue('--gd-bpm').trim() === 'cover';
 
@@ -1026,166 +1211,258 @@
       : `${(min / 60).toLocaleString(locale(), { maximumFractionDigits: min < 6000 ? 1 : 0 })} ${W().h}`);
 
     /* the art layer */
-    const W = 192, H = 108, PAD = 12;
+    // The canvas has the shape of the screen it fills and about as many pixels as 480×270, which
+    // is what it is on a 16:9 screen. With one fixed shape the picture was pulled a third wider on
+    // an ultrawide and taller on 4:3; now it is cropped to the screen, once, as it is drawn.
+    // (No name here may be `W`: that is the word list, and a canvas width by that name once hid it
+    // inside this block, "3 h ago" threw, and the chip that stood where the marquee is never showed.)
+    const AREA = 480 * 270;
     const layer = document.createElement('div');
     layer.id = 'gd-bpm-bg';
-    const planes = [0, 1].map(() => {
-      const c = document.createElement('canvas');
-      c.width = W; c.height = H;
-      layer.appendChild(c);
-      return c;
-    });
+    const planes = [0, 1].map(() => layer.appendChild(document.createElement('canvas')));
+    const shapeOf = () => {
+      const bw = layer.clientWidth || innerWidth, bh = layer.clientHeight || innerHeight;
+      const ratio = Math.min(Math.max(bw / Math.max(1, bh), 0.5), 4);
+      const h = Math.round(Math.sqrt(AREA / ratio));
+      return [Math.round(h * ratio), h];
+    };
     let front = -1;
     const paintArt = img => {
       const next = front === 0 ? 1 : 0;
-      const ctx = planes[next].getContext('2d');
-      ctx.clearRect(0, 0, W, H);
-      ctx.filter = 'blur(4px) brightness(.72) saturate(1.5)';
+      const c = planes[next];
+      const [aw, ah] = shapeOf();
+      if (c.width !== aw || c.height !== ah) { c.width = aw; c.height = ah; }
+      const ctx = c.getContext('2d');
+      ctx.clearRect(0, 0, aw, ah);
+      // 3 px of blur on 270 lines, the same softness on a canvas of any other height
+      ctx.filter = `blur(${(ah / 90).toFixed(2)}px) brightness(.56) saturate(1.3)`;
       // cover the screen with a margin past every edge, so the blur does not fade at the border
+      const pad = Math.ceil(ah / 15);
       const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
-      const r = Math.max((W + PAD * 2) / iw, (H + PAD * 2) / ih);
+      const r = Math.max((aw + pad * 2) / iw, (ah + pad * 2) / ih);
       const w = iw * r, h = ih * r;
-      ctx.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
-      planes[next].classList.add('on');
+      ctx.drawImage(img, (aw - w) / 2, (ah - h) / 2, w, h);
+      c.classList.add('on');
       if (front >= 0 && front !== next) planes[front].classList.remove('on');
       front = next;
+      return aw + 'x' + ah;
     };
 
-    /* the chip — built once per game, logo or name, never both in turn */
-    const chip = document.createElement('div');
-    chip.id = 'gd-bpm-chip';
-    let chipToken = 0;
-    const renderChip = (o, app) => {
-      // the top bar only: Steam's newer home calls each section's heading an h2.Header too,
-      // and the chip ended up beside "What's New" halfway down the screen (#24)
-      const header = document.querySelector('.BasicHome .Header:not(h1, h2, h3)');
-      const mine = ++chipToken;
-      if (!header || !app) { chip.remove(); return; }
+    /* the marquee: what Steam knows about the focused game, at the right of its own label */
+    // Switch «Big Picture hours chip» (css/options/bpm-chip-hide.css hides it). Time played, when
+    // it was last played, and achievements with their bar, the last only for a game that has any
+    // and that Steam has looked at. It hangs on the row that holds the carousel, which stays put
+    // while the covers move, at the height of the label under them.
+    const marquee = document.createElement('div');
+    marquee.id = 'gd-bpm-marquee';
+    const achOf = (o, id) => {
+      try {
+        const e = o.appAchievementProgressCache.m_achievementProgress.mapCache.get(id);
+        return e && e.total > 0 ? e : null;
+      } catch (e) { return null; }
+    };
+    const renderMarquee = (o, app) => {
+      if (!o || !app) { marquee.remove(); delete marquee.dataset.app; return; }
+      const say = W().bpm;
       const min = app.minutes_playtime_forever || 0;
       // a game from outside Steam has no playtime Steam knows of: no "0 h" for it
       const timed = min > 0 || (app.rt_last_time_played && app.app_type !== SHORTCUT);
-      const stats = `<span>${timed ? `<b>${hours(min)}</b> · ` : ''}${ago(app.rt_last_time_played)}</span>`;
-      const put = head => {
-        if (mine !== chipToken) return;
-        chip.textContent = '';
-        chip.dataset.app = String(app.appid);
-        chip.append(head);
-        chip.insertAdjacentHTML('beforeend', stats);
-        if (chip.parentElement !== header) header.insertBefore(chip, header.firstChild);
-      };
-      // the logo too goes through the off-thread shrink: a 3539×1756 custom logo decoded
-      // in the header held a frame for ~90 ms
-      const urls = artFor(o, app).logo;
-      const next = async i => {
-        if (i >= urls.length) {
-          const name = document.createElement('span');
-          name.className = 'gd-name';
-          name.textContent = app.display_name;
-          put(name);
-          return;
-        }
-        // the CDN refuses fetch() (no CORS), and its official logos are small anyway: a plain <img>
-        if (/^https?:/.test(urls[i])) {
-          const img = new Image();
-          img.alt = '';
-          img.onload = () => put(img);
-          img.onerror = () => next(i + 1);
-          img.src = urls[i];
-          return;
-        }
-        let bmp;
-        try { bmp = await cached('logo:' + urls[i], () => shrink(urls[i], { resizeHeight: 40, resizeQuality: 'high' })); }
-        catch (e) { next(i + 1); return; }
-        const c = document.createElement('canvas');
-        c.width = bmp.width; c.height = bmp.height;
-        c.getContext('2d').drawImage(bmp, 0, 0);
-        put(c);
-      };
-      next(0);
+      const ach = achOf(o, app.appid);
+      const cells = [];
+      if (timed) cells.push([say.played, hours(min)]);
+      cells.push([say.last, ago(app.rt_last_time_played)]);
+      if (ach) cells.push([say.ach, `${ach.unlocked}/${ach.total}`, Math.round(ach.unlocked / ach.total * 100)]);
+      marquee.innerHTML = cells.map(([k, v, pct]) =>
+        `<div><small>${esc(k)}</small><b>${esc(v)}</b>${pct === undefined ? '' : `<i><u style="width: ${pct}%"></u></i>`}</div>`).join('');
+      marquee.dataset.app = String(app.appid);
+    };
+    const placeMarquee = () => {
+      const row = document.querySelector('.RecentGamesInnerContainer');
+      if (!row || !marquee.dataset.app) { marquee.remove(); return; }
+      if (marquee.parentElement !== row) row.appendChild(marquee);
     };
     const appRecord = (o, id) => {
       try { return o.appStore.GetAppOverviewByAppID(id) || o.appStore.allApps.find(a => a.appid === id) || null; }
       catch (e) { return null; }
     };
 
+    /* the Steam menu and the Quick Access menu */
+    // Each is a page of its own (MainMenu_uid…, QuickAccess_uid…) that Steam draws into this
+    // window, and Millennium loads nothing into them: no style sheet, no script. This window can
+    // reach them, though. Steam keeps a navigation tree for every part the controller can walk,
+    // and a tree knows its window. So each of those pages is given css/bigpicture.css, by the
+    // address this window loaded it from, a mark on <html> for the rules written for it
+    // (data-gd-bpm-view="menu | quick | side"), and the colours in use here, as they change.
+    // If a client update moves those trees, nothing is found and the menus stay Steam's own.
+    const sideViews = () => {
+      const found = new Map();
+      try {
+        for (const ctx of shared().SteamUIStore.WindowStore.m_Parent.m_GamepadNavigationManager.m_rgAllContexts) {
+          for (const tree of ctx.m_rgGamepadNavigationTrees) {
+            const w = tree.m_window;
+            if (w && w !== window && w.document && !found.has(w)) found.set(w, String(tree.m_ID || ''));
+          }
+        }
+      } catch (e) { /* no such trees in this client */ }
+      return found;
+    };
+    const dressViews = on => {
+      const sheet = [...document.querySelectorAll('link[rel=stylesheet]')].find(l => /\/css\/bigpicture\.css(\?|$)/.test(l.href));
+      const mine = getComputedStyle(root);
+      for (const [w, id] of sideViews()) {
+        try {
+          const d = w.document, r = d.documentElement;
+          const link = d.getElementById('gd-bpm-sheet');
+          if (!on || !sheet) {
+            if (link) link.remove();
+            r.removeAttribute('data-gd-bpm-view');
+            continue;
+          }
+          if (!d.head) continue;
+          if (!link) {
+            const l = d.createElement('link');
+            l.id = 'gd-bpm-sheet';
+            l.rel = 'stylesheet';
+            l.href = sheet.href;
+            d.head.appendChild(l);
+          }
+          const kind = /MainNav/i.test(id) ? 'menu' : /QuickAccess/i.test(id) ? 'quick' : 'side';
+          if (r.getAttribute('data-gd-bpm-view') !== kind) r.setAttribute('data-gd-bpm-view', kind);
+          for (const name of ['--gd-bpm-accent', '--gd-bpm-accent-2', '--gd-bpm-cut']) {
+            const v = mine.getPropertyValue(name).trim();
+            if (r.style.getPropertyValue(name) !== v) { if (v) r.style.setProperty(name, v); else r.style.removeProperty(name); }
+          }
+        } catch (e) { /* a page being closed */ }
+      }
+    };
+    let viewsDue = 0;
+
     /* one game at a time, after it is decoded */
-    let want = null, timer = 0, token = 0, chipApp = null, minute = 0;
-    // Fetched and scaled down to 320 px off the main thread. Drawing the full decoded
+    let want = null, timer = 0, token = 0, busy = 0, shownApp = null, minute = 0, where = '';
+    let painted = null;   // what is on the layer: { src, id, shape }
+    // Fetched and scaled down to 640 px off the main thread. Drawing the full decoded
     // 1920×620 hero into a canvas that is then read back pulled it off the GPU and held
     // a frame for 50–240 ms, right in the middle of Steam's cross-fade.
     // Custom art can be huge (animated PNGs of 10–75 MB here), so each picture is fetched
-    // once and kept small: the last 16 of them, 320 px wide.
-    const small = new Map();
-    const shrink = async (src, opts) => {
-      const res = await fetch(src);
+    // once and kept small: the last 16 of them, 640 px wide (about half a megabyte each).
+    // One request per picture, however often it is asked for while it loads; and a request for a
+    // game the carousel has already left is dropped instead of being read to the end for nothing.
+    const small = new Map();     // address → picture
+    const loading = new Map();   // address → { ctrl, promise }
+    const shrink = async (src, opts, signal) => {
+      const res = await fetch(src, { signal });
       if (!res.ok) throw new Error(String(res.status));
       return createImageBitmap(await res.blob(), opts);   // a 40-byte "missing" stub rejects here
     };
     const remember = (key, bmp) => {
+      const had = small.get(key);
+      if (had && had !== bmp) had.close();
+      small.delete(key);
       small.set(key, bmp);
-      if (small.size > 16) {
+      while (small.size > 16) {
         const [oldKey, oldBmp] = small.entries().next().value;
         small.delete(oldKey);
         oldBmp.close();
       }
       return bmp;
     };
-    const cached = async (key, make) => {
-      if (small.has(key)) { const b = small.get(key); small.delete(key); small.set(key, b); return b; }
-      return remember(key, await make());
+    const loadSmall = src => {
+      if (small.has(src)) { const b = small.get(src); small.delete(src); small.set(src, b); return Promise.resolve(b); }
+      let job = loading.get(src);
+      if (!job) {
+        const ctrl = new AbortController();
+        job = { ctrl };
+        job.promise = shrink(src, { resizeWidth: 640, resizeQuality: 'medium' }, ctrl.signal)
+          .then(bmp => remember(src, bmp))
+          .finally(() => { if (loading.get(src) === job) loading.delete(src); });
+        loading.set(src, job);
+      }
+      return job.promise;
     };
-    const loadSmall = src => cached(src, () => shrink(src, { resizeWidth: 320, resizeQuality: 'medium' }));
+    const dropOthers = src => { for (const [key, job] of loading) if (key !== src) job.ctrl.abort(); };
+    const forget = () => {
+      for (const job of loading.values()) job.ctrl.abort();
+      for (const bmp of small.values()) bmp.close();
+      small.clear();
+    };
     const apply = async (src, id) => {
       const mine = ++token;
+      dropOthers(src);
       let img;
-      try { img = await loadSmall(src); } catch (e) { return; }
+      busy++;
+      try { img = await loadSmall(src); } catch (e) { return; } finally { busy--; }
       if (mine !== token || !enabled()) return;
-      paintArt(img);
-      if (layer.classList.contains('show')) root.classList.add('gd-bpm-bg');
-      const picked = accentLocked() ? null : accentFrom(img);
+      painted = { src, id, shape: paintArt(img) };
+      layer.classList.add('show');
+      root.classList.add('gd-bpm-bg');
+      // The game's colours: the pair its art gave on the desktop where there is one, so the two
+      // modes agree (this picture is a smaller copy and can come out a different hue); worked
+      // out here for a game the desktop has not seen.
+      const known = id ? appAccents.get(String(id)) : null;
+      const picked = accentLocked() ? null : known && known.length > 2 ? { accent: known[0], ink: known[1], second: known[2] } : accentFrom(img);
       if (picked) root.style.setProperty('--gd-bpm-accent', picked.accent);
       else root.style.removeProperty('--gd-bpm-accent');
+      // a light accent (the one the desktop writes on in dark ink) is cut deeper, so the white
+      // words Big Picture puts on filled surfaces still read
+      if (picked && picked.ink && !/^#f{3,6}$/i.test(picked.ink)) root.style.setProperty('--gd-bpm-cut', '54%');
+      else root.style.removeProperty('--gd-bpm-cut');
+      if (picked && picked.second && twoTone()) root.style.setProperty('--gd-bpm-accent-2', picked.second);
+      else root.style.removeProperty('--gd-bpm-accent-2');
       const o = shared();
-      chipApp = o && id ? appRecord(o, id) : null;
+      shownApp = o && id ? appRecord(o, id) : null;
       minute = Math.floor(Date.now() / 60000);
-      renderChip(o, chipApp);
+      renderMarquee(o, shownApp);
     };
     const schedule = (src, id) => {
       clearTimeout(timer);
-      timer = setTimeout(() => { apply(src, id); }, 160);
+      timer = setTimeout(() => { timer = 0; apply(src, id); }, 160);
     };
 
     const teardown = () => {
-      clearTimeout(timer);
-      token++; chipToken++;
-      chip.remove(); layer.remove();
+      clearTimeout(timer); timer = 0;
+      token++;
+      forget(); painted = null;
+      marquee.remove(); layer.remove();
+      delete marquee.dataset.app;
       root.classList.remove('gd-bpm-bg');
+      root.removeAttribute('data-gd-bpm');
       root.style.removeProperty('--gd-bpm-accent');
-      want = null; chipApp = null; front = -1;
+      root.style.removeProperty('--gd-bpm-accent-2');
+      root.style.removeProperty('--gd-bpm-cut');
+      layer.classList.remove('show');
+      want = null; shownApp = null; front = -1; where = '';
       planes.forEach(c => c.classList.remove('on'));
+      dressViews(false);
     };
 
     const step = () => {
+      if (document.hidden) return;   // Big Picture minimised, or behind a game: nothing to keep up with
       if (!enabled()) { if (want !== null || layer.isConnected) teardown(); return; }
+      const frame = document.getElementById('GamepadUI_Full_Root');
+      if (frame && layer.parentElement !== frame) frame.insertBefore(layer, frame.firstChild);
+      if (--viewsDue <= 0) { viewsDue = 4; dressViews(true); }   // once a second
+      // the screen changed shape (the window was resized, or moved to another monitor): the
+      // picture on it is drawn again to fit, once nothing newer is on its way
+      if (painted && !timer && !busy && shapeOf().join('x') !== painted.shape) schedule(painted.src, painted.id);
       const img = bgImage();
+      // a game's page shows its own hero
+      const hero = img ? null : [...document.querySelectorAll('.ImgContainer img.ImgSrc')].find(i => /hero/.test(i.src));
+      const now = img ? 'home' : hero ? 'game' : 'far';
+      if (now !== where) { where = now; root.setAttribute('data-gd-bpm', now); }
       if (!img) {
-        // not the home screen: a game page shows its own hours — its colour only
-        chipToken++;
-        chip.remove();
-        layer.classList.remove('show');
-        root.classList.remove('gd-bpm-bg');
-        const hero = [...document.querySelectorAll('.ImgContainer img.ImgSrc')].find(i => /hero/.test(i.src));
-        if (hero && hero.src !== want) { want = hero.src; schedule(hero.src, null); }
+        marquee.remove();
+        if (hero && hero.src !== want) {
+          want = hero.src;
+          const m = /\/(?:customimages|assets)\/(\d+)[/_]/.exec(hero.src);
+          schedule(hero.src, m ? Number(m[1]) : null);
+        }
         return;
       }
-      const home = document.querySelector('.BasicHome');
-      if (home && layer.parentElement !== home) home.insertBefore(layer, home.firstChild);
-      layer.classList.add('show');
-      if (front >= 0) root.classList.add('gd-bpm-bg');
       if (img.src !== want) { want = img.src; schedule(img.src, appOf(img)); return; }
-      // "N хв тому" moves on by itself
-      const now = Math.floor(Date.now() / 60000);
-      if (chipApp && now !== minute) { minute = now; renderChip(shared(), chipApp); }
+      placeMarquee();
+      // "N min ago" moves on by itself
+      const minuteNow = Math.floor(Date.now() / 60000);
+      if (shownApp && minuteNow !== minute) { minute = minuteNow; renderMarquee(shared(), shownApp); }
     };
     setInterval(() => { try { step(); } catch (e) { /* Big Picture extras are a bonus, never break it */ } }, 250);
     return;
@@ -1334,6 +1611,8 @@
   const paintPlay = (button, state) => {
     if (button.dataset.state === state) return;
     button.dataset.state = state;
+    // "Play: Haste": the word alone says nothing of which game to someone who hears the button
+    if (button.dataset.name) button.setAttribute('aria-label', `${W()[state] || ''}: ${button.dataset.name}`);
     button.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">${PLAY_ICONS[state] || PLAY_ICONS.cross}</svg>${W()[state]}`;
   };
   // The header is rebuilt only when what it shows changes, and that would redraw the art
@@ -1392,6 +1671,7 @@
     const card = document.createElement('div');
     card.className = 'gd-peek';
     card.hidden = true;
+    card.setAttribute('aria-hidden', 'true');   // it shows what the cover's own name already says
     card.innerHTML = '<img alt=""><div><strong></strong><span></span></div>';
     const img = card.querySelector('img'), title = card.querySelector('strong'), line = card.querySelector('span');
     let wait = 0, turn = 0, shown = null;
@@ -1443,9 +1723,84 @@
       if (cap && !cap.contains(e.relatedTarget)) hide();
     });
     block.addEventListener('pointerdown', hide);
+    // The same look for the keyboard: the cover Tab has landed on shows its card after the same
+    // moment, and Escape or moving on puts it away. Only the keyboard's focus counts
+    // (:focus-visible): a click focuses the cover as well, on its way to the game's page.
+    block.addEventListener('focusin', e => {
+      const cap = e.target.closest('.gd-cap');
+      if (!cap || !cap.matches(':focus-visible')) return;
+      clearTimeout(wait);
+      wait = setTimeout(() => { if (cap.isConnected && document.activeElement === cap) show(cap); }, 350);
+    });
+    block.addEventListener('focusout', e => { if (e.target.closest('.gd-cap')) hide(); });
+    block.addEventListener('keydown', e => { if (e.key === 'Escape' && !card.hidden) hide(); });
     document.body.appendChild(card);
     peek = { card, hide };
   };
+
+  /* ── every game's own colours ── */
+
+  // gd-app-accents holds the pair each game's art gave the last time its page was open. The
+  // home's two weeks in colour and the game list use them for games that are not the open one;
+  // a game not seen yet has them worked out here, once, from its hero.
+  const learning = new Map();   // appid → who waits for its colours
+  // known: looked at, even if its art had no colour to give. A pair kept before the two-tone
+  // accent has no second colour and is worked out again.
+  const coloursKnown = id => { const v = appAccents.get(id); return appAccents.has(id) && (!v || v.length > 2); };
+  const learnColours = (o, app, done) => {
+    const id = String(app.appid);
+    if (coloursKnown(id)) { done(appAccents.get(id)); return; }
+    if (learning.has(id)) { learning.get(id).push(done); return; }
+    learning.set(id, [done]);
+    const tell = pair => { for (const fn of learning.get(id) || []) fn(pair); learning.delete(id); };
+    detailsReady(o, app).promise.then(() => {
+      const urls = artFor(o, app).hero;
+      const attempt = i => {
+        if (i >= urls.length) { tell(null); return; }
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => { keepAppAccent(id, accentFrom(img)); tell(appAccents.get(id)); };
+        img.onerror = () => attempt(i + 1);
+        img.src = new URL(urls[i], location.href).href;
+      };
+      attempt(0);
+    });
+  };
+
+  // The game list: the row under the pointer is washed in the colours of its own game
+  // (css/steam.css, [data-gd-own]). A game not seen yet is learned once the pointer has rested on
+  // it for a quarter of a second, so sweeping down the list asks for nothing. One listener on the
+  // document: the list is virtual, its rows are reused for other games, and a row is dressed
+  // again each time the pointer comes onto it. «Accent colour → Fixed» keeps its one colour here.
+  let ownWait = 0;
+  addEventListener('pointerover', e => {
+    const entry = e.target.closest && e.target.closest('.GameListEntryContainer');
+    const cell = entry && entry.closest('[role=gridcell]');
+    if (!cell) return;
+    clearTimeout(ownWait);
+    const idOf = () => {
+      const img = entry.querySelector('.GameIcon img');
+      return (img && (/\/assets\/(\d+)\//.exec(img.getAttribute('src') || '') || [])[1]) || '';
+    };
+    const id = idOf();
+    const dress = pair => {
+      if (pair && !accentLocked()) {
+        cell.style.setProperty('--gd-own', pair[0]);
+        cell.style.setProperty('--gd-own-2', (twoTone() && pair[2]) || pair[0]);
+        cell.setAttribute('data-gd-own', '');
+      } else {
+        cell.removeAttribute('data-gd-own');
+      }
+    };
+    dress(id ? appAccents.get(id) : null);
+    if (!id || coloursKnown(id)) return;
+    ownWait = setTimeout(() => {
+      const o = shared();
+      let app = null;
+      try { app = o && o.appStore.GetAppOverviewByAppID(Number(id)); } catch (err) { /* the row stays plain */ }
+      if (app) learnColours(o, app, pair => { if (idOf() === id) dress(pair); });
+    }, 250);
+  }, { passive: true });
 
   const buildHome = () => {
     const o = shared();
@@ -1464,6 +1819,9 @@
 
     const now = Date.now();
     if (existing && now - homeChecked < 2500) return;
+    // Nobody is looking (Steam minimised or in the tray, or a web page up, which keeps the library
+    // mounted underneath): the library is not counted again until someone is.
+    if (existing && (document.hidden || onWebPage())) return;
     homeChecked = now;
 
     const apps = installedApps(o);
@@ -1495,6 +1853,10 @@
     const installed = new Set(apps.map(a => a.appid));
     const played = games.filter(wasPlayed).length;
     const recent = games.filter(a => a.minutes_playtime_last_two_weeks > 0);
+    // switch «Home: two weeks in colour» (css/options/fortnight-off.css): the games of the last
+    // fortnight, most played first. One game alone makes no picture.
+    const fortnight = getComputedStyle(root).getPropertyValue('--gd-fortnight').trim() === 'off' || recent.length < 2 ? []
+      : recent.slice().sort((a, b) => b.minutes_playtime_last_two_weeks - a.minutes_playtime_last_two_weeks).slice(0, 14);
     if (shown.list.includes('perfect')) renewAchievements(o, games);
     const ach = shown.list.includes('perfect') ? achievements(o, games) : null;
     const numbers = {
@@ -1510,6 +1872,7 @@
     const sig = [locale(), new Date().getHours(), name, ...stats.map(s => `${s.label}=${s.value}/${s.sub}`),
       ...(last ? [last.rt_last_time_played, last.minutes_playtime_forever, last.minutes_playtime_last_two_weeks || 0] : []),
       lastAch ? `${lastAch.unlocked}/${lastAch.total}` : '',
+      ...fortnight.map(a => `${a.appid}~${a.minutes_playtime_last_two_weeks}`),
       ...(last ? [last, ...shelf] : []).map(a => `${a.appid}:${a.rt_custom_image_mtime || 0}`)].join('|');
     if (existing && sig === homeSig) return;
     homeSig = sig;
@@ -1526,8 +1889,14 @@
         ${!stats.length ? '' : `<div class="gd-stats">${stats.map(s => `
           <div><small>${s.label}</small><b class="gd-num">${s.value}</b>${s.sub ? `<i>${esc(s.sub)}</i>` : ''}</div>`).join('')}
         </div>`}
-      </div>${!last ? '' : `
-      <div class="gd-continue" data-app="${last.appid}">
+      </div>${!fortnight.length ? '' : `
+      <div class="gd-fortnight">
+        <div class="gd-fortnight-bar" role="group" aria-label="${esc(W().twoWeeks)}">${fortnight.map(a => `
+          <button data-app="${a.appid}" style="flex-grow: ${a.minutes_playtime_last_two_weeks}" aria-label="${esc(`${a.display_name}, ${hoursOf(a.minutes_playtime_last_two_weeks)}`)}"></button>`).join('')}
+        </div>
+        <div class="gd-fortnight-note"></div>
+      </div>`}${!last ? '' : `
+      <div class="gd-continue" data-app="${last.appid}" tabindex="0" role="link" aria-label="${esc(last.display_name)}">
         <img class="gd-cont-art" alt="">
         <div class="gd-cont-body">
           <small>${W().cont}</small>
@@ -1536,13 +1905,13 @@
           <div class="gd-cont-meta">${relDay(last.rt_last_time_played)}, ${clock.format(new Date(last.rt_last_time_played * 1000))}${
             playedOf(last) ? ` · ${playedOf(last)}` : ''}</div>${!lastAch ? '' : `
           <div class="gd-cont-ach"><i><b style="width: ${Math.round(lastAch.unlocked / lastAch.total * 100)}%"></b></i>${esc(W().ach(lastAch.unlocked, lastAch.total))}</div>`}
-          <button class="gd-play" data-game="${esc(gameIdOf(last))}"></button>
+          <button class="gd-play" data-game="${esc(gameIdOf(last))}" data-name="${esc(last.display_name)}"></button>
         </div>
       </div>${!shelf.length ? '' : `
       <h4 class="gd-label">${W().recent}</h4>
       <div class="gd-shelf">
         ${shelf.map(a => `
-          <button class="gd-cap" data-app="${a.appid}"${peeking ? '' : ` title="${esc(a.display_name)}"`}>
+          <button class="gd-cap" data-app="${a.appid}" aria-label="${esc(`${a.display_name}, ${relDay(a.rt_last_time_played)}`)}"${peeking ? '' : ` title="${esc(a.display_name)}"`}>
             <img alt="">
             <span>${relDay(a.rt_last_time_played)}</span>
           </button>`).join('')}
@@ -1574,6 +1943,28 @@
       });
     });
 
+    // two weeks in colour: each segment in its game's colours, and the line under the bar says
+    // what the whole is, or which game is under the pointer (or has the keyboard's focus)
+    const bar = block.querySelector('.gd-fortnight-bar');
+    if (bar) {
+      const note = block.querySelector('.gd-fortnight-note');
+      const total = fortnight.reduce((s, a) => s + a.minutes_playtime_last_two_weeks, 0);
+      const whole = () => { note.textContent = `${hoursOf(total)} ${W().inTwoWeeks} · ${W().sub.inGames(fortnight.length)}`; };
+      const one = a => { note.innerHTML = `<b>${esc(a.display_name)}</b> · ${hoursOf(a.minutes_playtime_last_two_weeks)}`; };
+      [...bar.children].forEach((seg, i) => {
+        learnColours(o, fortnight[i], pair => {
+          if (!pair) return;
+          seg.style.setProperty('--gd-own', pair[0]);
+          seg.style.setProperty('--gd-own-2', (twoTone() && pair[2]) || pair[0]);
+        });
+        seg.addEventListener('pointerenter', () => one(fortnight[i]));
+        seg.addEventListener('focus', () => one(fortnight[i]));
+      });
+      bar.addEventListener('pointerleave', whole);
+      bar.addEventListener('focusout', whole);
+      whole();
+    }
+
     block.addEventListener('click', e => {
       const play = e.target.closest('.gd-play');
       if (play) {
@@ -1594,9 +1985,25 @@
       }
     });
 
+    // The Continue card is a link in all but its tag (the Play button inside it is a control of
+    // its own): Enter or Space on the card opens the game's page, as a click on it does.
+    block.addEventListener('keydown', e => {
+      if (e.target.classList.contains('gd-continue') && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault();
+        e.target.click();
+      }
+    });
+
+    // a rebuild must not take the keyboard's place away: what had the focus has it again
+    const focused = existing && existing.contains(document.activeElement) ? document.activeElement : null;
+    const again = !focused ? '' : focused.classList.contains('gd-play') ? '.gd-play'
+      : !focused.dataset.app ? '' : focused.parentElement.classList.contains('gd-fortnight-bar')
+        ? `.gd-fortnight-bar button[data-app="${focused.dataset.app}"]` : `.${focused.classList[0]}[data-app="${focused.dataset.app}"]`;
     if (existing) existing.replaceWith(block);
     else anchor.insertBefore(block, anchor.firstElementChild);
     if (peeking && shelf.length) wirePeek(o, block, shelf);
+    const same = again && block.querySelector(again);
+    if (same) same.focus({ preventScroll: true });
     state.home++;
   };
 
@@ -1721,8 +2128,9 @@
       close.addEventListener('click', () => slSetOpen(false));
       rail.close = close;
     }
-    rail.querySelector('.gd-rail-open').title = W().slOpen;
-    rail.close.title = W().slClose;
+    for (const [button, say] of [[rail.querySelector('.gd-rail-open'), W().slOpen], [rail.close, W().slClose]]) {
+      if (button.title !== say) { button.title = say; button.setAttribute('aria-label', say); }
+    }
     if (rail.parentElement !== frame) frame.appendChild(rail);
     if (rail.close.parentElement !== frame) frame.appendChild(rail.close);
     const hidden = hiddenIn(o);
@@ -1733,7 +2141,7 @@
     if (sig === rail.dataset.sig) return;
     rail.dataset.sig = sig;
     const caps = rail.querySelector('.gd-rail-caps');
-    caps.innerHTML = games.map(a => `<button class="gd-rail-cap" data-app="${a.appid}" title="${esc(a.display_name)}"><img alt=""></button>`).join('');
+    caps.innerHTML = games.map(a => `<button class="gd-rail-cap" data-app="${a.appid}" title="${esc(a.display_name)}" aria-label="${esc(a.display_name)}"><img alt=""></button>`).join('');
     caps.querySelectorAll('.gd-rail-cap').forEach((cap, i) => {
       const img = cap.querySelector('img');
       chain(img, artFor(o, games[i]).portrait, () => {
@@ -1847,6 +2255,110 @@
     });
   };
 
+  /* ═════════════ the still ═════════════ */
+
+  // Switch «When idle» (css/options/still-*.css set --gd-still, the minutes: 5 without a file, 0
+  // is never). Steam left alone on the library becomes the picture of the game in view: its art
+  // unblurred, its logo, the time and the date (css/steam.css, #gd-still). The first move of the
+  // pointer, a key or a click brings the client back.
+  // It stays away from a web page (the pointer over the store never reaches this document, so
+  // its stillness says nothing), from a hidden window, and while a video plays or something is
+  // downloading: a download left to run is being watched, not abandoned.
+  const stillMinutes = () => {
+    const v = getComputedStyle(root).getPropertyValue('--gd-still').trim();
+    return v === '' ? 5 : parseFloat(v) || 0;
+  };
+  let lastMove = Date.now(), lastAt = '', stillLayer = null, stillShown = '';
+  const wake = e => {
+    // Chromium sends a pointer move of its own when the page changes under a pointer at rest
+    if (e && e.type === 'pointermove') {
+      const at = e.screenX + ',' + e.screenY;
+      if (at === lastAt) return;
+      lastAt = at;
+    }
+    lastMove = Date.now();
+    if (root.classList.contains('gd-still')) root.classList.remove('gd-still');
+  };
+  for (const type of ['pointermove', 'pointerdown', 'wheel']) addEventListener(type, wake, { capture: true, passive: true });
+  addEventListener('focus', wake);
+  // The key that wakes the client stops here, or it would also act on whatever has the focus under
+  // the still (Enter on Play). The click is taken by the layer itself, which lies over everything.
+  addEventListener('keydown', e => {
+    const still = root.classList.contains('gd-still');
+    wake(e);
+    if (still) { e.preventDefault(); e.stopImmediatePropagation(); }
+  }, { capture: true });
+  // Steam's own record of what it is downloading, one entry for this machine and one for each it
+  // is linked to
+  const downloading = () => {
+    try {
+      for (const d of shared().downloadsStore.m_DownloadOverview.values()) {
+        if (d && d.update_appid && d.update_state !== 'None' && d.update_state !== 'Paused') return true;
+      }
+    } catch (e) { /* no such record in this client: downloads do not hold the still back */ }
+    return false;
+  };
+
+  const stillFits = () => !!state.src && document.visibilityState === 'visible' && !onWebPage() && !downloading() &&
+    ![...document.querySelectorAll('video')].some(v => !v.paused && !v.ended);
+  const stillDress = () => {
+    if (!stillLayer) {
+      stillLayer = document.createElement('div');
+      stillLayer.id = 'gd-still';
+      stillLayer.setAttribute('aria-hidden', 'true');
+      stillLayer.innerHTML = '<div class="gd-still-stage"><div class="gd-still-fill"></div><div class="gd-still-art"></div></div>' +
+        '<div class="gd-still-words">' +
+        '<img class="gd-still-logo" alt="" hidden><div class="gd-still-name" hidden></div>' +
+        '<div class="gd-still-clock gd-num"></div><div class="gd-still-date"></div></div>';
+    }
+    if (!stillLayer.isConnected) document.body.appendChild(stillLayer);
+    const key = state.src + '|' + (state.app || '');
+    if (key !== stillShown) {
+      stillShown = key;
+      for (const e of stillLayer.querySelectorAll('.gd-still-fill, .gd-still-art')) e.style.backgroundImage = `url("${state.src}")`;
+      const logo = stillLayer.querySelector('.gd-still-logo'), name = stillLayer.querySelector('.gd-still-name');
+      logo.hidden = true;
+      name.hidden = true;
+      name.textContent = '';
+      const o = shared();
+      let app = null;
+      try { app = o && state.app ? o.appStore.GetAppOverviewByAppID(Number(state.app)) : null; } catch (e) { /* the art alone */ }
+      if (app) {
+        // the logo; a game without one is named in words
+        name.textContent = app.display_name || '';
+        logo.onload = () => { if (stillShown === key) { logo.hidden = false; name.hidden = true; } };
+        chain(logo, artFor(o, app).logo, () => { if (stillShown === key) name.hidden = !name.textContent; });
+      }
+    }
+    // the hour and the minute large, AM or PM (where the language has them) small beside them
+    const now = new Date();
+    const parts = new Intl.DateTimeFormat(locale(), { hour: 'numeric', minute: '2-digit' }).formatToParts(now);
+    const period = (parts.find(p => p.type === 'dayPeriod') || {}).value || '';
+    const time = parts.filter(p => p.type !== 'dayPeriod').map(p => p.value).join('').trim();
+    if (stillLayer.gdTime !== time + period) {
+      stillLayer.gdTime = time + period;
+      stillLayer.querySelector('.gd-still-clock').innerHTML = esc(time) + (period ? `<small>${esc(period)}</small>` : '');
+      stillLayer.querySelector('.gd-still-date').textContent =
+        new Intl.DateTimeFormat(locale(), { weekday: 'long', day: 'numeric', month: 'long' }).format(now);
+    }
+  };
+  // Once a second is as often as anything it looks at changes. The tick also runs on every burst
+  // of changes in the page, each frame while a list scrolls, and this asked Steam about its
+  // downloads and looked for a playing video on each of those.
+  let stillAt = 0;
+  const stillCheck = () => {
+    const at = Date.now();
+    if (at - stillAt < 900) return;
+    stillAt = at;
+    const on = root.classList.contains('gd-still');
+    const minutes = stillMinutes();
+    if (!minutes || !stillFits()) { if (on) root.classList.remove('gd-still'); return; }
+    if (on) { stillDress(); return; }
+    if (Date.now() - lastMove < minutes * 60000) return;
+    stillDress();
+    root.classList.add('gd-still');
+  };
+
   const tick = () => {
     mountLayer();
     fixReclassAnimation();
@@ -1859,6 +2371,7 @@
     try { buildHome(); } catch (e) { /* the home header is a bonus, never break the client over it */ }
     try { dressFeatured(); } catch (e) { /* Steam's own card stays */ }
     syncPlay();
+    try { stillCheck(); } catch (e) { /* the client as it is */ }
   };
 
   // React swaps the page in one mutation burst — react to that instead of waiting
@@ -1868,13 +2381,23 @@
     if (queued) return;
     queued = requestAnimationFrame(() => { queued = 0; tick(); });
   };
+  // One observer, on the main panel once there is one (until then, and in the sign-in window,
+  // on the whole body). Should Steam ever build that panel anew, the observer moves to the new
+  // one: left on a block no longer in the page it would hear nothing, and the theme would be a
+  // second behind everything.
+  const observer = new MutationObserver(soon);
+  let watched = null;
   const watch = () => {
+    if (watched && watched.isConnected && watched !== document.body) return;
     const target = document.querySelector('.MainPanel') || document.body;
-    if (!target) return;
-    new MutationObserver(soon).observe(target, { childList: true, subtree: true });
+    if (!target || target === watched) return;
+    observer.disconnect();
+    observer.observe(target, { childList: true, subtree: true });
+    watched = target;
   };
 
-  setInterval(tick, 1000);                 // fallback for anything the observer misses
+  setInterval(() => { watch(); tick(); }, 1000);   // fallback for anything the observer misses
+  addEventListener('visibilitychange', () => { if (!document.hidden) soon(); });   // back in view: up to date at once
   if (document.body) { tick(); watch(); }
   else addEventListener('DOMContentLoaded', () => { tick(); watch(); });
 })();

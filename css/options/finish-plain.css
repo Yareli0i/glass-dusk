@@ -1,0 +1,5 @@
+/* Glass finish: Plain — smooth glass with an even hairline, as before 1.8 */
+:root {
+  --gd-grain: none !important;
+  --gd-glass-lit: rgba(255, 255, 255, .1) !important;
+}

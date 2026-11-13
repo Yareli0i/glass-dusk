@@ -1,0 +1,141 @@
+/* Glass Dusk — a screensaver for Steam's Big Picture (see README.md beside this file).
+   The theme's dusk with two drifting fields of its colours, the time and the date. The art of
+   the last game would lie over it, in the look of the theme's own still, if the page could
+   reach it (README.md says why it is not expected to). */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #05060b;
+    color: #eef1f8;
+    font-family: 'Motiva Sans', 'Segoe UI', system-ui, sans-serif;
+    --accent: #5e90e4;
+    --second: #8489cd;
+}
+
+/* the dusk itself, under everything: what shows when there is no art */
+body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(120% 90% at 50% 0%, #18203c, transparent 70%),
+        linear-gradient(180deg, #0d1018, #080a11 60%, #05060b);
+}
+
+/* Two soft fields of colour over it, the accent and its neighbour, moving a step every two
+   seconds: with no art the screen is still not a still picture, and nothing bright stands in
+   one place for long. Larger than the screen, so its edge never comes into view. */
+#glow {
+    position: absolute;
+    inset: -22%;
+    background:
+        radial-gradient(34% 42% at 26% 32%, color-mix(in srgb, var(--accent) 34%, transparent), transparent 72%),
+        radial-gradient(30% 38% at 76% 66%, color-mix(in srgb, var(--second) 30%, transparent), transparent 72%);
+    will-change: transform;
+    transition: opacity 1.6s ease;
+    animation: glow 260s steps(130, end) infinite alternate;
+}
+body.has-art #glow { opacity: 0; }
+
+#stage {
+    position: absolute;
+    inset: -4%;
+    opacity: 0;
+    transition: opacity 1.6s ease;
+    will-change: transform;
+    /* a step every two seconds: nothing stands in one place, and next to nothing is drawn */
+    animation: drift 300s steps(150, end) infinite alternate;
+}
+body.has-art #stage { opacity: 1; }
+#fill, #art {
+    position: absolute;
+    background: center / cover no-repeat;
+}
+#fill {
+    inset: 0;
+    filter: blur(46px) saturate(1.25) brightness(.5);
+    transform: scale(1.12);
+}
+#art {
+    left: 0;
+    right: 0;
+    top: 10%;
+    height: 80%;
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 13%, #000 87%, transparent);
+    mask-image: linear-gradient(180deg, transparent, #000 13%, #000 87%, transparent);
+}
+
+/* the dusk under the words */
+#dusk {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(75deg, rgba(5, 6, 11, .8), rgba(5, 6, 11, .22) 44%, transparent 68%),
+        linear-gradient(0deg, rgba(5, 6, 11, .72), transparent 40%);
+}
+
+#words {
+    position: absolute;
+    left: 6vw;
+    bottom: 9vh;
+    display: flex;
+    flex-direction: column;
+    gap: 2.4vh;
+    will-change: transform;
+    animation: words 420s steps(84, end) infinite alternate;
+}
+#clock {
+    font-size: 13vh;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 6px 30px rgba(0, 0, 0, .55);
+}
+#clock small {
+    margin-left: .22em;
+    font-size: .3em;
+    letter-spacing: .04em;
+    color: rgba(238, 241, 248, .72);
+}
+#date {
+    font-size: 2vh;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: rgba(238, 241, 248, .72);
+}
+#date::before {
+    content: '';
+    display: inline-block;
+    width: 2.6vh;
+    height: 2px;
+    margin-right: 1.2vh;
+    vertical-align: middle;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--second));
+}
+
+@keyframes glow {
+    from { transform: translate3d(-5%, -3%, 0) rotate(0deg); }
+    to { transform: translate3d(5%, 4%, 0) rotate(9deg); }
+}
+@keyframes drift {
+    from { transform: translate3d(-1.2%, .6%, 0) scale(1.02); }
+    to { transform: translate3d(1.2%, -.6%, 0) scale(1.06); }
+}
+@keyframes words {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(28px, -18px, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+    #stage, #words, #glow { animation: none; }
+}
