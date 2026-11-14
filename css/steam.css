@@ -543,8 +543,15 @@ svg#arrowBase { background: var(--gd-field) !important; border-radius: 999px !im
 .AppDetailsMain { border: 0 !important; }
 /* blue section heading in the workshop / featured strips */
 .FeaturedItemHeader { color: var(--gd-accent, var(--gd-house)) !important; }
-/* the date badge on shelf tiles */
-.LibraryItemBoxSubscript { background: var(--gd-soft) !important; border-radius: 6px !important; }
+/* The caption over the bottom of a cover in shelves and collections (hours, a date, a size, as
+   the sort has it). White on the theme's faint glass could hardly be read on pale art, so it sits
+   on the dark card colour. No blur: a collection can hold hundreds of covers, all scrolling. */
+.LibraryItemBoxSubscript {
+  background: color-mix(in srgb, var(--gd-card, #08090e) 80%, transparent) !important;
+  color: var(--gd-ink, #eef1f8) !important;
+  border-radius: 6px !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1), 0 2px 8px rgba(0, 0, 0, .35) !important;
+}
 /* Game covers wherever Steam lays them out (a collection's page, the home's shelves) are
    rounded like the theme's own row. The box already clips its picture, the shine and the
    hover tilt, and its shadow follows the corners. */

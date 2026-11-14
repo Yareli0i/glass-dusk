@@ -2,6 +2,11 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 2.0.3 — 2026-11-14
+
+**Library**
+- The caption over the bottom of a cover in shelves and collections (hours played, the date last played, whatever the shelf is sorted by) was white on near-clear glass, and on pale art could hardly be read (from Discord). It sits on the theme's dark glass now, readable on any cover.
+
 ## 2.0.2 — 2026-11-14
 
 **New**
