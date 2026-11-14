@@ -2,6 +2,14 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 2.0.2 — 2026-11-14
+
+**New**
+- The main window says so when the theme cannot reach it. Where Millennium did not add Steam's readable class names, the store looks right and the library is stock Steam, with nothing to say why. A line in the window's foot bar now names the cause, with a link to what has helped. It shows only in that case, and once dismissed stays away for two weeks.
+
+**Menus**
+- The first and the last item of a menu poked past the menu's rounded corner when highlighted, and the menu's rim was drawn across them: the tabs' menus in the top bar (*Home*, *Collections*, *Downloads*) and the right-click menu of a game (from Discord). Their outer corners follow the menu's own curve now.
+
 ## 2.0.1 — 2026-11-13
 
 **Library**

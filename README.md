@@ -74,7 +74,7 @@ The **Colors** tab has six colours: accent, text, secondary text, glass tint, pl
 - **From steambrew.app:** open [Glass Dusk in the theme catalogue](https://steambrew.app/theme/0hs3xMU5Eb85uvIALzkq), press *Copy Theme ID* and paste it into Millennium → Themes → Install.
 - **By hand:** download this repository and put the folder into `Steam/millennium/themes/`, then pick it in Millennium → Themes.
 
-Tested on Windows 11 with Steam client 1788652215 and Millennium 3.5.0, and on Ubuntu 24.04 with the fix below.
+Tested on Windows 11 with Steam client 1794424036 and Millennium 3.6.2, and on Ubuntu 24.04 with the fix below.
 
 ### Linux
 
@@ -88,6 +88,14 @@ cp /usr/lib/millennium/libmillennium_hhx64.so libmillennium_hhx64.so
 ```
 
 Start Steam again, and repeat this after every Millennium update. It is for a regular Steam install with Millennium from its install script or the AUR (`ubuntu12_64` is Steam's own folder name on every distribution). NixOS keeps these files elsewhere, and Millennium does not support Steam from Flatpak or Snap.
+
+### The store is themed, the library is not
+
+If the store looks right while the main window is stock Steam (no glass, the game list on the left, Steam's own home), Steam's readable class names did not load. The theme is written against them, and Millennium (3.4.0 and newer) adds them to Steam's own scripts as the client starts. The store is a web page with class names of its own, which is why it alone still looks right. Since 2.0.2 the main window says so itself, in a line across its foot bar; if the library is stock and no such line appears, the cause is another one, and an issue here is welcome.
+
+- Exit Steam fully (Steam → Exit; closing the window is not enough) and start it again, then in Millennium switch to another theme and back to Glass Dusk. This has fixed it before.
+- On Linux, see the section above.
+- If it stays, the cause is between Millennium and that Steam install, not in the theme: other themes written against the readable names will show the same, while themes written against Steam's hashed names will not. Millennium's [issue tracker](https://github.com/SteamClientHomebrew/Millennium/issues) and Discord are the places to ask.
 
 ## Good to know
 

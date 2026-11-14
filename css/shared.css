@@ -177,6 +177,20 @@ body.DesktopUI .ContextMenuSeparator + .contextMenuItem {
   border-top-left-radius: 0 !important;
   border-top-right-radius: 0 !important;
 }
+/* The first and the last row follow the glass's own corner: 12 px with a 1 px rim leaves an 11 px
+   curve inside it. With the rows' 8 px, a highlighted first or last row poked past the corner and
+   the rim was drawn across it. Popup menus (the top bar's tabs, the account menu) carry .MenuItem,
+   menus drawn inside a window .contextMenuItem. */
+body.ContextMenuPopupBody .contextMenuContents > .MenuItem.Item:first-child,
+body.DesktopUI .contextMenuContents > .contextMenuItem.contextMenuItem:first-child {
+  border-top-left-radius: 11px !important;
+  border-top-right-radius: 11px !important;
+}
+body.ContextMenuPopupBody .contextMenuContents > .MenuItem.Item:last-child,
+body.DesktopUI .contextMenuContents > .contextMenuItem.contextMenuItem:last-child {
+  border-bottom-left-radius: 11px !important;
+  border-bottom-right-radius: 11px !important;
+}
 
 /* notifications live in the same kind of window */
 /* the notification rows keep Steam's own metrics and spacing; a background of

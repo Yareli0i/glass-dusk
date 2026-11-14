@@ -556,6 +556,92 @@
     return;
   }
 
+  /* ── when Steam's readable class names are not there ── */
+
+  // The theme is written against the readable names Millennium gives Steam's classes: Steam
+  // ships hashes only, and Millennium's web helper hook adds the names to Steam's own scripts
+  // as the client loads them. Where that did not happen, the store, a web page with class names
+  // of its own, looks right and the library is stock Steam, with nothing to say why (#24, #28).
+  // Nothing in a theme can repair that; but the window can say what it is.
+  // Told by Steam's own code: of the first CSS-module maps found in it, not one has a readable
+  // name beside its hash. With the hook loaded every one has (24 of 24 when this was written);
+  // Steam's files on disk, never rewritten, have none in 508.
+  // This piece takes nothing else of the theme for granted, since what it reports is the rest
+  // not working: it knows the main window by its title at the moment it looks (the body class
+  // the script goes by is itself one of those names), looks on a timer of its own, and carries
+  // its words and its look in itself (css/steam.css is the sheet with no effect there).
+  const namesMissing = req => {
+    let maps = 0, named = 0;
+    for (const k of Object.keys(req.m)) {
+      const src = String(req.m[k]);
+      const at = src.indexOf('.exports={');
+      if (at < 0) continue;
+      const m = /^\.exports=\{"?[A-Za-z_][\w-]*"?:"([\w-]{18,30})( [\w -]+)?"/.exec(src.slice(at, at + 200));
+      if (!m || !/\d|[A-Z]{2}/.test(m[1])) continue;   // not a map of class hashes
+      maps++;
+      if (m[2]) named++;
+      if (maps >= 24) break;
+    }
+    return maps >= 8 && named === 0;
+  };
+  const NAMES_HELP = 'https://github.com/Yareli0i/glass-dusk#the-store-is-themed-the-library-is-not';
+  const NAMES_WORDS = {
+    en: ['Glass Dusk cannot reach this window.', 'Steam\'s readable class names did not load. That part is Millennium\'s: exit Steam fully and start it again.',
+      'What else to try', 'Dismiss'],
+    uk: ['Glass Dusk не дістає до цього вікна.', 'Не завантажилися читабельні назви класів Steam. Це частина Millennium: повністю вийдіть зі Steam і запустіть його знову.',
+      'Що ще спробувати', 'Закрити'],
+    fr: ['Glass Dusk n’atteint pas cette fenêtre.', 'Les noms de classes lisibles de Steam ne se sont pas chargés. C’est le rôle de Millennium : quittez Steam complètement, puis relancez-le.',
+      'Que tenter d’autre', 'Fermer'],
+  };
+  const namesNote = () => {
+    if (!document.body || document.getElementById('gd-names-note')) return;
+    // said once a fortnight at most: someone who cannot fix it today should not be told every day
+    try { if (Date.now() - Number(localStorage.getItem('gd-names-note') || 0) < 14 * 864e5) return; } catch (e) { /* said */ }
+    const [title, text, howText, shutText] = NAMES_WORDS[getComputedStyle(root).getPropertyValue('--gd-lang').trim()] || NAMES_WORDS.en;
+    const make = (tag, css, words) => {
+      const e = document.createElement(tag);
+      e.style.cssText = css;
+      if (words) e.textContent = words;
+      return e;
+    };
+    // One line in the window's foot bar, no taller than Steam's own: the store's page is drawn
+    // over everything above that bar, whatever the z-index, and the store is what such a user
+    // is looking at. Cut short in a narrow window, so the whole of it is the tooltip as well.
+    const note = make('div', 'position:fixed;left:50%;bottom:3px;transform:translateX(-50%);z-index:100000;display:flex;align-items:center;gap:8px;'
+      + 'box-sizing:border-box;height:34px;max-width:calc(100vw - 16px);padding:0 4px 0 14px;border:1px solid rgba(255,255,255,.16);border-radius:999px;'
+      + 'background:#0c0d13;box-shadow:0 6px 22px -6px rgba(0,0,0,.8);color:#a7aec0;font:12.5px/1 "Motiva Sans",Arial,sans-serif;text-align:left');
+    note.id = 'gd-names-note';
+    note.setAttribute('role', 'status');
+    const say = make('span', 'flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap');
+    say.append(make('strong', 'color:#eef1f8;font-weight:700', title), ' ' + text);
+    say.title = `${title} ${text}`;
+    const button = 'flex:none;height:26px;padding:0 12px;border:0;border-radius:999px;font:600 12px/1 "Motiva Sans",Arial,sans-serif;white-space:nowrap;cursor:pointer;';
+    const how = make('button', button + 'background:var(--gd-accent,#b79cff);color:var(--gd-accent-ink,#10131a)', howText);
+    const shut = make('button', button + 'background:rgba(255,255,255,.08);color:#eef1f8', shutText);
+    how.type = shut.type = 'button';
+    how.addEventListener('click', () => {
+      try { (window.opener || window).SteamClient.System.OpenInSystemBrowser(NAMES_HELP); } catch (e) { window.open(NAMES_HELP); }
+    });
+    shut.addEventListener('click', () => {
+      try { localStorage.setItem('gd-names-note', String(Date.now())); } catch (e) { /* asked again next time */ }
+      note.remove();
+    });
+    note.append(say, how, shut);
+    document.body.appendChild(note);
+  };
+  let namesLooked = false;
+  const namesLook = () => {
+    if (namesLooked || isGamepad || !/^Steam$/.test(document.title || '')) return;
+    const W = window.opener && window.opener.webpackChunksteamui ? window.opener : window;
+    if (!W.webpackChunksteamui) return;
+    let req = null;
+    W.webpackChunksteamui.push([[Symbol('gd-names')], {}, r => { req = r; }]);
+    if (!req || !req.m) return;
+    namesLooked = true;
+    if (namesMissing(req)) namesNote();
+  };
+  for (const ms of [4000, 12000, 30000]) setTimeout(() => { try { namesLook(); } catch (e) { /* the window as it is */ } }, ms);
+
   /* ── windows other than the main one just follow what it published ── */
 
   if (!isMain && !isGamepad) {
