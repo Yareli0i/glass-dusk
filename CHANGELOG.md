@@ -2,6 +2,12 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 2.0.4 — 2026-11-16
+
+**Plugins**
+- [Command Palette](https://github.com/NotAmiru/Steam-Command-Palette) (Ctrl+K: games, Steam pages, actions, the store) takes the theme's colours: the menus' glass, the field with the accent's hairline while you type, results as rounded rows in the accent's wash, matched letters in the accent. Before, it stood with no ground at all over the page behind it, and its selected row was white with white text on it.
+- With *Plugins → Plugin's own* the palette keeps the grey Steam gives its menu window; the theme had cleared that too.
+
 ## 2.0.3 — 2026-11-14
 
 **Library**

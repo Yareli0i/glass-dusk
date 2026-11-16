@@ -242,4 +242,104 @@ body .steam-hunters-tooltip .__TextToolTip__ { background-color: #12151f !import
 }
 .ext-links-manager .ext-links-toggle input[type=checkbox]::after { background: var(--gd-plug-accent) !important; }
 
+/* ═══════════════ Command Palette — Ctrl+K: games, pages, actions, the store ═══════════════ */
+
+/* The plugin is written to be themed: cmdpal-* classes and --cmdpal-* variables, in a <style> it
+   puts first in the head. By default it opens in a Steam menu window of its own (.cmdpal--hosted,
+   the window titled "Menu"); without one, as an overlay in the main window (.cmdpal-backdrop >
+   .cmdpal) or a window of its own (.cmdpal--modal). Steam sizes a menu's window once, when it
+   opens, so the panel's size stays the plugin's: colour, corners and spacing inside only. */
+.cmdpal-backdrop.cmdpal-backdrop,
+.cmdpal.cmdpal--hosted,
+.cmdpal.cmdpal--modal {
+  --cmdpal-scrim: rgba(4, 5, 10, .45) !important;
+  --cmdpal-bg: var(--gd-pane, rgba(16, 19, 30, .9)) !important;
+  --cmdpal-text: var(--gd-ink, #EEF1F8) !important;
+  --cmdpal-dim: var(--gd-ink-soft, #A7AEC0) !important;
+  --cmdpal-accent: var(--gd-plug-accent) !important;
+  --cmdpal-border: var(--gd-line, rgba(255, 255, 255, .08)) !important;
+  --cmdpal-panel-border: rgba(255, 255, 255, .1) !important;
+  --cmdpal-selected-bg: color-mix(in srgb, var(--gd-plug-accent) 28%, transparent) !important;
+  --cmdpal-hover-bg: color-mix(in srgb, var(--gd-plug-accent) 28%, transparent) !important;
+  --cmdpal-hover-fg: #fff !important;
+  --cmdpal-tile-bg: rgba(255, 255, 255, .06) !important;
+  --cmdpal-owned: var(--gd-plug-accent) !important;
+  --cmdpal-radius: 8px !important;
+}
+
+/* The panel is the theme's menu glass. In a menu window the plugin leaves the ground to Steam's
+   menu container; here the container stays clear (css/shared.css leaves it to this sheet) and the
+   panel carries the glass itself, with its corners. */
+.contextMenu.contextMenu:has(> .cmdpal--hosted) {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.cmdpal.cmdpal--hosted,
+.cmdpal:not(.cmdpal--hosted):not(.cmdpal--modal) {
+  /* the menus' glass is 0.9; a panel this big, full of text, let the page's words read through */
+  background: color-mix(in srgb, var(--gd-glass, #0C0D13) 97%, transparent) !important;
+  border: 1px solid rgba(255, 255, 255, .1) !important;
+  border-radius: 12px !important;
+  color: var(--gd-ink, #EEF1F8) !important;
+}
+.cmdpal:not(.cmdpal--hosted):not(.cmdpal--modal) {
+  -webkit-backdrop-filter: blur(26px) saturate(1.3);
+  backdrop-filter: blur(26px) saturate(1.3);
+  box-shadow: 0 30px 60px -22px rgba(0, 0, 0, .75) !important;
+}
+
+/* A result is a rounded row like a menu item, inset from the glass's edge: the accent's wash under
+   the pointer and on the selected one, no stock white bar, no blue edge. In a menu window the rows
+   wear Steam's own menu item classes too, whose hover is that white. */
+.cmdpal .cmdpal-row {
+  margin-inline: 6px !important;
+  padding-inline: 10px !important;
+  border-left: 0 !important;
+  border-radius: 8px !important;
+  color: var(--gd-ink, #EEF1F8) !important;
+}
+.cmdpal .cmdpal-row:hover,
+.cmdpal .cmdpal-row.is-selected {
+  background: var(--cmdpal-selected-bg) !important;
+  color: #fff !important;
+}
+.cmdpal .cmdpal-match { color: var(--cmdpal-accent) !important; }
+.cmdpal .cmdpal-row:hover .cmdpal-match,
+.cmdpal .cmdpal-row.is-selected .cmdpal-match { color: inherit !important; text-decoration: underline 1px; text-underline-offset: 3px; }
+.cmdpal .cmdpal-row.is-owned .cmdpal-right { color: var(--cmdpal-accent) !important; }
+.cmdpal .cmdpal-row.is-owned:hover .cmdpal-right,
+.cmdpal .cmdpal-row.is-owned.is-selected .cmdpal-right { color: inherit !important; }
+.cmdpal .cmdpal-icon { border-radius: 6px !important; }
+.cmdpal .cmdpal-skeleton { border-radius: 8px !important; background: rgba(255, 255, 255, .06) !important; }
+
+/* Group heads (Recent, Steam pages, Store…) in the soft ink over a hairline, in line with the rows'
+   text; the hint line at the foot the same. */
+.cmdpal .cmdpal-group {
+  padding-inline: 16px !important;
+  color: var(--gd-ink-soft, #A7AEC0) !important;
+  border-top-color: var(--gd-line, rgba(255, 255, 255, .08)) !important;
+}
+.cmdpal .cmdpal-list > .cmdpal-group:first-child { border-top-color: transparent !important; }
+.cmdpal .cmdpal-footer {
+  padding-inline: 16px !important;
+  border-top-color: var(--gd-line, rgba(255, 255, 255, .08)) !important;
+}
+
+/* The search field: the theme's field, with the accent's hairline while typing. */
+.cmdpal .cmdpal-inputrow {
+  background: var(--gd-field, rgba(255, 255, 255, .08)) !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+.cmdpal .cmdpal-inputrow:focus-within { box-shadow: inset 0 0 0 1px var(--cmdpal-accent) !important; }
+.cmdpal .cmdpal-input { caret-color: var(--cmdpal-accent) !important; }
+.cmdpal .cmdpal-input::placeholder { color: var(--gd-ink-soft, #A7AEC0) !important; }
+.cmdpal .cmdpal-mode {
+  background: var(--cmdpal-accent) !important;
+  color: var(--gd-accent-ink, #10131a) !important;
+  border-radius: 999px !important;
+}
+
 }   /* :where(:root:not(.MillenniumWindow_SteamBrowser)) */

@@ -74,7 +74,7 @@ body.DesktopToastContainer #gd-art { display: none !important; }
    belongs to the menu itself. */
 body.ContextMenuPopupBody,
 body.ContextMenuPopupBody #popup_target,
-body.ContextMenuPopupBody .contextMenu {
+body.ContextMenuPopupBody .contextMenu:not(:has(> .cmdpal--hosted)) {
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
@@ -106,7 +106,7 @@ body.ContextMenuPopupBody hr.MenuItem { background: var(--gd-line) !important; b
 
 /* A menu that fits inside its parent window is drawn right there — no popup window, no
    ContextMenuPopupBody: the right-click menu on a game in the library. Same glass. */
-body.DesktopUI .contextMenu {
+body.DesktopUI .contextMenu:not(:has(> .cmdpal--hosted)) {
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
