@@ -1,0 +1,3 @@
+/* Friends list side: Left — read by js/dusk.js in the main window, which marks <html> with
+   gd-fp-left; css/steam.css and css/options/list-left.css hold what changes with it */
+:root { --gd-fp-side: left; }

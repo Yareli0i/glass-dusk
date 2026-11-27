@@ -342,4 +342,105 @@ body .steam-hunters-tooltip .__TextToolTip__ { background-color: #12151f !import
   border-radius: 999px !important;
 }
 
+/* ═══════════════ Friends Panel — Steam's friends list docked beside the library ═══════════════
+   Steam's friends list docked at the window's right side: a third pane of glass beside the game
+   list, with the same gaps, corners, fill and edge. The list inside is the friends window's, which
+   the theme already dresses (css/shared.css); only its ground goes, the pane is the ground. The
+   plugin copies the theme's sheets into the dock under #friends-panel-host .fp-theme-html, so the
+   rules inside it carry the id twice to stay ahead of those copies. */
+#friends-panel-host.fp-fdock {
+  right: var(--gd-fp-edge) !important;
+  width: calc(var(--fp-panel-width, 300px) - 10px) !important;
+  margin: 16px 0 14px !important;
+  border-left: 0 !important;
+  background: none !important;
+  color: var(--gd-ink);
+  /* the plugin's own controls: the toolbar, the rail of avatars, the chat chip */
+  --fp-theme-accent: var(--gd-accent, var(--gd-house)) !important;
+  --fp-panel-background: transparent;
+  --fp-native-panel-background: transparent;
+  --fp-hairline: var(--gd-line);
+  --fp-control-radius: 10px;
+  --fp-control-color: var(--gd-ink-soft);
+  --fp-control-hover-color: var(--gd-ink);
+  --fp-control-hover-background: var(--gd-hover);
+  --fp-resize-color: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 70%, transparent);
+  --fp-online: #7cc7f2;
+  --fp-running: #a3d060;
+  --fp-chip-background: color-mix(in srgb, var(--gd-glass, #0c0d13) 86%, transparent);
+  --fp-chip-hover-background: color-mix(in srgb, var(--gd-accent, var(--gd-house)) 22%, color-mix(in srgb, var(--gd-glass, #0c0d13) 86%, transparent));
+  --fp-chip-border: rgba(255, 255, 255, .1);
+  --fp-chip-radius: 14px;
+  --fp-chip-shadow: 0 18px 40px -16px rgba(0, 0, 0, .8);
+}
+/* The glass is a layer of its own: a backdrop-filter on the dock would make it the frame of the
+   chat that the plugin opens beside it, and the chat would be cut to the dock. */
+#friends-panel-host.fp-fdock::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--gd-grain), var(--gd-glass-fill);
+  -webkit-backdrop-filter: blur(var(--gd-blur)) saturate(1.25);
+  backdrop-filter: blur(var(--gd-blur)) saturate(1.25);
+  border: var(--gd-glass-edge);
+  border-top-color: var(--gd-glass-lit);
+  border-left-color: var(--gd-glass-lit);
+  border-radius: var(--gd-r-xl);
+  box-shadow: var(--gd-glass-shadow);
+}
+/* the list keeps inside the rounded corners */
+#friends-panel-host#friends-panel-host .fp-fd-steam .chat_main_flex > .friendsListContainer {
+  border-radius: var(--gd-r-xl);
+  overflow: clip;
+}
+#friends-panel-host#friends-panel-host :is(.chat_main, .chat_main_flex, .friendsListContainer, .friendlist) {
+  background: none !important;
+  background-image: none !important;
+}
+/* the collapse button sits in the pane's corner, clear of its curve */
+#friends-panel-host.fp-fdock .fp-control-root { top: 10px; right: 10px; }
+/* the rail of avatars (the dock collapsed) fills the pane, which is narrower than the plugin's
+   72 px by the gap, and starts under the button */
+#friends-panel-host.fp-fdock[data-mode="compact"] > .fp-compact-rail:not([hidden]) {
+  inset: 46px 0 6px 0 !important;
+  width: auto !important;
+}
+/* Steam's slabs for the friends window's grey: the header's inset frame, the dark bands that hint
+   at more list above and below, the footer's frame. On the glass they read as grey bars. */
+#friends-panel-host#friends-panel-host :is(.friendListHeaderContainer, .friendListFooter) { box-shadow: none !important; }
+#friends-panel-host#friends-panel-host :is(.FriendListInsetShadowTop, .FriendListInsetShadowBottom) { display: none !important; }
+#friends-panel-host#friends-panel-host .friendListFooter { border-top: 1px solid var(--gd-line) !important; }
+#friends-panel-host#friends-panel-host .friendGroup.offlineFriends { border-top-color: var(--gd-line) !important; }
+/* the store page and the game list beside it keep the same gap from the pane as the panes keep
+   from each other (css/steam.css makes the room) */
+body[data-fp-fdock][data-fp-fdock] { --gd-fp-room: calc(var(--fp-panel-width, 300px) + 10px); --gd-fp-edge: 10px; }
+/* A conversation opens beside the dock as a pane of its own, glass like the dock. The friends
+   window's ground for chats (.chatDialogs) goes; the glass lies under it, on a layer of its own. */
+#friends-panel-host#friends-panel-host[data-chat="1"] .chat_main_flex > .multiChatDialog {
+  border-radius: var(--gd-r-xl);
+  overflow: clip;
+  box-shadow: var(--gd-glass-shadow);
+}
+#friends-panel-host#friends-panel-host[data-chat="1"] .chat_main_flex > .multiChatDialog::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--gd-grain), var(--gd-glass-fill);
+  -webkit-backdrop-filter: blur(var(--gd-blur)) saturate(1.25);
+  backdrop-filter: blur(var(--gd-blur)) saturate(1.25);
+  border: var(--gd-glass-edge);
+  border-top-color: var(--gd-glass-lit);
+  border-left-color: var(--gd-glass-lit);
+  border-radius: inherit;
+}
+#friends-panel-host#friends-panel-host[data-chat="1"] .multiChatDialog .chatDialogs { background: none !important; }
+/* the chat's close and minimise buttons, the plugin's own: Steam's grey under the pointer */
+#friends-panel-host.fp-fdock .fp-fd-chat-back { border-radius: 8px !important; }
+#friends-panel-host.fp-fdock .fp-fd-chat-back:hover { background: var(--gd-hover) !important; }
+#friends-panel-host.fp-fdock .fp-fd-chat-back.closeButton:hover { background: #c4384a !important; }
+
 }   /* :where(:root:not(.MillenniumWindow_SteamBrowser)) */

@@ -2,6 +2,21 @@
 
 Versions follow [semantic versioning](https://semver.org). The repository starts at 1.2.0. The two earlier versions were built before it existed, and they are described from the development notes.
 
+## 2.0.5 — 2026-11-27
+
+**Plugins**
+- **Friends Panel**, the plugin that docks Steam's friends list beside the library, is a third pane of glass next to the game list: the same gaps, corners, fill and lit edge. The friends window's grey bars in its header and foot are gone, and its rail of avatars (the dock collapsed) fits the pane.
+- The dock's colours follow the window at once. The plugin copied the theme's colours into the dock every half minute, and copied the theme's defaults rather than the Colors tab, so the dock wore an earlier game's accent, or the default blue.
+- The store page no longer covers the dock, and with *Store: game list* on, the list beside the store moves out from under it. On a web page the dock no longer runs over the tabs and the foot bar.
+- The still hides the dock along with the rest of the client; the dock had stayed on top of the picture.
+- New switch *Friends list side* (Library tab): Right or Left. On the left, a chat opened on the STORE or COMMUNITY tab still appears on the dock's left side: the plugin places that window itself.
+
+**Store**
+- Store pages no longer appear in Steam's own style for a moment before the theme (#36). The store's styles waited for a mark the theme's script sets, and Millennium runs that script only once the whole page has been parsed. The stylesheet now recognises a store page by itself until the script has run, so the page is drawn in the theme from its first frame. A few details that belong to one kind of page (the front page's shelves, reviews, the points shop) still arrive with the script a moment later.
+
+**Friends**
+- Friends in *Quick access*, the row pinned above the list, show their status by colour again (#39): blue online, green in a game, grey offline, a little dimmer while away. The theme had given every name the same white.
+
 ## 2.0.4 — 2026-11-16
 
 **Plugins**

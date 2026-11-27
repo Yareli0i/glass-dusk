@@ -517,6 +517,13 @@ body.fullheight #popup_target.popup_chat_frame,
 .FriendStatusHover .playerName { color: #a3d060 !important; }
 .labelHolder.offline .playerName { color: var(--gd-ink-soft) !important; }
 .labelHolder.awayOrSnooze .playerName { opacity: .72; }
+/* Quick access, the friends pinned above the list: Steam colours a name by status through its tile,
+   and the rule that gives every name the ink took that away, so who was online could not be told
+   (#39). The tiles keep Steam's colours, softened as in the list. */
+.quickAccessFriend.online .playerName { color: #7cc7f2 !important; }
+.quickAccessFriend.ingame .playerName { color: #a3d060 !important; }
+.quickAccessFriend.offline .playerName { color: var(--gd-ink-soft) !important; }
+.quickAccessFriend:is(.away, .snooze, .awayOrSnooze) .playerName { opacity: .72; }
 .currentUserContainer .avatarHolder.online { box-shadow: 0 0 12px 1px rgba(124, 199, 242, .7); }
 .currentUserContainer .avatarHolder.ingame { box-shadow: 0 0 12px 1px rgba(163, 208, 96, .7); }
 /* the friends who play a game, from the icon beside it in the list: a square grey box */

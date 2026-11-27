@@ -180,6 +180,9 @@
   // element under it again, and a game page dropped from about 100 frames a second to 70-85
   // with long frames all the way. So on web pages the two sheets are switched off.
   if (/^https?:$/.test(location.protocol) && !/steamloopback/.test(location.host)) {
+    // css/webkit.css stands in for this script until it has run (#36); from here on, the store's
+    // look is decided below, in the same go, so no frame falls between.
+    root.classList.add('gd-seen');
     const CLIENT_ONLY = /\/css\/(shared|plugins)\.css(\?|$)/;
     const dropClientSheets = () => {
       for (const s of document.styleSheets) if (!s.disabled && CLIENT_ONLY.test(s.href || '')) s.disabled = true;
@@ -2267,6 +2270,55 @@
     if (mode === 'rail' && o) slRail(o);
   };
 
+  /* ═════════════ Friends Panel (a Millennium plugin) ═════════════ */
+
+  // The plugin docks Steam's friends list at the window's right side and places the dock from the
+  // library's box. A web page has none, and the dock kept the window's top and bottom, over the
+  // tabs and the footer. css/steam.css places it from the content frame, measured here: a few
+  // times a second at most, and only while there is a dock.
+  // Switch «Friends list side» (css/options/friends-left.css → --gd-fp-side): html.gd-fp-left.
+  let fpAt = 0, fpFrame = '';
+  const friendsPanel = () => {
+    const at = Date.now();
+    if (at - fpAt < 400 || !document.getElementById('friends-panel-host')) return;
+    fpAt = at;
+    const left = getComputedStyle(root).getPropertyValue('--gd-fp-side').trim() === 'left';
+    if (root.classList.contains('gd-fp-left') !== left) root.classList.toggle('gd-fp-left', left);
+    const frame = document.querySelector('.ContentFrame');
+    const b = frame && frame.getBoundingClientRect();
+    if (!b || !b.height) return;
+    const top = Math.round(b.top), bottom = Math.round(innerHeight - b.bottom);
+    if (top + ',' + bottom === fpFrame) return;
+    fpFrame = top + ',' + bottom;
+    root.style.setProperty('--gd-fp-top', top + 'px');
+    root.style.setProperty('--gd-fp-bottom', bottom + 'px');
+  };
+  // On the left the dock is widened by its right edge, and the plugin takes the width as the
+  // distance from the dock's right side to the pointer: it is handed the pointer mirrored across
+  // the dock, and the arrow keys on the grip swapped, so the edge follows the pointer.
+  const fpMirror = new WeakSet();
+  const fpGrip = e => root.classList.contains('gd-fp-left') && !fpMirror.has(e) && e.target && e.target.closest &&
+    e.target.closest('#friends-panel-host > .fp-panel-resizer');
+  addEventListener('pointermove', e => {
+    const grip = fpGrip(e);
+    if (!grip || !grip.parentElement.hasAttribute('data-resizing')) return;
+    e.stopImmediatePropagation();
+    const b = grip.parentElement.getBoundingClientRect();
+    const m = new PointerEvent('pointermove', { pointerId: e.pointerId, pointerType: e.pointerType, isPrimary: e.isPrimary,
+      clientX: b.right - e.clientX, clientY: e.clientY, buttons: e.buttons, bubbles: true, cancelable: true });
+    fpMirror.add(m);
+    grip.dispatchEvent(m);
+  }, true);
+  addEventListener('keydown', e => {
+    const grip = (e.key === 'ArrowLeft' || e.key === 'ArrowRight') && fpGrip(e);
+    if (!grip) return;
+    e.stopImmediatePropagation();
+    e.preventDefault();
+    const k = new KeyboardEvent('keydown', { key: e.key === 'ArrowLeft' ? 'ArrowRight' : 'ArrowLeft', bubbles: true, cancelable: true });
+    fpMirror.add(k);
+    grip.dispatchEvent(k);
+  }, true);
+
   /* ═════════════ a fix for Millennium's reclass ═════════════ */
 
   // Reclass gives Steam's hashed classes the readable names this theme is written against, and
@@ -2450,6 +2502,7 @@
     fixReclassAnimation();
     if (signIn()) return;
     try { storeList(); } catch (e) { /* the list beside the store is a bonus */ }
+    try { friendsPanel(); } catch (e) { /* the plugin keeps its own place */ }
     try { rememberGamesForSignIn(); } catch (e) { /* the sign-in screen falls back to dusk */ }
     rememberHeroesForSignIn().catch(() => { /* the sign-in screen falls back to dusk */ });
     const want = wantedArt();

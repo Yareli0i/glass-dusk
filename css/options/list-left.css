@@ -9,6 +9,13 @@ html .LibraryWindowDivider.Sizable::before { left: auto; right: -2px; }
 /* the game list beside the store, on the left too: the page to its right, and everything
    slides out and back on the left */
 html:root.gd-on-web .BrowserWrapper { margin-left: auto !important; }
+/* with the Friends Panel's dock out, the page lies between the list and the dock (css/steam.css) */
+html:root body[data-fp-fdock] { --gd-fp-page: var(--gd-fp-room); }
+/* and with the dock on the left as well: the dock, then the list, then the page */
+html:root.gd-fp-left body[data-fp-fdock] { --gd-fp-page: var(--gd-fp-dock); }
+html:root.gd-fp-left.gd-on-web body[data-fp-fdock] .BrowserWrapper { margin-left: auto !important; }
+html:root.gd-fp-left.gd-on-web.gd-sl-rail #gd-rail { right: auto; left: calc(10px + var(--gd-fp-dock, 0px)); }
+html:root.gd-fp-left.gd-on-web.gd-sl-rail.gd-sl-open #gd-rail-close { right: auto; left: calc(var(--gd-list-w, 320px) + 1px + var(--gd-fp-dock, 0px)); }
 html:root.gd-on-web.gd-sl-hover:not(.gd-sl-open) .LocalContentContainer .LeftListSizableContainer { transform: translateX(calc(-100% + 26px)); }
 html:root.gd-on-web.gd-sl-hover .LocalContentContainer::after { right: auto; left: 8px; }
 html:root.gd-on-web.gd-sl-rail:not(.gd-sl-open) .LocalContentContainer .LeftListSizableContainer { transform: translateX(calc(-100% - 24px)); }

@@ -4,7 +4,8 @@
    ║  Community and profile pages stay as Steam draws them: profiles carry      ║
    ║  their owners' own backgrounds and themes, and a half-restyled community   ║
    ║  read worse than an untouched one. Millennium loads this file into every   ║
-   ║  web page; its rules wait for html.gd-store, set by js/dusk.js.            ║
+   ║  web page; its rules wait for html.gd-store, set by js/dusk.js, and until  ║
+   ║  the script has run, for the store's own page markers (#36).              ║
    ║                                                                           ║
    ║  Deliberately small. Steam's store pages are a fixed-height, absolutely     ║
    ║  positioned layout in a font it measures itself: boxing their blocks or     ║
@@ -25,8 +26,15 @@
   --gd-r-md: 12px;
 }
 
-/* store.steampowered.com only (js/dusk.js adds the class); :where() adds no specificity */
-:where(html.gd-store) {
+/* store.steampowered.com only. js/dusk.js adds the class, but Millennium runs it only once the
+   page has been parsed, and until then the store was drawn in Steam's own style (#36). Until the
+   script has run (html.gd-seen), the store's own markers stand in for it: the body of a classic
+   store page (.widestore, though not the sale-style landing pages nor About Steam, which stay
+   Steam's) and the frame of the newer ones (#StoreTemplate, the wishlist). Once it has run, the
+   script alone decides. :where() adds no specificity. */
+:where(html.gd-store,
+       html:not(.gd-seen):has(> body.widestore:not(.sale_page_background, .promoannounce)),
+       html:not(.gd-seen):has(> body > #StoreTemplate)) {
 
 /* ═══════════════ the ground ═══════════════ */
 

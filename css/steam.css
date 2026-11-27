@@ -1484,7 +1484,7 @@ body.DesktopUI,
 html.gd-on-web .LocalContentContainer {
   display: flex !important;
   position: absolute !important;
-  inset: 0 !important;
+  inset: 0 var(--gd-fp-dock, 0px) 0 0 !important;   /* clear of the Friends Panel's dock while it is out */
   z-index: 2;
   /* clip, not hidden: a hidden box can still be scrolled, and Steam, bringing the selected game
      into view, scrolled it sideways towards the list waiting past the edge — all of it slid over */
@@ -1506,10 +1506,10 @@ html.gd-on-web .LocalContentContainer .LeftListSizableContainer > .Container > *
 /* the page beside it: narrows at once, widens as the list goes (it covers the rest of the way) */
 html.gd-on-web .BrowserWrapper { transition: width 0s .08s; }
 html.gd-on-web.gd-sl-open .BrowserWrapper { transition: width 0s 0s; }
-html.gd-on-web:is(.gd-sl-pinned, .gd-sl-hover.gd-sl-open) .BrowserWrapper { width: calc(100% - var(--gd-list-w, 320px)) !important; }
-html.gd-on-web.gd-sl-hover:not(.gd-sl-open) .BrowserWrapper { width: calc(100% - 26px) !important; }
-html.gd-on-web.gd-sl-rail:not(.gd-sl-open) .BrowserWrapper { width: calc(100% - 96px) !important; }
-html.gd-on-web.gd-sl-rail.gd-sl-open .BrowserWrapper { width: calc(100% - var(--gd-list-w, 320px) - 42px) !important; }
+html.gd-on-web:is(.gd-sl-pinned, .gd-sl-hover.gd-sl-open) .BrowserWrapper { width: calc(100% - var(--gd-list-w, 320px) - var(--gd-fp-page, 0px)) !important; }
+html.gd-on-web.gd-sl-hover:not(.gd-sl-open) .BrowserWrapper { width: calc(100% - 26px - var(--gd-fp-page, 0px)) !important; }
+html.gd-on-web.gd-sl-rail:not(.gd-sl-open) .BrowserWrapper { width: calc(100% - 96px - var(--gd-fp-page, 0px)) !important; }
+html.gd-on-web.gd-sl-rail.gd-sl-open .BrowserWrapper { width: calc(100% - var(--gd-list-w, 320px) - 42px - var(--gd-fp-page, 0px)) !important; }
 
 /* On hover, while the list is in: only its glass edge shows at the window's side */
 html.gd-on-web.gd-sl-hover:not(.gd-sl-open) .LocalContentContainer .LeftListSizableContainer { transform: translateX(calc(100% - 26px)); }
@@ -1540,7 +1540,7 @@ html.gd-on-web.gd-sl-rail #gd-rail {
   gap: 10px;
   position: absolute;
   top: 4px;
-  right: 10px;
+  right: calc(10px + var(--gd-fp-dock, 0px));
   bottom: 16px;
   width: 76px;
   padding: 10px 0;
@@ -1626,13 +1626,105 @@ html.gd-on-web.gd-sl-rail.gd-sl-open #gd-rail-close {
 html.gd-on-web.gd-sl-rail.gd-sl-open #gd-rail-close {
   position: absolute;
   top: 10px;
-  right: calc(var(--gd-list-w, 320px) + 1px);
+  right: calc(var(--gd-list-w, 320px) + 1px + var(--gd-fp-dock, 0px));
   width: 34px;
   height: 34px;
   z-index: 3;
   animation: gd-rail-close-in .26s ease both;
 }
 @keyframes gd-rail-close-in { from { opacity: 0; transform: translateX(12px); } }
+
+/* ═══════════════ Friends Panel (a Millennium plugin) ═══════════════
+   The plugin docks Steam's own friends list at the window's right side (#friends-panel-host) and
+   marks <body>: data-fp-fdock while the dock is out, open or as a rail of avatars, with its width
+   in --fp-panel-width. It makes room for itself by padding the library. A web page in the main
+   window (store, community) is a separate view that takes its bounds from .BrowserWrapper and
+   covered the dock: the page narrows here, and the game list beside it (switch «Store: game list»)
+   moves in from under the dock with it.
+   --gd-fp-dock is the dock's width, which the game list and the rail keep clear of (they keep
+   their own gap); --gd-fp-room, what a page right beside the dock gives up (css/plugins.css adds
+   the gap between panes); --gd-fp-page, what the page gives up beside the game list: the dock's
+   width while the list stands between them, the room when the list is on the left
+   (css/options/list-left.css). */
+body[data-fp-fdock] {
+  --gd-fp-dock: var(--fp-panel-width, 300px);
+  --gd-fp-room: var(--gd-fp-dock);
+  --gd-fp-page: var(--gd-fp-dock);
+}
+body[data-fp-fdock] .BrowserWrapper {
+  width: calc(100% - var(--gd-fp-room)) !important;
+  margin-right: var(--gd-fp-room) !important;
+}
+/* The plugin places the dock from the library's box. A web page has none, and the dock kept the
+   window's top and bottom, over the tabs and the footer: it follows the content frame
+   (js/dusk.js measures it into --gd-fp-top and --gd-fp-bottom). */
+#friends-panel-host.fp-fdock {
+  top: var(--gd-fp-top, 78px) !important;
+  bottom: var(--gd-fp-bottom, 51px) !important;
+}
+/* The plugin copies the theme's colours into the dock now and then (every half minute once it
+   has settled), and its copy of css/root.css holds the file's defaults, not the Colors tab: the
+   dock wore an earlier game's colour, or the default blue, while the window had moved on. Every
+   colour of the theme comes from the window itself. */
+#friends-panel-host :is(.fp-theme-html, .fp-theme-body) {
+  --gd-accent: inherit !important;
+  --gd-accent-ink: inherit !important;
+  --gd-accent-2: inherit !important;
+  --gd-accent-fill: inherit !important;
+  --gd-house: inherit !important;
+  --gd-ink: inherit !important;
+  --gd-ink-soft: inherit !important;
+  --gd-ink-faint: inherit !important;
+  --gd-glass: inherit !important;
+  --gd-card: inherit !important;
+  --gd-night: inherit !important;
+  --gd-pane: inherit !important;
+  --gd-soft: inherit !important;
+  --gd-hover: inherit !important;
+  --gd-field: inherit !important;
+  --gd-line: inherit !important;
+}
+/* «Friends list side → Left» (css/options/friends-left.css; js/dusk.js marks html.gd-fp-left and
+   mirrors the dock's resizing, which the plugin measures from the dock's right side). The plugin
+   keeps the right side in everything it places itself; here the dock, the room the library and
+   the page make for it, its grip and its button, and the conversation beside it change sides.
+   --gd-fp-edge is the dock's gap from the window's side (css/plugins.css). */
+html.gd-fp-left #friends-panel-host.fp-fdock { left: var(--gd-fp-edge, 0px) !important; right: auto !important; }
+html.gd-fp-left [data-fp-library] {
+  padding-inline-end: 0 !important;
+  padding-inline-start: var(--fp-panel-width, 300px) !important;
+}
+html.gd-fp-left #friends-panel-host > .fp-panel-resizer { left: auto; right: -3px; }
+html.gd-fp-left #friends-panel-host .fp-collapse-toggle::before { transform: scaleX(-1); }
+/* the page lies between the dock and the game list beside it (css/options/list-left.css for the
+   list on the left too) */
+html.gd-fp-left body[data-fp-fdock] { --gd-fp-page: var(--gd-fp-room); }
+html.gd-fp-left body[data-fp-fdock] .BrowserWrapper { margin-left: var(--gd-fp-room) !important; margin-right: 0 !important; }
+html.gd-fp-left.gd-on-web .LocalContentContainer { inset: 0 0 0 var(--gd-fp-dock, 0px) !important; }
+html.gd-fp-left.gd-on-web.gd-sl-rail #gd-rail { right: 10px; }
+html.gd-fp-left.gd-on-web.gd-sl-rail.gd-sl-open #gd-rail-close { right: calc(var(--gd-list-w, 320px) + 1px); }
+/* a conversation opens to the dock's right; its two buttons stay at its top right corner */
+html.gd-fp-left #friends-panel-host.fp-fdock[data-chat="1"] .fp-fd-steam .chat_main .chat_main_flex > .multiChatDialog {
+  inset: auto auto var(--fp-chat-bottom) var(--fp-chat-right) !important;
+}
+html.gd-fp-left #friends-panel-host.fp-fdock .fp-fd-chat-back {
+  right: auto;
+  left: calc(var(--fp-chat-right) + min(var(--fp-chat-width), calc(100vw - var(--fp-chat-right) - var(--fp-chat-edge))) - 40px);
+}
+html.gd-fp-left #friends-panel-host.fp-fdock .fp-fd-chat-minimize {
+  left: calc(var(--fp-chat-right) + min(var(--fp-chat-width), calc(100vw - var(--fp-chat-right) - var(--fp-chat-edge))) - 78px);
+}
+html.gd-fp-left #friends-panel-host .fp-fd-chat-chip { right: auto; left: var(--fp-chat-right); }
+/* the group chats the rail opens: beside the rail, on its right */
+html.gd-fp-left #friends-panel-host .fp-rail-search-popover { left: calc(var(--fp-panel-width, 72px) + 8px) !important; right: auto !important; }
+
+/* the still covers the whole client, and the dock lies above everything Steam draws */
+html.gd-still #friends-panel-host.fp-fdock {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 1.6s ease, visibility 0s linear 1.6s !important;
+}
 
 /* ═══════════════ Millennium's settings ═══════════════
    Millennium shows its settings in the main window (/millennium/settings) and builds them from

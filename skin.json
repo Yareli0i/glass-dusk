@@ -2,7 +2,7 @@
   "name": "Glass Dusk",
   "description": "Smoked glass over the art of the game you have open: the client takes its accent colour from that art. Styles the library, store, menus, Big Picture and the in-game overlay.",
   "author": "Yareli",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "tags": [
     "Dark",
     "Glass",
@@ -569,6 +569,22 @@
               "^Steam$"
             ],
             "src": "css/options/list-left.css"
+          }
+        }
+      }
+    },
+    "Friends list side": {
+      "description": "Where the Friends Panel plugin docks your friends list, if you use it.",
+      "tab": "Library",
+      "default": "Right",
+      "values": {
+        "Right": {},
+        "Left": {
+          "TargetCss": {
+            "affects": [
+              "^Steam$"
+            ],
+            "src": "css/options/friends-left.css"
           }
         }
       }

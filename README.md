@@ -14,7 +14,7 @@ A [Millennium](https://steambrew.app) theme for the Steam desktop client. Smoked
 - **Menus, settings and notifications.** All wear the same colour as the main window.
 - **Friends and chat.** Status keeps Steam's colours and becomes a ring round each avatar; friends in a game glow green; groups, conversations, channels and the field you type in are glass and accent.
 - **Sign-in.** The account chooser (*Who's playing?*) and the signing-in screen after it sit on the art of the game you played last, on the covers of your own games drifting past, or on a slideshow of your games' art, with the chooser on a card of glass. Steam shows them only when it is set to ask which account to use.
-- **Plugins.** Millennium plugins with an interface of their own take the theme's colours: HLTB for Steam, Achievement Groups, Player Count, Extendium, Command Palette. Size on Disk, Non-Steam Playtimes and Easy SteamGrid match as they are. Browser extensions added through Extendium (SteamDB, Augmented Steam) put their blocks on store pages in the same cards as Steam's own.
+- **Plugins.** Millennium plugins with an interface of their own take the theme's colours: HLTB for Steam, Achievement Groups, Player Count, Extendium, Command Palette, Friends Panel. Size on Disk, Non-Steam Playtimes and Easy SteamGrid match as they are. Browser extensions added through Extendium (SteamDB, Augmented Steam) put their blocks on store pages in the same cards as Steam's own.
 - **Community and profiles** stay as Steam draws them. Profiles carry their owners' own backgrounds and themes, and a half-restyled community reads worse than an untouched one.
 - **Big Picture.** The focused game's art fills the home, sharp, with the carousel at its foot, and lends its two colours to tabs, buttons and the ring round whatever the controller is on. Under the carousel stand the game's numbers: time played, last played, achievements. The art lies further back under every other screen; a game's page, the library, the settings, the Steam menu and the Quick Access menu are smoked glass over it.
 - **In-game overlay (Shift+Tab).** A light veil replaces Steam's near-black sheet, so the game stays visible. *Game Overview* and the toolbar become smoked glass in the running game's colour.
@@ -58,6 +58,7 @@ Millennium → Themes → Glass Dusk → ⋯ → Settings. Changes apply after S
 | What's New shelf | on · **off** | Steam's What's New shelf on the home page. |
 | Add shelf button | **on** · off | Steam's *Add shelf* row on the home page. |
 | Game list side | **Right** · Left | Where the game list sits. |
+| Friends list side | **Right** · Left | Where the Friends Panel plugin docks your friends list, if you use it. |
 | Store: game list | **Off** · Pinned · On hover · Rail | Your game list beside the store and other web pages of the client: pinned there, coming out when you point at the window's edge, or a rail of your last games' covers with a button that opens the list. It is Steam's own list, with its collections, search and filters. |
 | Game page: collection tags | **on** · off | The collections a game is in, at the top right of its art, as Steam shows them. A click opens the collection. |
 | Big Picture | **Cover** · Steam | Whole-screen art of the focused game, or Big Picture untouched. |
@@ -74,7 +75,7 @@ The **Colors** tab has six colours: accent, text, secondary text, glass tint, pl
 - **From steambrew.app:** open [Glass Dusk in the theme catalogue](https://steambrew.app/theme/0hs3xMU5Eb85uvIALzkq), press *Copy Theme ID* and paste it into Millennium → Themes → Install.
 - **By hand:** download this repository and put the folder into `Steam/millennium/themes/`, then pick it in Millennium → Themes.
 
-Tested on Windows 11 with Steam client 1794424036 and Millennium 3.6.2, and on Ubuntu 24.04 with the fix below.
+Tested on Windows 11 with Steam client 1794536281 and Millennium 3.6.3, and on Ubuntu 24.04 with the fix below.
 
 ### Linux
 
